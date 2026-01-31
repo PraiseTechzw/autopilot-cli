@@ -1,6 +1,6 @@
 {
   "name": "@traisetech/autopilot",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "publishConfig": {
     "access": "public"
   },
@@ -34,7 +34,7 @@
     "dev": "node bin/autopilot.js",
     "test": "node --test",
     "lint": "node -c bin/autopilot.js && node -c src/index.js",
-    "verify": "npm run test && npm run lint && node bin/autopilot.js --help",
+    "verify": "node bin/autopilot.js --help && npm run test && node bin/autopilot.js doctor",
     "prepublishOnly": "npm run verify",
     "release:patch": "npm run verify && npm version patch && git push --follow-tags && echo \"\n🚀 Ready to publish! Run: npm publish --access public\""
   },

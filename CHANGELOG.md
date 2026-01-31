@@ -25,11 +25,16 @@ This project follows Semantic Versioning (https://semver.org).
 ## [0.1.4] – 2026-02-01
 
 ### Fixed
+- **Windows Compatibility**: Fixed critical issue where absolute paths on Windows caused ignore rules to fail.
+- **Watcher Noise**: Fixed infinite commit loops caused by `.vscode/time-analytics.json` and self-logging.
 - Fixed a critical CLI crash where `autopilot start` failed due to miswired Commander action handlers.
 - Improved command registration to ensure all CLI commands are correctly bound and validated at runtime.
 - Prevented undefined command handlers from causing runtime exceptions.
 
 ### Added
+- **Release Gates**: Added `npm run verify` and `prepublishOnly` hooks to prevent broken releases.
+- **Integration Tests**: Added full end-to-end test suite using `node:test`.
+- **Smart Init**: `autopilot init` now automatically adds `autopilot.log` to `.gitignore`.
 - Pre-publish verification pipeline to block publishing broken builds.
 - CLI smoke tests to ensure core commands (`init`, `start`, `status`, `doctor`) do not crash.
 - Test-only dry-run mode for watcher to allow safe automated testing.
