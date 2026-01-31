@@ -22,6 +22,8 @@ const DEFAULT_IGNORE_PATTERNS = [
   '.env.*',
   'coverage/',
   '*.log',
+  'autopilot.log',
+  '.autopilot.pid',
   '.DS_Store',
   '.git/',
   '.idea/',

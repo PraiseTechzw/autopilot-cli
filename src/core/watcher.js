@@ -6,13 +6,12 @@
 const fs = require('fs-extra');
 const path = require('path');
 const chokidar = require('chokidar');
-const { execa } = require('execa');
 const logger = require('../utils/logger');
 const git = require('./git');
 const { generateCommitMessage } = require('./commit');
-const { getIgnorePath } = require('../utils/paths');
 const { savePid, removePid, registerProcessHandlers } = require('../utils/process');
 const { loadConfig } = require('../config/loader');
+const { readIgnoreFile, createIgnoredFilter, normalizePath } = require('../config/ignore');
 
 class Watcher {
   constructor(repoPath) {
@@ -25,6 +24,23 @@ class Watcher {
     this.lastCommitAt = 0;
     this.logFilePath = path.join(repoPath, 'autopilot.log');
     this.ignorePatterns = [];
+  }
+
+  logVerbose(message) {
+    // Helper to log debug messages to file/stdout if needed
+    // For now, we use logger.debug which writes to stdout if DEBUG is set
+    // We also want to ensure we don't create a loop by logging to the file we watch
+    // But since we ignore autopilot.log, it should be fine.
+    logger.debug(message);
+    // TODO: Append to log file if configured
+  }
+
+  async reloadConfig() {
+    this.config = await loadConfig(this.repoPath);
+  }
+
+  async reloadIgnore() {
+    this.ignorePatterns = await readIgnoreFile(this.repoPath);
   }
 
   /**
@@ -41,7 +57,7 @@ class Watcher {
       await fs.ensureFile(this.logFilePath);
       await savePid(this.repoPath);
       
-      this.logVerbose('Starting Autopilot watcher...');
+      logger.info('Starting Autopilot watcher...');
       
       // Load configuration
       await this.reloadConfig();
@@ -51,23 +67,16 @@ class Watcher {
       const currentBranch = await git.getBranch(this.repoPath);
       if (currentBranch && this.config.blockedBranches?.includes(currentBranch)) {
         logger.error(`Branch '${currentBranch}' is blocked in config. Stopping.`);
-        this.logVerbose(`Blocked branch detected: ${currentBranch}`);
         await this.stop();
         return;
       }
 
-      // Combine defaults + loaded patterns
-      const finalIgnored = [
-        ...this.ignorePatterns,
-        /(^|[\/\\])\.git([\/\\]|$)/, // Regex for .git folder
-        '**/autopilot.log',
-        '**/.autopilot.pid',
-        'node_modules' // Sensible default
-      ];
+      // Create robust ignore filter
+      const ignoredFilter = createIgnoredFilter(this.repoPath, this.ignorePatterns);
 
-      // Start Chokidar
+      // Start Chokidar with function-based ignore
       this.watcher = chokidar.watch(this.repoPath, {
-        ignored: finalIgnored,
+        ignored: ignoredFilter,
         ignoreInitial: true,
         persistent: true,
         awaitWriteFinish: {
@@ -93,17 +102,16 @@ class Watcher {
       
       // Test Mode Support
       if (process.env.AUTOPILOT_TEST_MODE) {
-        logger.warn('TEST MODE: Running in dry-run mode for 3 seconds...');
+        logger.warn('TEST MODE: Running in dry-run mode for 8 seconds...');
         setTimeout(async () => {
           logger.info('TEST MODE: Auto-stopping watcher...');
           await this.stop();
           process.exit(0);
-        }, 3000);
+        }, 8000);
       }
       
     } catch (error) {
       logger.error(`Failed to start watcher: ${error.message}`);
-      this.logVerbose(`Start error: ${error.stack}`);
       await this.stop();
     }
   }
@@ -137,10 +145,15 @@ class Watcher {
   onFsEvent(type, filePath) {
     if (this.isProcessing) return;
     
-    // Double check ignore (safety net)
-    if (filePath.includes('.git') || filePath.endsWith('autopilot.log')) return;
+    // Normalize path relative to repo for logging and checks
+    const relativePath = normalizePath(path.relative(this.repoPath, filePath));
+    
+    // Double check ignore (safety net) - although chokidar should catch most
+    if (relativePath.includes('.git/') || relativePath.endsWith('autopilot.log') || relativePath.includes('.vscode/')) {
+        return;
+    }
 
-    this.logVerbose(`File event: ${type} ${filePath}`);
+    this.logVerbose(`File event: ${type} ${relativePath}`);
     this.scheduleProcess();
   }
 
@@ -154,9 +167,20 @@ class Watcher {
       clearTimeout(this.debounceTimer);
     }
 
+    logger.debug('Debounce fired. Waiting...');
+    
     this.debounceTimer = setTimeout(() => {
       this.processChanges();
     }, debounceMs);
+  }
+
+  handleError(error) {
+    logger.error(`Watcher error: ${error.message}`);
+  }
+
+  async runChecks() {
+    // Placeholder for custom checks
+    return true;
   }
 
   /**
@@ -167,152 +191,83 @@ class Watcher {
     this.isProcessing = true;
 
     try {
+      logger.debug('Checking git status...');
+
       // 1. Min interval check
       const now = Date.now();
-      const minInterval = (this.config?.minIntervalSeconds || 30) * 1000;
-      if (now - this.lastCommitAt < minInterval) {
-        this.logVerbose('Skipping: Minimum interval not met');
+      const minInterval = (this.config?.minSecondsBetweenCommits || 180) * 1000;
+      if (this.lastCommitAt > 0 && now - this.lastCommitAt < minInterval) {
+        logger.debug(`Skip commit: Minimum interval not met (${Math.round((minInterval - (now - this.lastCommitAt))/1000)}s remaining)`);
         return;
       }
 
-      // 2. Safety: Branch check
+      // 2. Check if dirty
+      const statusObj = await git.getPorcelainStatus(this.repoPath);
+      const isDirty = statusObj.ok && statusObj.files.length > 0;
+      logger.debug(`Git dirty: ${isDirty}`);
+
+      if (!isDirty) {
+        return;
+      }
+
+      // 3. Safety: Branch check
       const branch = await git.getBranch(this.repoPath);
       if (this.config?.blockedBranches?.includes(branch)) {
-        logger.warn(`Current branch '${branch}' is blocked. Skipping.`);
+        logger.warn(`Skip commit: Branch '${branch}' is blocked`);
         return;
       }
 
-      // 3. Safety: Remote check (fetch -> behind?)
-      this.logVerbose('Checking remote status...');
-      const remoteStatus = await git.isRemoteAhead(this.repoPath);
-      if (remoteStatus.behind) {
-        logger.warn('Local branch is behind remote. Please pull changes.');
-        this.logVerbose('Behind remote. Pausing auto-commit.');
-        return;
+      // 4. Safety: Remote check (fetch -> behind?)
+      logger.debug('Checking remote status...');
+      // Note: isRemoteAhead might need network, timeout safely?
+      try {
+          const remoteStatus = await git.isRemoteAhead(this.repoPath);
+          if (remoteStatus.behind) {
+            logger.warn('Skip commit: Local branch is behind remote. Please pull changes.');
+            return;
+          }
+      } catch (e) {
+          logger.debug(`Remote check failed (offline?): ${e.message}`);
       }
 
-      // 4. Safety: Custom checks
+      // 5. Safety: Custom checks
       if (this.config?.requireChecks) {
         const checksPassed = await this.runChecks();
         if (!checksPassed) {
-          logger.warn('Checks failed. Skipping commit.');
+          logger.warn('Skip commit: Checks failed');
           return;
         }
       }
 
-      // 5. Flow: Status -> Add -> Commit -> Push
-      const status = await git.getPorcelainStatus(this.repoPath);
-      if (!status.ok || status.files.length === 0) {
-        this.logVerbose('No changes to commit');
-        return;
-      }
-
-      this.logVerbose(`Detecting ${status.files.length} changed files`);
+      // 6. Commit
+      logger.info('Committing changes...');
       
-      // Add all
+      // Add all changes
       await git.addAll(this.repoPath);
       
       // Generate message
-      const message = generateCommitMessage(status.files);
-      this.logVerbose(`Generated message: ${message}`);
-      
-      // Commit
-      const commitResult = await git.commit(this.repoPath, message);
-      if (commitResult.ok) {
-        logger.success(`Committed: ${message}`);
-        this.lastCommitAt = Date.now();
+      const changedFiles = statusObj.files;
+      const message = this.config?.commitMessageMode === 'simple' 
+        ? 'chore: auto-commit changes'
+        : generateCommitMessage(changedFiles);
 
-        // Push if enabled
-        if (this.config?.autoPush) {
-          logger.info('Pushing to remote...');
-          const pushResult = await git.push(this.repoPath, branch);
-          if (pushResult.ok) {
-            logger.success('Pushed successfully');
-          } else {
-            logger.error(`Push failed: ${pushResult.stderr}`);
-            this.logVerbose(`Push error: ${pushResult.stderr}`);
-          }
-        }
-      } else {
-        logger.error(`Commit failed: ${commitResult.stderr}`);
-        this.logVerbose(`Commit error: ${commitResult.stderr}`);
+      await git.commit(this.repoPath, message);
+      this.lastCommitAt = Date.now();
+      logger.success('Commit done');
+
+      // 7. Auto-push
+      if (this.config?.autoPush) {
+        logger.info('Pushing to remote...');
+        await git.push(this.repoPath);
+        logger.success('Push complete');
       }
 
     } catch (error) {
       logger.error(`Process error: ${error.message}`);
-      this.logVerbose(`Process exception: ${error.stack}`);
     } finally {
       this.isProcessing = false;
       this.debounceTimer = null;
     }
-  }
-
-  /**
-   * Run user-defined checks
-   */
-  async runChecks() {
-    const checks = this.config?.checks || [];
-    if (checks.length === 0) return true;
-
-    this.logVerbose(`Running checks: ${checks.join(', ')}`);
-
-    for (const cmd of checks) {
-      try {
-        logger.info(`Running check: ${cmd}`);
-        await execa(cmd, { cwd: this.repoPath, shell: true });
-      } catch (error) {
-        logger.error(`Check failed: ${cmd}`);
-        this.logVerbose(`Check output: ${error.message}`);
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Reload configuration
-   */
-  async reloadConfig() {
-    this.config = await loadConfig(this.repoPath);
-    this.logVerbose('Config reloaded');
-  }
-
-  /**
-   * Reload ignore patterns
-   */
-  async reloadIgnore() {
-    const ignorePath = getIgnorePath(this.repoPath);
-    this.ignorePatterns = []; 
-    
-    if (await fs.pathExists(ignorePath)) {
-      try {
-        const content = await fs.readFile(ignorePath, 'utf-8');
-        const lines = content.split('\n')
-          .map(l => l.trim())
-          .filter(l => l && !l.startsWith('#'));
-        
-        this.ignorePatterns.push(...lines);
-        this.logVerbose(`Loaded ${lines.length} ignore patterns`);
-      } catch (error) {
-        logger.warn(`Failed to load ignore file: ${error.message}`);
-      }
-    }
-    
-    // Also load ignore patterns from config json if they exist
-    if (this.config?.ignore && Array.isArray(this.config.ignore)) {
-       this.ignorePatterns.push(...this.config.ignore);
-    }
-  }
-
-  handleError(error) {
-    logger.error(`Watcher error: ${error.message}`);
-    this.logVerbose(`Watcher error: ${error.stack}`);
-  }
-
-  logVerbose(message) {
-    const timestamp = new Date().toISOString();
-    const logLine = `[${timestamp}] ${message}\n`;
-    fs.appendFile(this.logFilePath, logLine).catch(() => {});
   }
 }
 

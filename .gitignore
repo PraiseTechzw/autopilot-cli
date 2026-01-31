@@ -43,3 +43,5 @@ config/local.js
 .autopilot/
 dist/
 build/
+autopilot.log
+.autopilot.pid

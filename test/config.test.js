@@ -1,49 +1,32 @@
-const { test, describe, it } = require('node:test');
 const assert = require('node:assert');
-const path = require('path');
-const fs = require('fs-extra');
-const os = require('os');
+const test = require('node:test');
+const path = require('node:path');
 const { loadConfig } = require('../src/config/loader');
 const { DEFAULT_CONFIG } = require('../src/config/defaults');
+const fs = require('fs-extra');
 
-describe('Config Loader', () => {
-  let tmpDir;
-
-  it('should load default config when no config file exists', async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-test-config-'));
-    // Ensure we are in a clean directory
-    const originalCwd = process.cwd();
-    process.chdir(tmpDir);
-
-    try {
-      const config = await loadConfig(tmpDir);
-      assert.deepStrictEqual(config, DEFAULT_CONFIG);
-    } finally {
-      process.chdir(originalCwd);
-      await fs.remove(tmpDir);
-    }
+test('Config Loader', async (t) => {
+  const tmpDir = await fs.mkdtemp(path.join(require('os').tmpdir(), 'autopilot-config-test-'));
+  
+  t.after(async () => {
+    await fs.remove(tmpDir);
   });
 
-  it('should merge user config with defaults', async () => {
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-test-config-merge-'));
-    const originalCwd = process.cwd();
-    process.chdir(tmpDir);
+  await t.test('should load default config when no file exists', async () => {
+    const config = await loadConfig(tmpDir);
+    assert.deepStrictEqual(config, DEFAULT_CONFIG);
+  });
 
+  await t.test('should merge user config with defaults', async () => {
     const userConfig = {
-      autoPush: false,
-      commitPrefix: 'custom:'
+      debounceSeconds: 10,
+      blockBranches: ['production']
     };
-
     await fs.writeJson(path.join(tmpDir, '.autopilotrc.json'), userConfig);
-
-    try {
-      const config = await loadConfig(tmpDir);
-      assert.strictEqual(config.autoPush, false);
-      assert.strictEqual(config.commitPrefix, 'custom:');
-      assert.strictEqual(config.pushIntervalMinutes, DEFAULT_CONFIG.pushIntervalMinutes); // Preserves defaults
-    } finally {
-      process.chdir(originalCwd);
-      await fs.remove(tmpDir);
-    }
+    
+    const config = await loadConfig(tmpDir);
+    assert.strictEqual(config.debounceSeconds, 10);
+    assert.strictEqual(config.minSecondsBetweenCommits, DEFAULT_CONFIG.minSecondsBetweenCommits);
+    assert.deepStrictEqual(config.blockBranches, ['production']);
   });
 });

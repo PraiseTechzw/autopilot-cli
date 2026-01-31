@@ -1,7 +1,7 @@
 {
-  "debounceSeconds": 20,
-  "minSecondsBetweenCommits": 180,
-  "autoPush": true,
+  "debounceSeconds": 2,
+  "minSecondsBetweenCommits": 0,
+  "autoPush": false,
   "blockBranches": [
     "main",
     "master"

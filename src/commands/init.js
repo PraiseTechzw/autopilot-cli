@@ -4,6 +4,7 @@
  */
 
 const fs = require('fs-extra');
+const path = require('path');
 const logger = require('../utils/logger');
 const { getConfigPath, getIgnorePath, getGitPath } = require('../utils/paths');
 const { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS } = require('../config/defaults');
@@ -55,6 +56,41 @@ async function createConfigFile(repoPath) {
 }
 
 /**
+ * Update .gitignore with Autopilot specific files
+ * @param {string} repoPath 
+ */
+async function updateGitIgnore(repoPath) {
+  const gitIgnorePath = path.join(repoPath, '.gitignore');
+  const toIgnore = ['autopilot.log', '.autopilot.pid'];
+  let content = '';
+  
+  try {
+    if (await fs.pathExists(gitIgnorePath)) {
+      content = await fs.readFile(gitIgnorePath, 'utf-8');
+    }
+    
+    const lines = content.split('\n').map(l => l.trim());
+    const newLines = [];
+    let added = false;
+
+    for (const item of toIgnore) {
+      if (!lines.includes(item)) {
+        newLines.push(item);
+        added = true;
+      }
+    }
+
+    if (added) {
+      const newContent = content + (content && !content.endsWith('\n') ? '\n' : '') + newLines.join('\n') + '\n';
+      await fs.writeFile(gitIgnorePath, newContent);
+      logger.success('Updated .gitignore');
+    }
+  } catch (error) {
+    logger.warn(`Could not update .gitignore: ${error.message}`);
+  }
+}
+
+/**
  * Initialize Autopilot in current repository
  */
 async function initRepo() {
@@ -76,6 +112,7 @@ async function initRepo() {
     // Create files
     await createIgnoreFile(repoPath);
     await createConfigFile(repoPath);
+    await updateGitIgnore(repoPath);
 
     logger.section('✨ Initialization Complete');
     logger.info('Next steps:');

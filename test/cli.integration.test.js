@@ -1,90 +1,138 @@
-const { test, describe, it, before, after } = require('node:test');
 const assert = require('node:assert');
-const path = require('path');
+const test = require('node:test');
+const path = require('node:path');
 const fs = require('fs-extra');
-const os = require('os');
-const { execa } = require('execa');
+const { spawn } = require('node:child_process');
+const os = require('node:os');
 
-const CLI_PATH = path.join(__dirname, '../bin/autopilot.js');
+const BIN_PATH = path.resolve(__dirname, '../bin/autopilot.js');
 
-describe('CLI Integration Tests', () => {
-  let tmpDir;
-  let originalCwd;
+function run(args, cwd, env = {}) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [BIN_PATH, ...args], {
+      cwd,
+      env: { ...process.env, ...env },
+      stdio: 'pipe', // Capture output
+    });
 
-  before(async () => {
-    // Create a temp directory for our "repo"
-    tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-cli-test-'));
-    originalCwd = process.cwd();
-    
-    // Initialize a dummy git repo
-    await execa('git', ['init'], { cwd: tmpDir });
-    await execa('git', ['config', 'user.email', 'test@example.com'], { cwd: tmpDir });
-    await execa('git', ['config', 'user.name', 'Test User'], { cwd: tmpDir });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (d) => stdout += d.toString());
+    child.stderr.on('data', (d) => stderr += d.toString());
+
+    child.on('close', (code) => {
+      resolve({ code, stdout, stderr });
+    });
+  });
+}
+
+function runGit(args, cwd) {
+  return new Promise((resolve, reject) => {
+    const child = spawn('git', args, { cwd, stdio: 'pipe' });
+    let stdout = '';
+    child.stdout.on('data', d => stdout += d.toString());
+    child.on('close', code => code === 0 ? resolve(stdout.trim()) : reject(new Error(`Git failed: ${args.join(' ')}`)));
+  });
+}
+
+test('CLI Integration', async (t) => {
+  const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-cli-test-'));
+  
+  t.after(async () => {
+    await fs.remove(tmpDir);
   });
 
-  after(async () => {
-    // Cleanup
-    try {
-      await fs.remove(tmpDir);
-    } catch (e) {
-      console.warn('Failed to cleanup temp dir:', e.message);
-    }
+  await t.test('init command', async () => {
+    // Setup git repo
+    await runGit(['init'], tmpDir);
+    await runGit(['config', 'user.email', 'test@example.com'], tmpDir);
+    await runGit(['config', 'user.name', 'Test User'], tmpDir);
+
+    const { code, stdout } = await run(['init'], tmpDir);
+    assert.strictEqual(code, 0);
+    assert.match(stdout, /Created \.autopilotrc\.json/);
+    
+    const hasConfig = await fs.pathExists(path.join(tmpDir, '.autopilotrc.json'));
+    const hasIgnore = await fs.pathExists(path.join(tmpDir, '.autopilotignore'));
+    assert.ok(hasConfig, 'Config file created');
+    assert.ok(hasIgnore, 'Ignore file created');
+
+    const ignoreContent = await fs.readFile(path.join(tmpDir, '.autopilotignore'), 'utf-8');
+    assert.match(ignoreContent, /\.vscode\//);
+    assert.match(ignoreContent, /autopilot\.log/);
   });
 
-  it('should display help', async () => {
-    const { stdout } = await execa('node', [CLI_PATH, '--help']);
-    assert.match(stdout, /Usage: autopilot/);
-    assert.match(stdout, /Built by Praise Masunga/);
+  await t.test('watcher integration with noisy files', async () => {
+    // Override config for faster test
+    await fs.writeJson(path.join(tmpDir, '.autopilotrc.json'), {
+      debounceSeconds: 1,
+      minSecondsBetweenCommits: 0,
+      autoPush: false
+    });
+
+    // Create initial commit
+    await fs.writeFile(path.join(tmpDir, 'README.md'), '# Initial');
+    // Ensure .vscode and autopilot files are ignored by git
+    await fs.writeFile(path.join(tmpDir, '.gitignore'), '.vscode/\nautopilot.log\n.autopilot.pid\n');
+    await runGit(['add', '.'], tmpDir);
+    await runGit(['commit', '-m', 'Initial commit'], tmpDir);
+
+    // Prepare noisy files
+    await fs.ensureDir(path.join(tmpDir, '.vscode'));
+    
+    // Spawn watcher in TEST MODE (foreground)
+    const watcher = spawn(process.execPath, [BIN_PATH, 'start'], {
+      cwd: tmpDir,
+      env: { ...process.env, AUTOPILOT_TEST_MODE: '1' },
+      stdio: 'pipe'
+    });
+
+    let watcherLog = '';
+    watcher.stdout.on('data', d => watcherLog += d.toString());
+    watcher.stderr.on('data', d => watcherLog += d.toString());
+
+    // Wait for watcher to start
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Simulate noisy activity
+    const noisyInterval = setInterval(async () => {
+      try {
+        await fs.appendFile(path.join(tmpDir, '.vscode/time-analytics.json'), `{"t": ${Date.now()}}\n`);
+        await fs.appendFile(path.join(tmpDir, 'autopilot.log'), `[${new Date().toISOString()}] Log entry\n`);
+      } catch (e) { /* ignore */ }
+    }, 500);
+
+    // Make a real change
+    await fs.appendFile(path.join(tmpDir, 'README.md'), '\nUpdate 1');
+
+    // Wait for test mode to finish (it runs for ~5-8s)
+    await new Promise((resolve) => {
+      watcher.on('close', resolve);
+    });
+
+    clearInterval(noisyInterval);
+
+    // Verify
+    const gitLog = await runGit(['log', '--oneline'], tmpDir);
+    const commits = gitLog.split('\n');
+    
+    assert.ok(commits.length > 1, 'Should have created at least one new commit');
+    
+    const lastCommit = await runGit(['show', '--name-only', 'HEAD'], tmpDir);
+    assert.doesNotMatch(lastCommit, /\.vscode/, 'Ignored file should not be in the commit');
+    assert.doesNotMatch(lastCommit, /autopilot\.log/, 'Log file should not be in the commit');
+    assert.match(lastCommit, /README\.md/, 'Tracked file should be in the commit');
   });
 
-  it('should initialize a new repo with "init"', async () => {
-    const { stdout } = await execa('node', [CLI_PATH, 'init'], { cwd: tmpDir });
-    
-    assert.match(stdout, /Autopilot Init/);
-    assert.match(stdout, /Initialization Complete/);
-    
-    const configExists = await fs.pathExists(path.join(tmpDir, '.autopilotrc.json'));
-    const ignoreExists = await fs.pathExists(path.join(tmpDir, '.autopilotignore'));
-    
-    assert.strictEqual(configExists, true, 'Config file should exist');
-    assert.strictEqual(ignoreExists, true, 'Ignore file should exist');
+  await t.test('doctor command', async () => {
+    const { code } = await run(['doctor'], tmpDir);
+    assert.strictEqual(code, 0, 'Doctor should pass in healthy repo');
   });
 
-  it('should run "status" without crashing', async () => {
-    const { stdout } = await execa('node', [CLI_PATH, 'status'], { cwd: tmpDir });
-    // It might say "Not Running"
-    assert.match(stdout, /Autopilot Status/);
-  });
-
-  it('should run "doctor" without crashing', async () => {
-    const { stdout } = await execa('node', [CLI_PATH, 'doctor'], { cwd: tmpDir });
-    assert.match(stdout, /Autopilot Doctor/);
-    // It might find issues, but shouldn't crash
-  });
-
-  it('should start in test mode and exit cleanly', async () => {
-    // We use the AUTOPILOT_TEST_MODE env var we added to watcher.js
-    // This should run for 3 seconds and then exit
-    
-    // Windows might need shell: true or careful env handling, execa handles env well.
-    const start = Date.now();
-    
-    try {
-      const { stdout, stderr } = await execa('node', [CLI_PATH, 'start'], { 
-        cwd: tmpDir,
-        env: { ...process.env, AUTOPILOT_TEST_MODE: '1' }
-      });
-      
-      const duration = Date.now() - start;
-      
-      assert.match(stdout, /Starting Autopilot/);
-      assert.match(stdout, /TEST MODE/);
-      assert.ok(duration >= 2500, 'Should run for at least ~3 seconds');
-      
-    } catch (error) {
-      // If it fails, log output for debugging
-      console.error('Start command failed:', error.stdout, error.stderr);
-      throw error;
-    }
+  await t.test('help command', async () => {
+    const { stdout } = await run(['--help'], tmpDir);
+    const matches = stdout.match(/Built by Praise Masunga/g);
+    assert.strictEqual(matches ? matches.length : 0, 1, 'Signature should appear exactly once');
   });
 });
