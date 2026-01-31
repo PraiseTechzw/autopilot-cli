@@ -1,6 +1,17 @@
 {
   "name": "@praisetechzw/autopilot",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
   "description": "An intelligent CLI tool that automatically commits and pushes your code so you can focus on building.",
   "keywords": [
     "git",
