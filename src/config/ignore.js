@@ -8,7 +8,7 @@ const { getIgnorePath } = require('../utils/paths');
  * @param {string} p - Path to normalize
  * @returns {string} Normalized path
  */
-const normalizePath = (p) => p.split(path.sep).join('/');
+const normalizePath = (p) => p.replace(/\\/g, '/');
 
 /**
  * Read ignore file patterns

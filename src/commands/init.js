@@ -61,7 +61,7 @@ async function createConfigFile(repoPath) {
  */
 async function updateGitIgnore(repoPath) {
   const gitIgnorePath = path.join(repoPath, '.gitignore');
-  const toIgnore = ['autopilot.log', '.autopilot.pid'];
+  const toIgnore = ['autopilot.log', '.autopilot.pid', '.vscode/'];
   let content = '';
   
   try {
