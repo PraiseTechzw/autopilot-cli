@@ -1,34 +1,46 @@
 const fs = require('fs-extra');
 const path = require('path');
-const { getPidFile, getStateFile } = require('./paths');
+const { getPidFile, getStateFile, ensureConfigDir } = require('./paths');
 const logger = require('./logger');
 
-const savePid = async (pid) => {
+const getRepoPidPath = (repoPath) => {
+  if (repoPath) {
+    return path.join(repoPath, '.autopilot.pid');
+  }
+  return getPidFile();
+};
+
+const savePid = async (pid, repoPath) => {
   try {
-    await fs.writeFile(getPidFile(), pid.toString());
+    if (!repoPath) {
+      await ensureConfigDir();
+    }
+    const pidPath = getRepoPidPath(repoPath);
+    await fs.writeFile(pidPath, pid.toString());
   } catch (error) {
     logger.error(`Failed to save PID: ${error.message}`);
   }
 };
 
-const readPid = async () => {
+const readPid = async (repoPath) => {
   try {
-    if (await fs.pathExists(getPidFile())) {
-      const pid = await fs.readFile(getPidFile(), 'utf-8');
+    const pidPath = getRepoPidPath(repoPath);
+    if (await fs.pathExists(pidPath)) {
+      const pid = await fs.readFile(pidPath, 'utf-8');
       return parseInt(pid, 10);
     }
     return null;
   } catch (error) {
-    logger.debug(`Error reading PID: ${error.message}`);
     return null;
   }
 };
 
-const removePid = async () => {
+const removePid = async (repoPath) => {
   try {
-    await fs.remove(getPidFile());
+    const pidPath = getRepoPidPath(repoPath);
+    await fs.remove(pidPath);
   } catch (error) {
-    logger.debug(`Error removing PID file: ${error.message}`);
+    // Swallow errors on shutdown
   }
 };
 
@@ -43,6 +55,7 @@ const isProcessRunning = (pid) => {
 
 const saveState = async (state) => {
   try {
+    await ensureConfigDir();
     await fs.writeJson(getStateFile(), state, { spaces: 2 });
   } catch (error) {
     logger.error(`Failed to save state: ${error.message}`);
@@ -56,9 +69,41 @@ const readState = async () => {
     }
     return null;
   } catch (error) {
-    logger.debug(`Error reading state: ${error.message}`);
     return null;
   }
+};
+
+const registerProcessHandlers = (cleanup) => {
+  const handle = async (signal) => {
+    try {
+      if (typeof cleanup === 'function') {
+        await cleanup(signal);
+      }
+    } catch (error) {
+      logger.error(`Shutdown error: ${error.message}`);
+    } finally {
+      if (signal) {
+        process.exit(0);
+      }
+    }
+  };
+
+  process.on('SIGINT', () => handle('SIGINT'));
+  process.on('SIGTERM', () => handle('SIGTERM'));
+  process.on('uncaughtException', (error) => {
+    logger.error(`Uncaught exception: ${error.message}`);
+    handle('uncaughtException');
+  });
+  process.on('unhandledRejection', (reason) => {
+    const message = reason instanceof Error ? reason.message : String(reason);
+    logger.error(`Unhandled rejection: ${message}`);
+    handle('unhandledRejection');
+  });
+  process.on('exit', () => {
+    if (typeof cleanup === 'function') {
+      cleanup('exit');
+    }
+  });
 };
 
 module.exports = {
@@ -68,4 +113,5 @@ module.exports = {
   isProcessRunning,
   saveState,
   readState,
+  registerProcessHandlers,
 };

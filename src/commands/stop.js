@@ -1,23 +1,38 @@
-const path = require("path");
-const fs = require("fs-extra");
-const { findRepoRoot } = require("./init");
+const { execa } = require('execa');
+const logger = require('../utils/logger');
+const { readPid, removePid, isProcessRunning } = require('../utils/process');
 
-function stopWatcher() {
-  const root = findRepoRoot();
-  const pidPath = path.join(root, ".autopilot.pid");
-  if (!fs.existsSync(pidPath)) {
-    console.log("⛔ Not running.");
-    return;
-  }
+async function stopWatcher() {
+  const repoPath = process.cwd();
 
-  const pid = Number(fs.readFileSync(pidPath, "utf8").trim());
   try {
-    process.kill(pid);
-    console.log("🛑 Stopped. PID:", pid);
-  } catch {
-    console.log("⚠️ Could not kill process, removing PID file.");
+    const pid = await readPid(repoPath);
+    if (!pid) {
+      logger.warn('Autopilot is not running.');
+      return;
+    }
+
+    if (!isProcessRunning(pid)) {
+      await removePid(repoPath);
+      logger.warn('Found stale PID file. Removed.');
+      return;
+    }
+
+    try {
+      process.kill(pid, 'SIGTERM');
+    } catch (error) {
+      if (process.platform === 'win32') {
+        await execa('taskkill', ['/PID', String(pid), '/T', '/F'], { reject: false });
+      } else {
+        throw error;
+      }
+    }
+
+    await removePid(repoPath);
+    logger.success(`Stopped autopilot (PID ${pid}).`);
+  } catch (error) {
+    logger.error(`Failed to stop autopilot: ${error.message}`);
   }
-  fs.removeSync(pidPath);
 }
 
 module.exports = { stopWatcher };

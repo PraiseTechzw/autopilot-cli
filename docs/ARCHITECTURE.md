@@ -1,3 +1,96 @@
+# Autopilot CLI - Architecture
+
+**Built by Praise Masunga (PraiseTechzw)**
+
+This document reflects the current implementation of Autopilot CLI.
+
+---
+
+## Current Project Structure
+
+```
+autopilot-cli/
+├── bin/
+│   └── autopilot.js            # CLI entrypoint (Commander)
+├── src/
+│   ├── commands/               # CLI command handlers
+│   │   ├── init.js
+│   │   ├── start.js
+│   │   ├── stop.js
+│   │   ├── status.js
+│   │   └── doctor.js
+│   ├── core/                   # Core logic
+│   │   ├── watcher.js          # Watcher engine
+│   │   ├── git.js              # Git helper utilities
+│   │   ├── commit.js           # Smart commit message logic
+│   │   └── safety.js           # Basic validation stubs
+│   ├── config/                 # Configuration + ignore parsing
+│   │   ├── defaults.js
+│   │   ├── loader.js
+│   │   └── ignore.js
+│   └── utils/                  # Utilities
+│       ├── logger.js
+│       ├── paths.js
+│       └── process.js
+├── docs/                       # Documentation
+├── test/                       # Tests (node:test)
+├── README.md
+└── index.js                    # Programmatic API
+```
+
+---
+
+## Runtime Flow (Start)
+
+```
+autopilot start
+  -> src/commands/start.js
+    -> new Watcher(repoPath)
+      -> core/watcher.js
+        -> chokidar watches repo
+        -> debounce + rate limit
+        -> git status
+        -> commit message (core/commit.js)
+        -> git add/commit
+        -> git push (optional)
+```
+
+---
+
+## Key Responsibilities
+
+### CLI Layer
+- `bin/autopilot.js` wires commands via Commander
+- `src/commands/*` are thin handlers that call core logic
+
+### Core Layer
+- `core/watcher.js` orchestrates watching, debouncing, safety checks, and git actions
+- `core/git.js` wraps git commands with safe results
+- `core/commit.js` generates smart conventional commit messages
+
+### Config Layer
+- `.autopilotrc.json` is loaded at runtime
+- `.autopilotignore` patterns are loaded and merged with built‑ins
+
+### Utils
+- PID management and signal handling in `utils/process.js`
+- Logging via `utils/logger.js`
+- Path helpers in `utils/paths.js`
+
+---
+
+## Logs and State
+
+- PID file: `.autopilot.pid` in repo root
+- Log file: `autopilot.log` in repo root
+
+---
+
+## Programmatic API
+
+`index.js` exports the command handlers and core utilities for reuse.
+
+See [docs/EXTENDING.md](EXTENDING.md) for examples.
 # Autopilot CLI - Architecture Design Document
 
 **Built by Praise Masunga (PraiseTechzw)**  

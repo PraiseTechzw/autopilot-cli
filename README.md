@@ -1,6 +1,127 @@
 # Autopilot CLI
 
 **Built by Praise Masunga (PraiseTechzw)**  
+**GitHub:** https://github.com/praisetechzw/autopilot-cli
+
+Autopilot is a Git automation CLI that watches your repository and commits changes safely with smart, conventional commit messages.
+
+---
+
+## ✨ Features
+
+- ✅ Smart commit messages (conventional commits)
+- ✅ Safety checks (blocked branches, remote-ahead detection)
+- ✅ Debounced commits + rate limiting
+- ✅ Optional checks before committing
+- ✅ Clean status output + verbose file logging
+- ✅ Foreground watcher with PID tracking
+
+---
+
+## Quick Start
+
+```bash
+# in a git repository
+autopilot init
+autopilot start
+```
+
+Stop or check status:
+
+```bash
+autopilot status
+autopilot stop
+```
+
+---
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `init` | Create `.autopilotrc.json` and `.autopilotignore` |
+| `start` | Start the watcher in the foreground |
+| `stop` | Stop the running watcher via PID |
+| `status` | Show running status + last log line |
+| `doctor` | Diagnose Git, repo, remote, auth method |
+
+---
+
+## Configuration
+
+Create `.autopilotrc.json` in the repository root:
+
+```json
+{
+  "debounceSeconds": 20,
+  "minSecondsBetweenCommits": 180,
+  "autoPush": true,
+  "blockBranches": ["main", "master"],
+  "requireChecks": false,
+  "checks": ["npm test"],
+  "commitMessageMode": "smart"
+}
+```
+
+**Notes:**
+- `commitMessageMode`: `smart` or `simple`
+- `checks`: commands run sequentially when `requireChecks` is true
+
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the full reference.
+
+---
+
+## Ignore Patterns
+
+Autopilot reads `.autopilotignore` (gitignore-like) and always ignores `.git`.
+
+Example:
+```
+node_modules/
+dist/
+.env
+*.log
+```
+
+---
+
+## Logs
+
+- Verbose logs: `autopilot.log` in the repository root
+- `autopilot status` shows the last log line when available
+
+---
+
+## Troubleshooting
+
+Run:
+```bash
+autopilot doctor
+```
+
+See [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
+---
+
+## Development
+
+```bash
+npm install
+node --test
+```
+
+---
+
+## License
+
+MIT License - Copyright (c) 2026 Praise Masunga (PraiseTechzw)
+
+---
+
+**Built by Praise Masunga (PraiseTechzw)**
+# Autopilot CLI
+
+**Built by Praise Masunga (PraiseTechzw)**  
 **GitHub:** [github.com/praisetechzw/autopilot-cli](https://github.com/praisetechzw/autopilot-cli)
 
 An intelligent, production-grade Git automation CLI that intelligently commits and pushes your code changes, so you can focus on building. Designed with safety, maintainability, and extensibility in mind.
