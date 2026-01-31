@@ -43,22 +43,6 @@ const getConfigDir = () => {
 };
 
 /**
- * Get PID file path
- * @returns {string} PID file path
- */
-const getPidFile = () => {
-  return path.join(getConfigDir(), 'autopilot.pid');
-};
-
-/**
- * Get state file path
- * @returns {string} State file path
- */
-const getStateFile = () => {
-  return path.join(getConfigDir(), 'state.json');
-};
-
-/**
  * Ensure config directory exists
  * @returns {Promise<void>}
  */
@@ -71,7 +55,5 @@ module.exports = {
   getIgnorePath,
   getGitPath,
   getConfigDir,
-  getPidFile,
-  getStateFile,
   ensureConfigDir,
 };

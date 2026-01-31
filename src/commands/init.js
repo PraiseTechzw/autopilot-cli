@@ -61,7 +61,9 @@ async function initRepo() {
   try {
     const repoPath = process.cwd();
 
-    logger.section('🚀 Autopilot Init - Built by Praise Masunga (PraiseTechzw)');
+    logger.section('🚀 Autopilot Init');
+    logger.info('Built by Praise Masunga (PraiseTechzw)');
+    logger.info('Initializing git automation...');
 
     // Verify git repository
     if (!isGitRepo(repoPath)) {

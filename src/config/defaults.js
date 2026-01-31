@@ -23,6 +23,9 @@ const DEFAULT_IGNORE_PATTERNS = [
   'coverage/',
   '*.log',
   '.DS_Store',
+  '.git/',
+  '.idea/',
+  '.vscode/'
 ].join('\n');
 
 module.exports = {
