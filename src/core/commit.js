@@ -1,6 +1,5 @@
 /**
  * Smart commit message generator
- * Built by Praise Masunga (PraiseTechzw)
  */
 
 /**
@@ -13,13 +12,13 @@ function generateCommitMessage(files) {
     return 'chore: update changes';
   }
 
-  // Categorize files
   const categories = {
     fix: false,
     feat: false,
     docs: false,
     test: false,
-    chore: false,
+    chore: false,     // Generic chore (unknown files)
+    config: false,    // Specific config files
   };
 
   for (const file of files) {
@@ -27,8 +26,7 @@ function generateCommitMessage(files) {
     const normalized = lowerFile.replace(/\\/g, '/');
     let matched = false;
 
-    // Fix detection - highest priority
-    // Look for "fix" in path or common bugfix patterns
+    // Fix detection (highest priority)
     if (
       normalized.includes('/fix/') ||
       normalized.includes('fix-') ||
@@ -60,6 +58,15 @@ function generateCommitMessage(files) {
       matched = true;
     }
 
+    // Feat detection - src/ changes that aren't tests
+    if (
+      (normalized.startsWith('src/') || normalized.includes('/src/')) &&
+      !categories.test // Ensure we don't count tests as features if they happen to be in src
+    ) {
+      categories.feat = true;
+      matched = true;
+    }
+
     // Config files detection
     if (
       normalized === 'package.json' ||
@@ -68,20 +75,11 @@ function generateCommitMessage(files) {
       normalized.endsWith('.json') ||
       normalized.endsWith('.config.js') ||
       normalized.endsWith('.config.ts') ||
-      normalized.includes('.github/')
+      normalized.includes('.github/') ||
+      normalized.includes('.gitignore') ||
+      normalized.includes('.editorconfig')
     ) {
-      categories.chore = true;
-      matched = true;
-    }
-
-    // Feature detection - src/ changes that aren't tests
-    if (
-      (normalized.startsWith('src/') || normalized.includes('/src/')) &&
-      !normalized.includes('.test.') &&
-      !normalized.includes('.spec.') &&
-      !normalized.includes('/__tests__/')
-    ) {
-      categories.feat = true;
+      categories.config = true;
       matched = true;
     }
 
@@ -104,13 +102,15 @@ function generateCommitMessage(files) {
   if (categories.test) {
     return 'test: update tests';
   }
-  if (categories.chore) {
+  // "chore" category splits into explicit config vs generic changes
+  if (categories.config) {
     return 'chore: update configuration';
+  }
+  if (categories.chore) {
+    return 'chore: update changes';
   }
 
   return 'chore: update changes';
 }
 
-module.exports = {
-  generateCommitMessage,
-};
+module.exports = { generateCommitMessage };

@@ -1,70 +1,106 @@
+/**
+ * Autopilot Watcher Engine
+ * Built by Praise Masunga (PraiseTechzw)
+ */
+
 const fs = require('fs-extra');
 const path = require('path');
 const chokidar = require('chokidar');
 const { execa } = require('execa');
 const logger = require('../utils/logger');
 const git = require('./git');
-const { DEFAULT_CONFIG } = require('../config/defaults');
 const { generateCommitMessage } = require('./commit');
-const { getConfigPath, getIgnorePath } = require('../utils/paths');
+const { getIgnorePath } = require('../utils/paths');
 const { savePid, removePid, registerProcessHandlers } = require('../utils/process');
+const { loadConfig } = require('../config/loader');
 
 class Watcher {
   constructor(repoPath) {
     this.repoPath = repoPath;
-    this.config = { ...DEFAULT_CONFIG };
-    this.ignorePatterns = [];
-    this.ignoreMatchers = [];
+    this.config = null;
     this.watcher = null;
     this.isWatching = false;
     this.isProcessing = false;
-    this.pending = false;
     this.debounceTimer = null;
     this.lastCommitAt = 0;
     this.logFilePath = path.join(repoPath, 'autopilot.log');
+    this.ignorePatterns = [];
   }
 
+  /**
+   * Initialize and start the watcher
+   */
   async start() {
-    if (this.isWatching) {
-      logger.warn('Watcher is already running');
-      return;
-    }
+    try {
+      if (this.isWatching) {
+        logger.warn('Watcher is already running');
+        return;
+      }
 
-    await fs.ensureFile(this.logFilePath);
-    await savePid(process.pid, this.repoPath);
+      // Initialize environment
+      await fs.ensureFile(this.logFilePath);
+      await savePid(this.repoPath);
+      
+      this.logVerbose('Starting Autopilot watcher...');
+      
+      // Load configuration
+      await this.reloadConfig();
+      await this.reloadIgnore();
 
-    logger.section('Autopilot Watcher');
-    logger.info('Built by Praise Masunga (PraiseTechzw)');
+      // Initial safety check
+      const currentBranch = await git.getBranch(this.repoPath);
+      if (currentBranch && this.config.blockedBranches?.includes(currentBranch)) {
+        logger.error(`Branch '${currentBranch}' is blocked in config. Stopping.`);
+        this.logVerbose(`Blocked branch detected: ${currentBranch}`);
+        await this.stop();
+        return;
+      }
 
-    await this.reloadConfig();
-    await this.reloadIgnore();
+      // Combine defaults + loaded patterns
+      const finalIgnored = [
+        ...this.ignorePatterns,
+        /(^|[\/\\])\.git([\/\\]|$)/, // Regex for .git folder
+        '**/autopilot.log',
+        '**/.autopilot.pid',
+        'node_modules' // Sensible default
+      ];
 
-    this.watcher = chokidar.watch(this.repoPath, {
-      ignored: (filePath) => this.isIgnored(filePath),
-      ignoreInitial: true,
-      persistent: true,
-      awaitWriteFinish: {
-        stabilityThreshold: 1000,
-        pollInterval: 100,
-      },
-    });
+      // Start Chokidar
+      this.watcher = chokidar.watch(this.repoPath, {
+        ignored: finalIgnored,
+        ignoreInitial: true,
+        persistent: true,
+        awaitWriteFinish: {
+          stabilityThreshold: 1000,
+          pollInterval: 100,
+        }
+      });
 
-    this.watcher.on('add', (filePath) => this.onFsEvent(filePath));
-    this.watcher.on('change', (filePath) => this.onFsEvent(filePath));
-    this.watcher.on('unlink', (filePath) => this.onFsEvent(filePath));
-    this.watcher.on('error', (error) => {
-      logger.error(`Watcher error: ${error.message}`);
-      this.logVerbose(`Watcher error: ${error.stack || error.message}`);
-    });
+      this.watcher
+        .on('add', (path) => this.onFsEvent('add', path))
+        .on('change', (path) => this.onFsEvent('change', path))
+        .on('unlink', (path) => this.onFsEvent('unlink', path))
+        .on('error', (error) => this.handleError(error));
 
-    registerProcessHandlers(async () => {
+      // Handle process signals
+      registerProcessHandlers(async () => {
+        await this.stop();
+      });
+
+      this.isWatching = true;
+      logger.success(`Autopilot is watching ${this.repoPath}`);
+      logger.info(`Logs: ${this.logFilePath}`);
+      
+    } catch (error) {
+      logger.error(`Failed to start watcher: ${error.message}`);
+      this.logVerbose(`Start error: ${error.stack}`);
       await this.stop();
-    });
-
-    this.isWatching = true;
-    logger.success('Autopilot is watching for changes');
+    }
   }
 
+  /**
+   * Stop the watcher
+   */
   async stop() {
     try {
       if (this.debounceTimer) {
@@ -76,255 +112,197 @@ class Watcher {
         await this.watcher.close();
         this.watcher = null;
       }
-    } catch (error) {
-      this.logVerbose(`Stop error: ${error.stack || error.message}`);
-    } finally {
-      this.isWatching = false;
+
       await removePid(this.repoPath);
-      logger.success('Autopilot watcher stopped');
+      this.isWatching = false;
+      logger.info('Watcher stopped');
+    } catch (error) {
+      logger.error(`Error stopping watcher: ${error.message}`);
     }
   }
 
-  isRunning() {
-    return this.isWatching;
+  /**
+   * Handle filesystem events
+   */
+  onFsEvent(type, filePath) {
+    if (this.isProcessing) return;
+    
+    // Double check ignore (safety net)
+    if (filePath.includes('.git') || filePath.endsWith('autopilot.log')) return;
+
+    this.logVerbose(`File event: ${type} ${filePath}`);
+    this.scheduleProcess();
   }
 
-  onFsEvent(filePath) {
-    this.logVerbose(`Change detected: ${filePath}`);
-    this.scheduleDebounced();
-  }
-
-  scheduleDebounced() {
-    const debounceMs = (this.config.debounceSeconds || DEFAULT_CONFIG.debounceSeconds) * 1000;
+  /**
+   * Schedule processing with debounce
+   */
+  scheduleProcess() {
+    const debounceMs = (this.config?.debounceSeconds || 5) * 1000;
+    
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }
-    this.debounceTimer = setTimeout(() => this.runCycle(), debounceMs);
+
+    this.debounceTimer = setTimeout(() => {
+      this.processChanges();
+    }, debounceMs);
   }
 
-  async runCycle() {
-    if (this.isProcessing) {
-      this.pending = true;
-      return;
-    }
-
-    const minMs =
-      (this.config.minSecondsBetweenCommits || DEFAULT_CONFIG.minSecondsBetweenCommits) * 1000;
-    if (this.lastCommitAt && Date.now() - this.lastCommitAt < minMs) {
-      const waitMs = minMs - (Date.now() - this.lastCommitAt);
-      this.logVerbose(`Anti-spam active. Waiting ${waitMs}ms before next commit.`);
-      if (this.debounceTimer) {
-        clearTimeout(this.debounceTimer);
-      }
-      this.debounceTimer = setTimeout(() => this.runCycle(), waitMs);
-      return;
-    }
-
+  /**
+   * Main processing loop
+   */
+  async processChanges() {
+    if (this.isProcessing) return;
     this.isProcessing = true;
-    this.pending = false;
 
     try {
-      await this.reloadConfig();
-      await this.reloadIgnore();
-      await this.processChanges();
-    } catch (error) {
-      logger.error('Autopilot cycle failed');
-      this.logVerbose(`Cycle error: ${error.stack || error.message}`);
-    } finally {
-      this.isProcessing = false;
-      if (this.pending) {
-        this.pending = false;
-        this.scheduleDebounced();
-      }
-    }
-  }
-
-  async processChanges() {
-    const hasChanges = await git.hasChanges(this.repoPath);
-    if (!hasChanges) {
-      this.logVerbose('No changes detected in working tree.');
-      return;
-    }
-
-    const branch = await git.getBranch(this.repoPath);
-    if (!branch) {
-      logger.warn('Unable to determine current branch');
-      this.logVerbose('Branch detection failed');
-      return;
-    }
-
-    if ((this.config.blockBranches || []).includes(branch)) {
-      logger.warn(`Blocked branch "${branch}". Switch branches to enable autopilot.`);
-      this.logVerbose(`Blocked branch: ${branch}`);
-      return;
-    }
-
-    const fetchResult = await git.fetch(this.repoPath);
-    if (!fetchResult.ok) {
-      logger.warn('Fetch failed. Skipping commit cycle.');
-      this.logVerbose(`Fetch failed: ${fetchResult.stderr}`);
-      return;
-    }
-
-    const remoteAhead = await git.isRemoteAhead(this.repoPath);
-    if (remoteAhead) {
-      logger.warn('Remote is ahead. Please pull before autopilot can continue.');
-      this.logVerbose('Remote ahead detected.');
-      return;
-    }
-
-    if (this.config.requireChecks && Array.isArray(this.config.checks) && this.config.checks.length) {
-      const checksOk = await this.runChecks(this.config.checks);
-      if (!checksOk) {
+      // 1. Min interval check
+      const now = Date.now();
+      const minInterval = (this.config?.minIntervalSeconds || 30) * 1000;
+      if (now - this.lastCommitAt < minInterval) {
+        this.logVerbose('Skipping: Minimum interval not met');
         return;
       }
-    }
 
-    const files = await git.getPorcelainStatus(this.repoPath);
-    if (!files.length) {
-      this.logVerbose('No staged changes found in git status.');
-      return;
-    }
-
-    const message =
-      this.config.commitMessageMode === 'simple'
-        ? 'chore: update changes'
-        : generateCommitMessage(files);
-
-    const addResult = await git.addAll(this.repoPath);
-    if (!addResult.ok) {
-      logger.warn('Failed to stage changes');
-      this.logVerbose(`git add failed: ${addResult.stderr}`);
-      return;
-    }
-
-    const commitResult = await git.commit(this.repoPath, message);
-    if (!commitResult.ok) {
-      logger.warn('Commit skipped or failed');
-      this.logVerbose(`git commit failed: ${commitResult.stderr}`);
-      return;
-    }
-
-    if (this.config.autoPush) {
-      const pushResult = await git.push(this.repoPath, branch);
-      if (!pushResult.ok) {
-        logger.warn('Push failed');
-        this.logVerbose(`git push failed: ${pushResult.stderr}`);
-      } else {
-        logger.success(`Committed and pushed (${branch}): ${message}`);
+      // 2. Safety: Branch check
+      const branch = await git.getBranch(this.repoPath);
+      if (this.config?.blockedBranches?.includes(branch)) {
+        logger.warn(`Current branch '${branch}' is blocked. Skipping.`);
+        return;
       }
-    } else {
-      logger.success(`Committed (${branch}): ${message}`);
-    }
 
-    this.lastCommitAt = Date.now();
+      // 3. Safety: Remote check (fetch -> behind?)
+      this.logVerbose('Checking remote status...');
+      const remoteStatus = await git.isRemoteAhead(this.repoPath);
+      if (remoteStatus.behind) {
+        logger.warn('Local branch is behind remote. Please pull changes.');
+        this.logVerbose('Behind remote. Pausing auto-commit.');
+        return;
+      }
+
+      // 4. Safety: Custom checks
+      if (this.config?.requireChecks) {
+        const checksPassed = await this.runChecks();
+        if (!checksPassed) {
+          logger.warn('Checks failed. Skipping commit.');
+          return;
+        }
+      }
+
+      // 5. Flow: Status -> Add -> Commit -> Push
+      const status = await git.getPorcelainStatus(this.repoPath);
+      if (!status.ok || status.files.length === 0) {
+        this.logVerbose('No changes to commit');
+        return;
+      }
+
+      this.logVerbose(`Detecting ${status.files.length} changed files`);
+      
+      // Add all
+      await git.addAll(this.repoPath);
+      
+      // Generate message
+      const message = generateCommitMessage(status.files);
+      this.logVerbose(`Generated message: ${message}`);
+      
+      // Commit
+      const commitResult = await git.commit(this.repoPath, message);
+      if (commitResult.ok) {
+        logger.success(`Committed: ${message}`);
+        this.lastCommitAt = Date.now();
+
+        // Push if enabled
+        if (this.config?.autoPush) {
+          logger.info('Pushing to remote...');
+          const pushResult = await git.push(this.repoPath, branch);
+          if (pushResult.ok) {
+            logger.success('Pushed successfully');
+          } else {
+            logger.error(`Push failed: ${pushResult.stderr}`);
+            this.logVerbose(`Push error: ${pushResult.stderr}`);
+          }
+        }
+      } else {
+        logger.error(`Commit failed: ${commitResult.stderr}`);
+        this.logVerbose(`Commit error: ${commitResult.stderr}`);
+      }
+
+    } catch (error) {
+      logger.error(`Process error: ${error.message}`);
+      this.logVerbose(`Process exception: ${error.stack}`);
+    } finally {
+      this.isProcessing = false;
+      this.debounceTimer = null;
+    }
   }
 
-  async runChecks(checks) {
+  /**
+   * Run user-defined checks
+   */
+  async runChecks() {
+    const checks = this.config?.checks || [];
+    if (checks.length === 0) return true;
+
+    this.logVerbose(`Running checks: ${checks.join(', ')}`);
+
     for (const cmd of checks) {
-      if (!cmd || typeof cmd !== 'string') {
-        continue;
-      }
-      this.logVerbose(`Running check: ${cmd}`);
-      const result = await execa(cmd, { cwd: this.repoPath, shell: true, reject: false });
-      if (result.exitCode !== 0) {
-        logger.warn(`Check failed: ${cmd}`);
-        this.logVerbose(`Check failed: ${cmd}\n${result.stdout}\n${result.stderr}`);
+      try {
+        logger.info(`Running check: ${cmd}`);
+        await execa(cmd, { cwd: this.repoPath, shell: true });
+      } catch (error) {
+        logger.error(`Check failed: ${cmd}`);
+        this.logVerbose(`Check output: ${error.message}`);
         return false;
       }
     }
     return true;
   }
 
+  /**
+   * Reload configuration
+   */
   async reloadConfig() {
-    const configPath = getConfigPath(this.repoPath);
-    try {
-      if (await fs.pathExists(configPath)) {
-        const config = await fs.readJson(configPath);
-        this.config = { ...DEFAULT_CONFIG, ...config };
-        return;
-      }
-    } catch (error) {
-      logger.warn(`Error reading config: ${error.message}`);
-      this.logVerbose(`Config read error: ${error.stack || error.message}`);
-    }
-    this.config = { ...DEFAULT_CONFIG };
+    this.config = await loadConfig(this.repoPath);
+    this.logVerbose('Config reloaded');
   }
 
+  /**
+   * Reload ignore patterns
+   */
   async reloadIgnore() {
     const ignorePath = getIgnorePath(this.repoPath);
-    let patterns = [];
-    try {
-      if (await fs.pathExists(ignorePath)) {
+    this.ignorePatterns = []; 
+    
+    if (await fs.pathExists(ignorePath)) {
+      try {
         const content = await fs.readFile(ignorePath, 'utf-8');
-        patterns = content
-          .split(/\r?\n/)
-          .map((line) => line.trim())
-          .filter((line) => line && !line.startsWith('#'));
+        const lines = content.split('\n')
+          .map(l => l.trim())
+          .filter(l => l && !l.startsWith('#'));
+        
+        this.ignorePatterns.push(...lines);
+        this.logVerbose(`Loaded ${lines.length} ignore patterns`);
+      } catch (error) {
+        logger.warn(`Failed to load ignore file: ${error.message}`);
       }
-    } catch (error) {
-      this.logVerbose(`Ignore read error: ${error.stack || error.message}`);
     }
-
-    const builtIn = ['.autopilot.pid', 'autopilot.log'];
-    this.ignorePatterns = [...patterns, ...builtIn];
-    this.ignoreMatchers = this.buildIgnoreMatchers(this.ignorePatterns);
+    
+    // Also load ignore patterns from config json if they exist
+    if (this.config?.ignore && Array.isArray(this.config.ignore)) {
+       this.ignorePatterns.push(...this.config.ignore);
+    }
   }
 
-  buildIgnoreMatchers(patterns) {
-    return patterns
-      .map((pattern) => pattern.trim())
-      .filter(Boolean)
-      .map((pattern) => {
-        const normalized = pattern.replace(/\\/g, '/').replace(/^\/+/, '');
-        if (normalized.endsWith('/')) {
-          return { type: 'prefix', value: normalized };
-        }
-        if (normalized.startsWith('*.')) {
-          return { type: 'ext', value: normalized.slice(1) };
-        }
-        if (normalized.includes('*')) {
-          const escaped = normalized.replace(/[.+^${}()|[\]\\]/g, '\\$&');
-          const regex = new RegExp(`^${escaped.replace(/\*/g, '.*')}$`);
-          return { type: 'regex', value: regex };
-        }
-        return { type: 'exact', value: normalized };
-      });
-  }
-
-  isIgnored(filePath) {
-    const relativePath = path.relative(this.repoPath, filePath).replace(/\\/g, '/');
-    if (!relativePath || relativePath === '') {
-      return false;
-    }
-
-    if (relativePath === '.git' || relativePath.startsWith('.git/')) {
-      return true;
-    }
-
-    for (const matcher of this.ignoreMatchers) {
-      if (matcher.type === 'prefix' && relativePath.startsWith(matcher.value)) {
-        return true;
-      }
-      if (matcher.type === 'ext' && relativePath.endsWith(matcher.value)) {
-        return true;
-      }
-      if (matcher.type === 'regex' && matcher.value.test(relativePath)) {
-        return true;
-      }
-      if (matcher.type === 'exact' && relativePath === matcher.value) {
-        return true;
-      }
-    }
-
-    return false;
+  handleError(error) {
+    logger.error(`Watcher error: ${error.message}`);
+    this.logVerbose(`Watcher error: ${error.stack}`);
   }
 
   logVerbose(message) {
     const timestamp = new Date().toISOString();
-    fs.appendFile(this.logFilePath, `[${timestamp}] ${message}\n`).catch(() => {
-      // Ignore logging failures
-    });
+    const logLine = `[${timestamp}] ${message}\n`;
+    fs.appendFile(this.logFilePath, logLine).catch(() => {});
   }
 }
 

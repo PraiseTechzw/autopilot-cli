@@ -1,71 +1,83 @@
+/**
+ * Process management utilities
+ * Built by Praise Masunga (PraiseTechzw)
+ */
+
 const fs = require('fs-extra');
 const path = require('path');
-const { getPidFile, getStateFile, ensureConfigDir } = require('./paths');
 const logger = require('./logger');
+const { ensureConfigDir } = require('./paths');
 
-const getRepoPidPath = (repoPath) => {
+/**
+ * Get path to PID file for a repository or global
+ * @param {string} [repoPath] - Repository path
+ * @returns {string} PID file path
+ */
+const getPidPath = (repoPath) => {
   if (repoPath) {
     return path.join(repoPath, '.autopilot.pid');
   }
-  return getPidFile();
+  // Fallback to global pid if needed, though mostly used per-repo
+  return path.join(require('os').homedir(), '.autopilot', 'autopilot.pid');
 };
 
-const savePid = async (pid, repoPath) => {
+/**
+ * Save current process PID to file
+ * @param {string} repoPath - Repository path
+ */
+const savePid = async (repoPath) => {
   try {
-    if (!repoPath) {
-      await ensureConfigDir();
-    }
-    const pidPath = getRepoPidPath(repoPath);
-    await fs.writeFile(pidPath, pid.toString());
+    const pidPath = getPidPath(repoPath);
+    await fs.writeFile(pidPath, process.pid.toString());
   } catch (error) {
-    logger.error(`Failed to save PID: ${error.message}`);
+    logger.error(`Failed to save PID file: ${error.message}`);
   }
 };
 
-const readPid = async (repoPath) => {
-  try {
-    const pidPath = getRepoPidPath(repoPath);
-    if (await fs.pathExists(pidPath)) {
-      const pid = await fs.readFile(pidPath, 'utf-8');
-      return parseInt(pid, 10);
-    }
-    return null;
-  } catch (error) {
-    return null;
-  }
-};
-
+/**
+ * Remove PID file
+ * @param {string} repoPath - Repository path
+ */
 const removePid = async (repoPath) => {
   try {
-    const pidPath = getRepoPidPath(repoPath);
-    await fs.remove(pidPath);
+    const pidPath = getPidPath(repoPath);
+    if (await fs.pathExists(pidPath)) {
+      await fs.remove(pidPath);
+    }
   } catch (error) {
-    // Swallow errors on shutdown
+    // Ignore errors during cleanup
   }
 };
 
+/**
+ * Check if a process is running
+ * @param {number} pid - Process ID
+ * @returns {boolean} True if running
+ */
 const isProcessRunning = (pid) => {
   try {
     process.kill(pid, 0);
     return true;
-  } catch (error) {
+  } catch (e) {
     return false;
   }
 };
 
-const saveState = async (state) => {
+/**
+ * Read PID from file and check if running
+ * @param {string} repoPath - Repository path
+ * @returns {Promise<number|null>} PID if running, null otherwise
+ */
+const getRunningPid = async (repoPath) => {
   try {
-    await ensureConfigDir();
-    await fs.writeJson(getStateFile(), state, { spaces: 2 });
-  } catch (error) {
-    logger.error(`Failed to save state: ${error.message}`);
-  }
-};
-
-const readState = async () => {
-  try {
-    if (await fs.pathExists(getStateFile())) {
-      return await fs.readJson(getStateFile());
+    const pidPath = getPidPath(repoPath);
+    if (await fs.pathExists(pidPath)) {
+      const pid = parseInt(await fs.readFile(pidPath, 'utf-8'), 10);
+      if (isProcessRunning(pid)) {
+        return pid;
+      }
+      // Stale PID file
+      await removePid(repoPath);
     }
     return null;
   } catch (error) {
@@ -73,45 +85,57 @@ const readState = async () => {
   }
 };
 
-const registerProcessHandlers = (cleanup) => {
-  const handle = async (signal) => {
+/**
+ * Register process signal handlers for graceful shutdown
+ * @param {Function} cleanupFn - Async cleanup function to run on exit
+ */
+const registerProcessHandlers = (cleanupFn) => {
+  let cleaningUp = false;
+
+  const handleSignal = async (signal) => {
+    if (cleaningUp) return;
+    cleaningUp = true;
+
+    logger.info(`Received ${signal}, shutting down...`);
+    
     try {
-      if (typeof cleanup === 'function') {
-        await cleanup(signal);
+      if (cleanupFn) {
+        await cleanupFn();
       }
     } catch (error) {
-      logger.error(`Shutdown error: ${error.message}`);
+      logger.error(`Error during cleanup: ${error.message}`);
     } finally {
-      if (signal) {
-        process.exit(0);
-      }
+      process.exit(0);
     }
   };
 
-  process.on('SIGINT', () => handle('SIGINT'));
-  process.on('SIGTERM', () => handle('SIGTERM'));
-  process.on('uncaughtException', (error) => {
-    logger.error(`Uncaught exception: ${error.message}`);
-    handle('uncaughtException');
-  });
-  process.on('unhandledRejection', (reason) => {
-    const message = reason instanceof Error ? reason.message : String(reason);
-    logger.error(`Unhandled rejection: ${message}`);
-    handle('unhandledRejection');
-  });
-  process.on('exit', () => {
-    if (typeof cleanup === 'function') {
-      cleanup('exit');
+  process.on('SIGINT', () => handleSignal('SIGINT'));
+  process.on('SIGTERM', () => handleSignal('SIGTERM'));
+  
+  // Handle uncaught errors to try to cleanup if possible
+  process.on('uncaughtException', async (error) => {
+    logger.error(`Uncaught Exception: ${error.message}`);
+    logger.error(error.stack);
+    if (!cleaningUp) {
+      cleaningUp = true;
+      try {
+        if (cleanupFn) await cleanupFn();
+      } catch (e) {
+        // Ignore
+      }
+      process.exit(1);
     }
+  });
+
+  process.on('unhandledRejection', async (reason) => {
+    logger.error(`Unhandled Rejection: ${reason}`);
   });
 };
 
 module.exports = {
   savePid,
-  readPid,
   removePid,
+  getRunningPid,
   isProcessRunning,
-  saveState,
-  readState,
-  registerProcessHandlers,
+  registerProcessHandlers
 };

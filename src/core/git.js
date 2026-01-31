@@ -12,10 +12,9 @@ const { execa } = require('execa');
  */
 async function getBranch(root) {
   try {
-    const result = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: root });
-    return result.stdout.trim();
+    const { stdout } = await execa('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { cwd: root });
+    return stdout.trim();
   } catch (error) {
-    // Not a git repo or other error
     return null;
   }
 }
@@ -27,8 +26,8 @@ async function getBranch(root) {
  */
 async function hasChanges(root) {
   try {
-    const result = await execa('git', ['status', '--porcelain'], { cwd: root });
-    return result.stdout.trim().length > 0;
+    const { stdout } = await execa('git', ['status', '--porcelain'], { cwd: root });
+    return stdout.trim().length > 0;
   } catch (error) {
     return false;
   }
@@ -37,42 +36,38 @@ async function hasChanges(root) {
 /**
  * Get porcelain status - parsed list of changed files
  * @param {string} root - Repository root path
- * @returns {Promise<string[]>} Array of changed file paths
+ * @returns {Promise<{ok: boolean, files: string[], raw: string}>} Status object
  */
 async function getPorcelainStatus(root) {
   try {
-    const result = await execa('git', ['status', '--porcelain'], { cwd: root });
+    const { stdout } = await execa('git', ['status', '--porcelain'], { cwd: root });
+    const raw = stdout.trim();
     
-    // Parse porcelain output: "XY filename"
-    // Example: " M file.js", "?? newfile.js"
-    return result.stdout
+    if (!raw) {
+      return { ok: true, files: [], raw: '' };
+    }
+
+    const files = raw
       .split(/\r?\n/)
-      .filter(Boolean)
       .map(line => line.slice(3).trim()); // Remove status prefix (XY + space)
+
+    return { ok: true, files, raw };
   } catch (error) {
-    return [];
+    return { ok: false, files: [], raw: error.message };
   }
 }
 
 /**
  * Stage all changes (git add -A)
  * @param {string} root - Repository root path
- * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>}
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
  */
 async function addAll(root) {
   try {
-    const result = await execa('git', ['add', '-A'], { cwd: root });
-    return {
-      ok: true,
-      stdout: result.stdout,
-      stderr: result.stderr || '',
-    };
+    const { stdout, stderr } = await execa('git', ['add', '-A'], { cwd: root });
+    return { ok: true, stdout, stderr };
   } catch (error) {
-    return {
-      ok: false,
-      stdout: error.stdout || '',
-      stderr: error.stderr || error.message,
-    };
+    return { ok: false, stdout: '', stderr: error.message };
   }
 }
 
@@ -80,104 +75,70 @@ async function addAll(root) {
  * Commit staged changes
  * @param {string} root - Repository root path
  * @param {string} message - Commit message
- * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>}
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
  */
 async function commit(root, message) {
   try {
-    const result = await execa('git', ['commit', '-m', message], { cwd: root, reject: false });
-    
-    // Git commit returns exit code 0 on success
-    return {
-      ok: result.exitCode === 0,
-      stdout: result.stdout,
-      stderr: result.stderr || '',
-    };
+    const { stdout, stderr } = await execa('git', ['commit', '-m', message], { cwd: root });
+    return { ok: true, stdout, stderr };
   } catch (error) {
-    return {
-      ok: false,
-      stdout: error.stdout || '',
-      stderr: error.stderr || error.message,
-    };
+    return { ok: false, stdout: '', stderr: error.message };
   }
 }
 
 /**
- * Fetch from remote (git fetch)
+ * Fetch updates from remote
  * @param {string} root - Repository root path
- * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>}
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
  */
 async function fetch(root) {
   try {
-    const result = await execa('git', ['fetch'], { cwd: root });
-    return {
-      ok: true,
-      stdout: result.stdout,
-      stderr: result.stderr || '',
-    };
+    const { stdout, stderr } = await execa('git', ['fetch'], { cwd: root });
+    return { ok: true, stdout, stderr };
   } catch (error) {
-    return {
-      ok: false,
-      stdout: error.stdout || '',
-      stderr: error.stderr || error.message,
-    };
+    return { ok: false, stdout: '', stderr: error.message };
   }
 }
 
 /**
- * Check if local branch is behind remote (remote is ahead)
+ * Check if remote is ahead/behind
  * @param {string} root - Repository root path
- * @returns {Promise<boolean>} True if remote is ahead
+ * @returns {Promise<{ok: boolean, ahead: boolean, behind: boolean, raw: string}>} Status object
  */
 async function isRemoteAhead(root) {
   try {
-    // First, get current branch
     const branch = await getBranch(root);
-    if (!branch) return false;
+    if (!branch) return { ok: false, ahead: false, behind: false, raw: 'No branch' };
 
-    // Fetch to update remote refs
+    // Ensure we have latest info
     await fetch(root);
 
-    // Compare local with remote using rev-list
-    // This counts commits that are in remote but not in local
-    const result = await execa(
-      'git',
-      ['rev-list', '--count', `HEAD..origin/${branch}`],
-      { cwd: root, reject: false }
-    );
-
-    if (result.exitCode !== 0) {
-      // No remote tracking branch or other error
-      return false;
-    }
-
-    const count = parseInt(result.stdout.trim(), 10);
-    return count > 0;
+    const { stdout } = await execa('git', ['rev-list', '--left-right', '--count', `${branch}...origin/${branch}`], { cwd: root });
+    const [aheadCount, behindCount] = stdout.trim().split(/\s+/).map(Number);
+    
+    return {
+      ok: true,
+      ahead: aheadCount > 0,
+      behind: behindCount > 0,
+      raw: stdout.trim()
+    };
   } catch (error) {
-    return false;
+    return { ok: false, ahead: false, behind: false, raw: error.message };
   }
 }
 
 /**
- * Push to remote
+ * Push changes to remote
  * @param {string} root - Repository root path
- * @param {string} branch - Branch name to push
- * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>}
+ * @param {string} branch - Branch to push
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
  */
 async function push(root, branch) {
   try {
-    const result = await execa('git', ['push', '-u', 'origin', branch], { cwd: root, reject: false });
-    
-    return {
-      ok: result.exitCode === 0,
-      stdout: result.stdout,
-      stderr: result.stderr || '',
-    };
+    const { stdout, stderr } = await execa('git', ['push', 'origin', branch], { cwd: root });
+    return { ok: true, stdout, stderr };
   } catch (error) {
-    return {
-      ok: false,
-      stdout: error.stdout || '',
-      stderr: error.stderr || error.message,
-    };
+    return { ok: false, stdout: '', stderr: error.message };
   }
 }
 

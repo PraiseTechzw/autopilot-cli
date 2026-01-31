@@ -1,29 +1,41 @@
-const fs = require('fs-extra');
+/**
+ * Command: start
+ * Starts the Autopilot watcher in the foreground
+ */
+
+const process = require('process');
 const logger = require('../utils/logger');
 const Watcher = require('../core/watcher');
-const { readPid, removePid, isProcessRunning } = require('../utils/process');
+const { getRunningPid } = require('../utils/process');
 
-async function startWatcher() {
+const start = async (options) => {
   const repoPath = process.cwd();
 
   try {
-    const existingPid = await readPid(repoPath);
-    if (existingPid && isProcessRunning(existingPid)) {
-      logger.warn(`Autopilot already running (PID ${existingPid}). Use "autopilot stop".`);
+    // Check if already running
+    const runningPid = await getRunningPid(repoPath);
+    if (runningPid) {
+      logger.warn(`Autopilot is already running (PID: ${runningPid})`);
+      logger.info('Run "autopilot stop" to stop the current instance.');
       return;
     }
 
-    if (existingPid && !isProcessRunning(existingPid)) {
-      await removePid(repoPath);
-    }
-
+    // Initialize watcher
     const watcher = new Watcher(repoPath);
+
+    logger.section('Starting Autopilot');
+    logger.info('Press Ctrl+C to stop, or run "autopilot stop" in another terminal.');
+    
+    // Start watching
     await watcher.start();
 
-    logger.info('Press Ctrl+C to stop, or run "autopilot stop" in another terminal.');
-  } catch (error) {
-    logger.error(`Failed to start watcher: ${error.message}`);
-  }
-}
+    // Keep process alive is handled by chokidar being persistent
+    // The watcher handles process signals for cleanup
 
-module.exports = { startWatcher };
+  } catch (error) {
+    logger.error(`Failed to start autopilot: ${error.message}`);
+    process.exit(1);
+  }
+};
+
+module.exports = start;

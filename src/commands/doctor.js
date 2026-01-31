@@ -1,102 +1,121 @@
+/**
+ * Command: doctor
+ * Diagnoses potential issues with the repository and environment
+ */
+
 const fs = require('fs-extra');
 const path = require('path');
+const process = require('process');
 const { execa } = require('execa');
 const logger = require('../utils/logger');
 const git = require('../core/git');
-const { getGitPath } = require('../utils/paths');
 
-async function doctor() {
+const doctor = async () => {
   const repoPath = process.cwd();
-
+  let issues = 0;
+  
   logger.section('Autopilot Doctor');
+  logger.info('Diagnosing environment...');
 
-  // Check git installed
+  // 1. Check Git installation
   try {
-    const result = await execa('git', ['--version'], { reject: false });
-    if (result.exitCode === 0) {
-      logger.success(`Git installed (${result.stdout.trim()})`);
+    const { stdout } = await execa('git', ['--version']);
+    logger.success(`Git installed: ${stdout.trim()}`);
+  } catch (error) {
+    logger.error('Git is not installed or not in PATH.');
+    issues++;
+  }
+
+  // 2. Check valid repository
+  try {
+    const { stdout } = await execa('git', ['rev-parse', '--is-inside-work-tree'], { cwd: repoPath });
+    if (stdout.trim() === 'true') {
+      logger.success('Valid Git repository detected');
     } else {
-      logger.error('Git not available. Install Git and try again.');
-      return;
+      logger.error('Not inside a Git repository.');
+      issues++;
+      return; // Stop further checks if not a repo
     }
   } catch (error) {
-    logger.error('Git not available. Install Git and try again.');
+    logger.error('Not inside a Git repository.');
+    issues++;
     return;
   }
 
-  // Check repository
-  const gitPath = getGitPath(repoPath);
-  if (await fs.pathExists(gitPath)) {
-    logger.success('Git repository detected');
-  } else {
-    logger.error('Not a git repository. Run this inside a git repo.');
-    return;
-  }
-
-  // Check origin remote
-  let originUrl = '';
+  // 3. Check remote origin
   try {
-    const result = await execa('git', ['remote', 'get-url', 'origin'], {
-      cwd: repoPath,
-      reject: false,
-    });
-    if (result.exitCode === 0) {
-      originUrl = result.stdout.trim();
-      logger.success(`Origin remote: ${originUrl}`);
+    const { stdout } = await execa('git', ['remote', 'get-url', 'origin'], { cwd: repoPath });
+    const remoteUrl = stdout.trim();
+    logger.success(`Remote 'origin' found: ${remoteUrl}`);
+
+    // Check remote type
+    if (remoteUrl.startsWith('http')) {
+      logger.warn('Remote uses HTTPS. Ensure credential helper is configured for non-interactive push.');
+    } else if (remoteUrl.startsWith('git@') || remoteUrl.startsWith('ssh://')) {
+      logger.success('Remote uses SSH (recommended).');
     } else {
-      logger.warn('Origin remote not found. Add one with: git remote add origin <url>');
+      logger.info('Remote uses unknown protocol.');
     }
   } catch (error) {
-    logger.warn('Origin remote not found. Add one with: git remote add origin <url>');
+    logger.warn('No remote \'origin\' configured. Auto-push will fail.');
+    issues++;
   }
 
-  // Auth method
-  if (originUrl) {
-    if (originUrl.startsWith('git@') || originUrl.startsWith('ssh://')) {
-      logger.info('Auth method: SSH');
-    } else if (originUrl.startsWith('https://')) {
-      logger.info('Auth method: HTTPS');
-    } else {
-      logger.info('Auth method: Unknown');
-    }
-  }
-
-  // Branch warning
+  // 4. Check branch name
   const branch = await git.getBranch(repoPath);
   if (branch) {
+    logger.info(`Current branch: ${branch}`);
     if (branch === 'main' || branch === 'master') {
-      logger.warn(`You are on ${branch}. Consider using a feature branch.`);
-    } else {
-      logger.success(`Current branch: ${branch}`);
+      logger.warn('You are on the main/master branch. It is recommended to work on feature branches.');
+      issues++;
     }
   } else {
-    logger.warn('Unable to determine current branch.');
+    logger.error('Could not detect current branch.');
+    issues++;
   }
 
-  // .env in gitignore
-  const gitignorePath = path.join(repoPath, '.gitignore');
-  if (await fs.pathExists(gitignorePath)) {
-    const content = await fs.readFile(gitignorePath, 'utf-8');
-    const lines = content
-      .split(/\r?\n/)
-      .map((line) => line.trim())
-      .filter((line) => line && !line.startsWith('#'));
-
-    const ignoresEnv = lines.some((line) => {
-      if (line === '.env') return true;
-      if (line === '.env*') return true;
-      if (line.startsWith('.env.')) return true;
-      return false;
-    });
-
-    if (ignoresEnv) {
-      logger.success('.env appears to be ignored in .gitignore');
-    } else {
-      logger.warn('.env is not ignored in .gitignore');
+  // 5. Check .env in .gitignore
+  const envPath = path.join(repoPath, '.env');
+  if (await fs.pathExists(envPath)) {
+    try {
+      // Check if ignored by git
+      await execa('git', ['check-ignore', '.env'], { cwd: repoPath });
+      logger.success('.env is properly ignored.');
+    } catch (error) {
+      // Exit code 1 means not ignored
+      logger.warn('SECURITY WARNING: .env file exists but is NOT ignored by git!');
+      logger.info('Add .env to your .gitignore file immediately.');
+      issues++;
     }
-  } else {
-    logger.warn('No .gitignore found. Consider adding one to protect secrets.');
   }
-}
 
-module.exports = { doctor };
+  // 6. Check remote status (ahead/behind)
+  try {
+    const remoteStatus = await git.isRemoteAhead(repoPath);
+    if (remoteStatus.ok) {
+      if (remoteStatus.behind) {
+        logger.warn('Your branch is behind remote. You should pull changes before starting autopilot.');
+        issues++;
+      } else if (remoteStatus.ahead) {
+        logger.info('Your branch is ahead of remote. Autopilot will push these changes.');
+      } else {
+        logger.success('Branch is up to date with remote.');
+      }
+    } else {
+       // Could be no upstream configured, which is fine for local-only initially
+       logger.info('Could not check remote status (upstream might not be set).');
+    }
+  } catch (error) {
+    logger.info('Skipping remote status check.');
+  }
+
+  // Summary
+  console.log(''); // newline
+  if (issues === 0) {
+    logger.success('Diagnosis complete. No issues found. You are ready to fly! ✈️');
+  } else {
+    logger.warn(`Diagnosis complete. Found ${issues} potential issue(s).`);
+  }
+};
+
+module.exports = doctor;

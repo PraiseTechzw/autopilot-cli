@@ -1,38 +1,50 @@
-const { execa } = require('execa');
-const logger = require('../utils/logger');
-const { readPid, removePid, isProcessRunning } = require('../utils/process');
+/**
+ * Command: stop
+ * Stops the running Autopilot instance
+ */
 
-async function stopWatcher() {
+const process = require('process');
+const logger = require('../utils/logger');
+const { getRunningPid, removePid } = require('../utils/process');
+
+const stop = async () => {
   const repoPath = process.cwd();
 
   try {
-    const pid = await readPid(repoPath);
+    const pid = await getRunningPid(repoPath);
+
     if (!pid) {
-      logger.warn('Autopilot is not running.');
+      logger.info('Autopilot is not running.');
+      // Clean up stale PID file just in case
+      await removePid(repoPath);
       return;
     }
 
-    if (!isProcessRunning(pid)) {
-      await removePid(repoPath);
-      logger.warn('Found stale PID file. Removed.');
-      return;
-    }
+    logger.info(`Stopping Autopilot (PID: ${pid})...`);
 
     try {
+      // Send SIGTERM to the process
       process.kill(pid, 'SIGTERM');
+      
+      logger.success('Autopilot stopped successfully.');
+      
+      // Cleanup PID file
+      await removePid(repoPath);
+      
     } catch (error) {
-      if (process.platform === 'win32') {
-        await execa('taskkill', ['/PID', String(pid), '/T', '/F'], { reject: false });
+      if (error.code === 'ESRCH') {
+        logger.warn('Process not found (stale PID file). Cleaning up...');
+        await removePid(repoPath);
+        logger.success('Cleaned up stale lock file.');
       } else {
-        throw error;
+        logger.error(`Failed to stop process: ${error.message}`);
       }
     }
 
-    await removePid(repoPath);
-    logger.success(`Stopped autopilot (PID ${pid}).`);
   } catch (error) {
-    logger.error(`Failed to stop autopilot: ${error.message}`);
+    logger.error(`Error stopping autopilot: ${error.message}`);
+    process.exit(1);
   }
-}
+};
 
-module.exports = { stopWatcher };
+module.exports = stop;
