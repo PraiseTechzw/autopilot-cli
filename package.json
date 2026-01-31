@@ -1,6 +1,6 @@
 {
   "name": "@praisetechzw/autopilot",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "publishConfig": {
     "access": "public"
   },
@@ -26,13 +26,10 @@
   "author": "Praise Masunga (PraiseTechzw)",
   "license": "MIT",
   "type": "commonjs",
-
   "bin": {
     "autopilot": "bin/autopilot.js"
   },
-
   "main": "src/index.js",
-
   "scripts": {
     "dev": "node bin/autopilot.js",
     "lint": "echo \"No lint configured\"",
@@ -42,22 +39,17 @@
     "release:minor": "npm test && echo \"⚠️  Ensure CHANGELOG.md is updated\" && npm version minor && git push --follow-tags",
     "release:major": "npm test && echo \"⚠️  Ensure CHANGELOG.md is updated\" && npm version major && git push --follow-tags"
   },
-
   "engines": {
     "node": ">=18.0.0"
   },
-
   "repository": {
     "type": "git",
     "url": "https://github.com/PraiseTechzw/autopilot-cli.git"
   },
-
   "bugs": {
     "url": "https://github.com/PraiseTechzw/autopilot-cli/issues"
   },
-
   "homepage": "https://github.com/PraiseTechzw/autopilot-cli#readme",
-
   "dependencies": {
     "chokidar": "^5.0.0",
     "commander": "^14.0.3",
