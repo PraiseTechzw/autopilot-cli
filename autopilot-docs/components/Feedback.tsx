@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ThumbsUp, ThumbsDown, Edit, Loader2 } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Edit } from 'lucide-react';
 import clsx from 'clsx';
 import { ISSUES_URL, DOCS_EDIT_URL } from '@/lib/constants';
 import { usePathname } from 'next/navigation';

@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { ArrowRight, Download, Terminal } from 'lucide-react';
+import { AlertCircle, ArrowRight, Download, Play, Terminal } from 'lucide-react';
 import { FeatureShowcase } from '@/components/FeatureShowcase';
 import { InstallCommand } from '@/components/InstallCommand';
-import { REPO_URL } from '@/lib/constants';
+import { REPO_URL, NPM_URL } from '@/lib/constants';
 import { getWeeklyDownloads, getTotalDownloads } from '@/lib/npm';
 
 export default async function Home() {
@@ -45,6 +45,20 @@ export default async function Home() {
       />
       {/* Hero */}
       <section className="py-24 px-4 text-center">
+        {/* Stats Badge */}
+        <div className="flex justify-center mb-8">
+          <a
+            href={NPM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/50 border border-border hover:bg-secondary/80 hover:border-link/30 transition-all cursor-pointer animate-fade-in group"
+          >
+            <Download className="h-3.5 w-3.5 text-link group-hover:scale-110 transition-transform" />
+            <span className="text-sm font-medium text-foreground">{displayDownloads.toLocaleString()}</span>
+            <span className="text-xs text-muted-foreground">{downloadLabel}</span>
+          </a>
+        </div>
+
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
           Autopilot CLI — Git automation with safety rails
         </h1>
@@ -70,15 +84,6 @@ export default async function Home() {
         </div>
 
         <InstallCommand />
-
-        {/* Stats */}
-        <div className="mt-12 flex justify-center items-center gap-2 text-muted-foreground animate-fade-in">
-          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-border">
-            <Download className="h-4 w-4 text-link" />
-            <span className="font-medium text-foreground">{displayDownloads.toLocaleString()}</span>
-            <span className="text-sm">{downloadLabel}</span>
-          </div>
-        </div>
       </section>
 
       {/* Features */}
