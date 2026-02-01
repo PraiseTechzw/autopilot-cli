@@ -4,6 +4,8 @@ import { DocMetadata } from '@/lib/mdx';
 import { SidebarNav, SidebarStats } from './Sidebar';
 import { X } from 'lucide-react';
 import { useSidebar } from './SidebarProvider';
+import { Feedback } from './Feedback';
+import { usePathname } from 'next/navigation';
 
 interface DocLayoutProps {
   children: React.ReactNode;
@@ -13,6 +15,11 @@ interface DocLayoutProps {
 
 export function DocLayout({ children, docs, stats }: DocLayoutProps) {
   const { isOpen, close } = useSidebar();
+  const pathname = usePathname();
+  
+  // Find current doc to pass title to Feedback
+  // Normalize pathname to match route (e.g. remove trailing slash if needed, though Next.js handles this)
+  const currentDoc = docs.find(doc => doc.route === pathname) || docs.find(doc => doc.route === pathname?.replace(/\/$/, ''));
 
   return (
     <div className="flex-1 container mx-auto flex items-start">
@@ -49,6 +56,7 @@ export function DocLayout({ children, docs, stats }: DocLayoutProps) {
       {/* Main Content */}
       <main className="flex-1 w-full min-w-0 py-6 px-4 md:px-8">
         {children}
+        <Feedback title={currentDoc?.title} />
       </main>
     </div>
   );

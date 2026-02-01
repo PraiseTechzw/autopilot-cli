@@ -66,27 +66,6 @@ export default async function DocPage({
       )}
       <hr className="my-8 border-gray-200 dark:border-gray-800" />
       <MDXRemote source={doc.content} components={components} />
-      <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <a 
-          href={editUrl} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="text-sm text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 transition-colors"
-        >
-          <Edit className="h-4 w-4" />
-          <span>Edit this page on GitHub</span>
-        </a>
-        
-        <a 
-          href={issueUrl}
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="text-sm text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 transition-colors"
-        >
-          <AlertCircle className="h-4 w-4" />
-          <span>Report an issue</span>
-        </a>
-      </div>
     </article>
   );
 }

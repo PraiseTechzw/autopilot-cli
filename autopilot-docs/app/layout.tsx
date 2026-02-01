@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarProvider } from "@/components/SidebarProvider";
 import { Topbar } from "@/components/Topbar";
 import { Footer } from "@/components/Footer";
+import { VersionBadge } from "@/components/VersionBadge";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
