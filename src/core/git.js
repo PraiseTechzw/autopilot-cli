@@ -49,7 +49,11 @@ async function getPorcelainStatus(root) {
 
     const files = raw
       .split(/\r?\n/)
-      .map(line => line.slice(3).trim()); // Remove status prefix (XY + space)
+      .map(line => {
+        const status = line.slice(0, 2).trim();
+        const file = line.slice(3).trim();
+        return { status, file };
+      });
 
     return { ok: true, files, raw };
   } catch (error) {
