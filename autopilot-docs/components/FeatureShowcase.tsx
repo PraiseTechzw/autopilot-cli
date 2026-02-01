@@ -15,12 +15,13 @@ const features = [
     bg: 'bg-blue-500/10',
     steps: [
       { text: 'autopilot start', type: 'command' },
-      { text: '[Watcher] Listening for changes in .', type: 'info', delay: 500 },
-      { text: '[Change] Detected modification in src/auth.ts', type: 'warning', delay: 1500 },
-      { text: '[AI] Analyzing diff...', type: 'info', delay: 1000 },
-      { text: '[Commit] Generated: "feat: add jwt token refresh"', type: 'success', delay: 800 },
-      { text: '[Push] Pushing to origin/main...', type: 'info', delay: 1200 },
-      { text: '[Success] Changes synced!', type: 'success' }
+      { text: 'Watcher initialized. Listening for changes...', type: 'info', delay: 800 },
+      { text: 'Detected change in src/auth.ts', type: 'warning', delay: 1000 },
+      { text: 'Analyzing changes with AI...', type: 'processing', delay: 1500 },
+      { text: 'Generated commit message: "feat: implement jwt token refresh"', type: 'success', delay: 800 },
+      { text: 'Pushing to origin/main...', type: 'processing', delay: 1200 },
+      { text: 'Successfully pushed commit a7b8c9', type: 'success' },
+      { text: 'Waiting for next change...', type: 'info' }
     ] as TerminalStep[]
   },
   {
@@ -32,12 +33,13 @@ const features = [
     bg: 'bg-yellow-500/10',
     steps: [
       { text: 'autopilot start', type: 'command' },
-      { text: '[Watcher] Monitoring 42 files...', type: 'info', delay: 600 },
-      { text: '[Watcher] Ignore rules loaded from .gitignore', type: 'info', delay: 400 },
-      { text: '[Change] src/components/Button.tsx modified', type: 'warning', delay: 2000 },
-      { text: '[Debounce] Waiting for file stability...', type: 'info', delay: 800 },
-      { text: '[Action] Triggering auto-commit workflow', type: 'success', delay: 600 },
-      { text: '[Success] Synced in 1.2s', type: 'success' }
+      { text: 'Monitoring 42 files in /src', type: 'info', delay: 600 },
+      { text: 'Ignore rules loaded from .gitignore', type: 'info', delay: 400 },
+      { text: 'src/components/Button.tsx modified', type: 'warning', delay: 500 },
+      { text: 'Debouncing (waiting for file stability)...', type: 'processing', delay: 1200 },
+      { text: 'Stability reached. Triggering workflow.', type: 'success', delay: 600 },
+      { text: 'Commit generated and pushed in 1.2s', type: 'success' },
+      { text: 'Watching for changes...', type: 'info' }
     ] as TerminalStep[]
   },
   {
@@ -49,11 +51,13 @@ const features = [
     bg: 'bg-green-500/10',
     steps: [
       { text: 'autopilot start', type: 'command' },
-      { text: '[Watcher] Branch: production (PROTECTED)', type: 'warning', delay: 800 },
-      { text: '[Warning] Auto-push is disabled on protected branch', type: 'error', delay: 600 },
-      { text: '[Change] Detected change in config.json', type: 'info', delay: 2000 },
-      { text: '[Commit] Created commit a1b2c3d', type: 'success', delay: 1000 },
-      { text: '[Info] Changes committed locally. Push manually when ready.', type: 'info' }
+      { text: 'Current branch: production', type: 'info', delay: 400 },
+      { text: 'Checking branch protection rules...', type: 'processing', delay: 1000 },
+      { text: 'PROTECTED BRANCH DETECTED', type: 'warning', delay: 500 },
+      { text: 'Auto-push is disabled on "production"', type: 'error', delay: 600 },
+      { text: 'Detected change in config.json', type: 'info', delay: 1500 },
+      { text: 'Created local commit 3f2a1d', type: 'success', delay: 800 },
+      { text: 'Changes saved locally. Push manually when ready.', type: 'info' }
     ] as TerminalStep[]
   },
   {
@@ -65,11 +69,13 @@ const features = [
     bg: 'bg-purple-500/10',
     steps: [
       { text: 'autopilot init', type: 'command' },
-      { text: '[Config] Created .autopilotrc.json', type: 'success', delay: 800 },
-      { text: '[Config] Added .autopilot to .gitignore', type: 'success', delay: 600 },
-      { text: '[Info] Ready to go! Run "autopilot start"', type: 'info', delay: 1000 },
+      { text: 'Scanning project structure...', type: 'processing', delay: 1000 },
+      { text: 'Created .autopilotrc.json', type: 'success', delay: 500 },
+      { text: 'Added .autopilot to .gitignore', type: 'success', delay: 500 },
+      { text: 'Initialization complete! Run "autopilot start"', type: 'info', delay: 1000 },
       { text: 'autopilot start', type: 'command' },
-      { text: '[Watcher] Started with default settings', type: 'info' }
+      { text: 'Loaded custom configuration from .autopilotrc.json', type: 'info' },
+      { text: 'Watching 15 files...', type: 'info' }
     ] as TerminalStep[]
   }
 ];
@@ -78,13 +84,13 @@ export function FeatureShowcase() {
   const [activeFeature, setActiveFeature] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // Auto-switch features every 8 seconds if user hasn't interacted
+  // Auto-switch features every 10 seconds if user hasn't interacted
   useEffect(() => {
     if (!isAutoPlaying) return;
 
     const interval = setInterval(() => {
       setActiveFeature((prev) => (prev + 1) % features.length);
-    }, 8000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [isAutoPlaying]);

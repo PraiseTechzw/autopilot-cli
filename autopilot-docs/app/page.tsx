@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { ArrowRight, Shield, Zap, GitCommit, Terminal, Check, Copy, Play, Settings, AlertCircle } from 'lucide-react';
+import { ArrowRight, Terminal, Check, Copy, Play, AlertCircle } from 'lucide-react';
 import { FeatureShowcase } from '@/components/FeatureShowcase';
 import { REPO_URL } from '@/lib/constants';
 
@@ -64,36 +64,7 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-24 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <FeatureCard 
-              icon={<GitCommit className="h-6 w-6 text-white" />}
-              iconBg="bg-blue-500"
-              title="Smart Commits"
-              description="Generates professional conventional commit messages automatically based on your changes."
-            />
-            <FeatureCard 
-              icon={<Zap className="h-6 w-6 text-white" />}
-              iconBg="bg-yellow-500"
-              title="Watcher Engine"
-              description="Real-time file monitoring with smart debouncing using chokidar to catch every save."
-            />
-            <FeatureCard 
-              icon={<Shield className="h-6 w-6 text-white" />}
-              iconBg="bg-green-500"
-              title="Safety First"
-              description="Blocks commits on protected branches and checks remote status to prevent conflicts."
-            />
-            <FeatureCard 
-              icon={<Settings className="h-6 w-6 text-white" />}
-              iconBg="bg-purple-500"
-              title="Zero Config"
-              description="Works out of the box, but fully configurable via .autopilotrc.json if needed."
-            />
-          </div>
-        </div>
-      </section>
+      <FeatureShowcase />
 
       {/* How it works */}
       <section className="py-24 px-4">
