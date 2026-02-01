@@ -1,0 +1,17 @@
+diff --git a/app/globals.css b/app/globals.css
+index 123456..789abc 100644
+--- a/app/globals.css
++++ b/app/globals.css
+@@ -1,5 +1,12 @@
+ :root {
+-  --foreground-rgb: 0, 0, 0;
+-  --background-start-rgb: 214, 219, 220;
+-  --background-end-rgb: 255, 255, 255;
++  --color-primary: #3b82f6;
++  --color-surface: #f3f4f6;
++}
++
++[data-theme='dark'] {
++  --color-primary: #60a5fa;
++  --color-surface: #1f2937;
+ }

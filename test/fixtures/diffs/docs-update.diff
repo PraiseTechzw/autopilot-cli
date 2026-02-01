@@ -1,0 +1,10 @@
+diff --git a/docs/configuration.md b/docs/configuration.md
+index 111111..222222 100644
+--- a/docs/configuration.md
++++ b/docs/configuration.md
+@@ -10,4 +10,4 @@
+ 
+ ## Options
+ 
+-- \`interval\`: Time in seconds between checks.
++- \`minSecondsBetweenCommits\`: Time in seconds (default: 180) to wait between auto-commits.

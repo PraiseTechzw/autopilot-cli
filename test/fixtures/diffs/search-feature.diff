@@ -1,0 +1,38 @@
+diff --git a/components/Search.tsx b/components/Search.tsx
+new file mode 100644
+index 000000..abcdef
+--- /dev/null
++++ b/components/Search.tsx
+@@ -0,0 +1,45 @@
++import { useEffect, useState } from 'react';
++import { createPortal } from 'react-dom';
++
++export const Search = () => {
++  const [isOpen, setIsOpen] = useState(false);
++
++  useEffect(() => {
++    const handleKeyDown = (e: KeyboardEvent) => {
++      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
++        e.preventDefault();
++        setIsOpen(true);
++      }
++    };
++    window.addEventListener('keydown', handleKeyDown);
++    return () => window.removeEventListener('keydown', handleKeyDown);
++  }, []);
++
++  if (!isOpen) return null;
++
++  return createPortal(
++    <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
++      <div className="bg-white dark:bg-zinc-900 w-full max-w-lg mx-auto mt-20 rounded-xl shadow-2xl">
++        <input 
++          placeholder="Search docs..." 
++          className="w-full px-4 py-3 bg-transparent border-b outline-none"
++          autoFocus
++        />
++      </div>
++    </div>,
++    document.body
++  );
++};

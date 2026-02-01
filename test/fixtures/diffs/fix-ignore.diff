@@ -1,0 +1,11 @@
+diff --git a/src/config/defaults.js b/src/config/defaults.js
+index 333333..444444 100644
+--- a/src/config/defaults.js
++++ b/src/config/defaults.js
+@@ -5,4 +5,5 @@ module.exports = {
+   ignored: [
+     'node_modules',
++    '.vscode/autopilot.log',
+     '.git'
+   ]
+ };

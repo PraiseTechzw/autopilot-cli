@@ -1,0 +1,12 @@
+{
+  "ui-tokens.diff": "style(ui): use theme variables for button colors\n\n- Updated Button component to use CSS variables instead of hardcoded classes\n- Added hover states using theme tokens\n- Enabled color transitions",
+  "theme-vars.diff": "feat(theme): add primary and surface color tokens\n\n- Defined `--color-primary` and `--color-surface` variables\n- Added dark mode overrides for theme tokens",
+  "search-feature.diff": "feat(search): add command palette modal\n\n- Implemented `Search` component with keyboard shortcuts (Cmd+K)\n- Added backdrop blur and responsive layout\n- Configured portal rendering for modal overlay",
+  "docs-update.diff": "docs(config): clarify minSecondsBetweenCommits option\n\n- Updated configuration documentation to match actual parameter names",
+  "fix-ignore.diff": "fix(config): ignore autopilot.log to prevent loops\n\n- Added `.vscode/autopilot.log` to default ignore list",
+  "refactor-move.diff": "refactor(utils): move time helpers to dedicated module\n\n- Deleted `src/utils/helpers.js`\n- Created `src/utils/time.js` with `sleep` function",
+  "breaking-config.diff": "feat(config): rename timeout to connectionTimeout\n\n- Updated default configuration to use `connectionTimeout`\n\nBREAKING CHANGE: The `timeout` option has been renamed to `connectionTimeout`",
+  "tests-only.diff": "test(cli): add unknown command validation test\n\n- Added test case for invalid CLI commands",
+  "release-scripts.diff": "chore(release): add verification step before publish\n\n- Updated release script to run `npm run verify` before publishing",
+  "ci-update.diff": "ci(workflow): enable tests in CI pipeline\n\n- Added `npm test` step to GitHub Actions workflow"
+}

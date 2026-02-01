@@ -146,6 +146,28 @@ async function push(root, branch) {
   }
 }
 
+/**
+ * Get git diff of staged changes
+ * @param {string} root - Repository root path
+ * @param {boolean} staged - Whether to get staged diff (default: true)
+ * @returns {Promise<string>} Diff content
+ */
+async function getDiff(root, staged = true) {
+  try {
+    const args = ['diff'];
+    if (staged) args.push('--cached');
+    
+    // Add context lines (default is 3, but explicit is good)
+    // -U3 is standard
+    args.push('-U3');
+    
+    const { stdout } = await execa('git', args, { cwd: root });
+    return stdout || '';
+  } catch (error) {
+    return '';
+  }
+}
+
 module.exports = {
   getBranch,
   hasChanges,
@@ -155,4 +177,5 @@ module.exports = {
   fetch,
   isRemoteAhead,
   push,
+  getDiff,
 };

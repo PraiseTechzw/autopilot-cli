@@ -1,0 +1,17 @@
+diff --git a/components/Button.tsx b/components/Button.tsx
+index 4b3d1a..8f9e2c 100644
+--- a/components/Button.tsx
++++ b/components/Button.tsx
+@@ -5,7 +5,7 @@ export const Button = ({ children, variant = 'primary' }: Props) => {
+   return (
+     <button
+-      className={`px-4 py-2 rounded-md ${
+-        variant === 'primary' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+-      }`}
++      className={`px-4 py-2 rounded-md transition-colors ${
++        variant === 'primary' 
++          ? 'bg-[var(--color-primary)] text-[var(--color-on-primary)] hover:bg-[var(--color-primary-hover)]' 
++          : 'bg-[var(--color-surface)] text-[var(--color-on-surface)] hover:bg-[var(--color-surface-hover)]'
++      }`}
+     >
+       {children}
