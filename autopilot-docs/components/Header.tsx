@@ -31,7 +31,7 @@ export function Header({ docs }: HeaderProps) {
           >
             <Github className="h-5 w-5" />
           </Link>
-          <button className="md:hidden p-2 text-gray-500">
+          <button onClick={onMenuClick} className="md:hidden p-2 text-gray-500">
             <Menu className="h-5 w-5" />
           </button>
         </div>

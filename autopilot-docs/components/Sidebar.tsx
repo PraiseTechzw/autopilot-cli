@@ -5,11 +5,11 @@ import { usePathname } from 'next/navigation';
 import { navigation } from '@/lib/navigation';
 import clsx from 'clsx';
 
-export function Sidebar() {
+export function SidebarNav({ className, onLinkClick }: { className?: string; onLinkClick?: () => void }) {
   const pathname = usePathname();
 
   return (
-    <nav className="w-64 flex-shrink-0 py-6 px-4 border-r border-gray-200 dark:border-gray-800 hidden md:block h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto">
+    <nav className={className}>
       {navigation.map((section, i) => (
         <div key={i} className="mb-8">
           {section.title && (
@@ -24,6 +24,7 @@ export function Sidebar() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
+                    onClick={onLinkClick}
                     target={item.external ? '_blank' : undefined}
                     rel={item.external ? 'noopener noreferrer' : undefined}
                     className={clsx(
@@ -42,5 +43,11 @@ export function Sidebar() {
         </div>
       ))}
     </nav>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <SidebarNav className="w-64 flex-shrink-0 py-6 px-4 border-r border-gray-200 dark:border-gray-800 hidden md:block h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto" />
   );
 }
