@@ -58,7 +58,12 @@ function SidebarGroup({ section, pathname, onLinkClick }: { section: NavSection;
   );
 }
 
-export function SidebarNav({ className, onLinkClick }: { className?: string; onLinkClick?: () => void }) {
+export interface SidebarStats {
+  version: string | null;
+  downloads: number | null;
+}
+
+export function SidebarNav({ className, onLinkClick, stats }: { className?: string; onLinkClick?: () => void; stats?: SidebarStats }) {
   const pathname = usePathname();
 
   return (
@@ -77,7 +82,7 @@ export function SidebarNav({ className, onLinkClick }: { className?: string; onL
             </div>
             <div>
               <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">Latest Release</p>
-              <p className="text-[10px] text-gray-500">v1.0.0 is now available</p>
+              <p className="text-[10px] text-gray-500">{stats?.version ? `v${stats.version}` : 'v—'}{stats?.downloads ? ` • ${stats.downloads.toLocaleString()} / week` : ''}</p>
             </div>
           </div>
           <a
@@ -95,8 +100,8 @@ export function SidebarNav({ className, onLinkClick }: { className?: string; onL
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ stats }: { stats?: SidebarStats }) {
   return (
-    <SidebarNav className="w-64 flex-shrink-0 py-8 px-4 border-r border-gray-200/50 dark:border-gray-800/50 hidden md:flex h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto scrollbar-none" />
+    <SidebarNav stats={stats} className="w-64 flex-shrink-0 py-8 px-4 border-r border-gray-200/50 dark:border-gray-800/50 hidden md:flex h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto scrollbar-none" />
   );
 }

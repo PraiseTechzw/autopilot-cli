@@ -1,22 +1,23 @@
 'use client';
 
 import { DocMetadata } from '@/lib/mdx';
-import { SidebarNav } from './Sidebar';
+import { SidebarNav, SidebarStats } from './Sidebar';
 import { X } from 'lucide-react';
 import { useSidebar } from './SidebarProvider';
 
 interface DocLayoutProps {
   children: React.ReactNode;
   docs: DocMetadata[];
+  stats?: SidebarStats;
 }
 
-export function DocLayout({ children, docs }: DocLayoutProps) {
+export function DocLayout({ children, docs, stats }: DocLayoutProps) {
   const { isOpen, close } = useSidebar();
 
   return (
     <div className="flex-1 container mx-auto flex items-start">
       {/* Desktop Sidebar */}
-      <SidebarNav className="hidden md:block w-64 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto py-6 pr-4" />
+      <SidebarNav stats={stats} className="hidden md:block w-64 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto py-6 pr-4" />
 
       {/* Mobile Sidebar (Drawer) */}
       {isOpen && (
@@ -39,7 +40,7 @@ export function DocLayout({ children, docs }: DocLayoutProps) {
               </button>
             </div>
             <div className="flex-1 overflow-y-auto">
-              <SidebarNav onLinkClick={close} />
+              <SidebarNav stats={stats} onLinkClick={close} />
             </div>
           </div>
         </div>

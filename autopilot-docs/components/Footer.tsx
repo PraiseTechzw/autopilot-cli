@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { REPO_URL, ISSUES_URL, RELEASES_URL } from '@/lib/constants';
 
 export function Footer() {
   return (
@@ -16,7 +17,9 @@ export function Footer() {
           
           <div className="flex items-center gap-6 text-sm font-medium text-gray-600 dark:text-gray-400">
             <Link href="/docs" className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">Documentation</Link>
-            <a href="https://github.com/PraiseTechzw/autopilot-cli" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">GitHub</a>
+            <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">GitHub</a>
+            <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">Releases</a>
+            <a href={ISSUES_URL} target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">Issues</a>
             <a href="https://www.npmjs.com/package/autopilot-cli" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors">NPM</a>
           </div>
         </div>

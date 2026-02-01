@@ -3,7 +3,9 @@ import { MDXRemote } from 'next-mdx-remote/rsc';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import { Pre } from '@/components/Pre';
-import { Edit } from 'lucide-react';
+import { AlertCircle, Edit } from 'lucide-react';
+import { DOCS_EDIT_URL, ISSUES_URL } from '@/lib/constants';
+import { components } from '@/components/MDXComponents';
 
 export async function generateStaticParams() {
   const files = getDocSlugs();
@@ -49,7 +51,10 @@ export default async function DocPage({
     notFound();
   }
 
-  const editUrl = `https://github.com/PraiseTechzw/autopilot-cli/edit/main/autopilot-docs/content/docs/${slug === 'index' ? 'index' : slug}.mdx`;
+  const editUrl = `${DOCS_EDIT_URL}/${slug === 'index' ? 'index' : slug}.mdx`;
+  const issueTitle = encodeURIComponent(`Issue with docs: ${doc.metadata.title}`);
+  const issueBody = encodeURIComponent(`\n\n**Route**: /docs/${slug}\n**What happened?**\n\n**Expected behavior?**\n\n**Screenshots?**`);
+  const issueUrl = `${ISSUES_URL}/new?title=${issueTitle}&body=${issueBody}`;
 
   return (
     <article className="prose prose-blue dark:prose-invert max-w-none">
@@ -60,16 +65,26 @@ export default async function DocPage({
         </p>
       )}
       <hr className="my-8 border-gray-200 dark:border-gray-800" />
-      <MDXRemote source={doc.content} components={{ pre: Pre }} />
-      <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800">
+      <MDXRemote source={doc.content} components={components} />
+      <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <a 
           href={editUrl} 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="text-sm text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2"
+          className="text-sm text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 transition-colors"
         >
           <Edit className="h-4 w-4" />
           <span>Edit this page on GitHub</span>
+        </a>
+        
+        <a 
+          href={issueUrl}
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-sm text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 flex items-center gap-2 transition-colors"
+        >
+          <AlertCircle className="h-4 w-4" />
+          <span>Report an issue</span>
         </a>
       </div>
     </article>

@@ -39,7 +39,7 @@ export default function RootLayout({
       >
         <ThemeProvider defaultTheme="system" storageKey="autopilot-theme">
           <SidebarProvider>
-            <Topbar />
+            <Topbar versionBadge={<VersionBadge />} />
             <div className="flex-1 flex flex-col">
               {children}
             </div>

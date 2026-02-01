@@ -4,12 +4,16 @@ import Link from 'next/link';
 import { Github, Menu, Command } from 'lucide-react';
 import { Search } from './Search';
 import { ThemeToggle } from './ThemeToggle';
+import { useSidebar } from './SidebarProvider';
+import { REPO_URL } from '@/lib/constants';
 
 interface TopbarProps {
-  onMenuClick?: () => void;
+  versionBadge?: React.ReactNode;
 }
 
-export function Topbar({ onMenuClick }: TopbarProps) {
+export function Topbar({ versionBadge }: TopbarProps) {
+  const { toggle } = useSidebar();
+  
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200/50 dark:border-gray-800/50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 transition-colors duration-500">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -22,6 +26,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
               Autopilot<span className="text-blue-500">CLI</span>
             </span>
           </Link>
+          {versionBadge}
         </div>
 
         <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
@@ -35,7 +40,7 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
         <div className="flex items-center gap-2">
           <Link
-            href="https://github.com/PraiseTechzw/autopilot-cli"
+            href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100/50 dark:bg-gray-800/50 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors border border-gray-200/50 dark:border-gray-700/50 mr-2"

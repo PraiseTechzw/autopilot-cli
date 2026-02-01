@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRight, Shield, Zap, GitCommit, Terminal, Check, Copy, Play, Settings, AlertCircle } from 'lucide-react';
+import { REPO_URL } from '@/lib/constants';
 
 export default function Home() {
   const [copied, setCopied] = useState(false);
@@ -32,7 +33,7 @@ export default function Home() {
             Get Started <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="https://github.com/PraiseTechzw/autopilot-cli"
+            href={REPO_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
