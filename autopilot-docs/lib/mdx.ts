@@ -8,6 +8,7 @@ export interface DocMetadata {
   title: string;
   description: string;
   slug: string;
+  route: string;
 }
 
 export interface Doc {
@@ -35,6 +36,7 @@ export function getDocBySlug(slug: string): Doc | null {
     metadata: {
       ...data,
       slug: realSlug,
+      route: realSlug === 'index' ? '/docs' : `/docs/${realSlug}`,
     } as DocMetadata,
     content,
   };

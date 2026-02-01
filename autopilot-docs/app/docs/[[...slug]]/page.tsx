@@ -8,6 +8,7 @@ import { DOCS_EDIT_URL, ISSUES_URL } from '@/lib/constants';
 import { components } from '@/components/MDXComponents';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
+import remarkGfm from 'remark-gfm';
 
 export async function generateStaticParams() {
   const files = getDocSlugs();
@@ -72,6 +73,7 @@ export default async function DocPage({
         components={components} 
         options={{
           mdxOptions: {
+            remarkPlugins: [remarkGfm],
             rehypePlugins: [
               rehypeHighlight,
               rehypeSlug,

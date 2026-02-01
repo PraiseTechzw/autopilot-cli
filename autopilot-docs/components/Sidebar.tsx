@@ -6,6 +6,7 @@ import { navigation, NavSection } from '@/lib/navigation';
 import clsx from 'clsx';
 import { ChevronDown, ChevronRight, Package, ExternalLink, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import { NPM_URL } from '@/lib/constants';
 
 function SidebarGroup({ section, pathname, onLinkClick }: { section: NavSection; pathname: string; onLinkClick?: () => void }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -86,7 +87,7 @@ export function SidebarNav({ className, onLinkClick, stats }: { className?: stri
             </div>
           </div>
           <a
-            href="https://www.npmjs.com/package/autopilot-cli"
+            href={NPM_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full px-3 py-2 text-xs font-medium text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-200"

@@ -1,19 +1,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import GithubSlugger from 'github-slugger';
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'docs');
 const OUTPUT_FILE = path.join(process.cwd(), 'lib', 'search-index.json');
-
-function slugify(text) {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-');
-}
 
 function getAllFiles(dirPath, arrayOfFiles = []) {
   const files = fs.readdirSync(dirPath);
@@ -45,6 +36,7 @@ function generateIndex() {
   files.forEach((filePath) => {
     const fileContent = fs.readFileSync(filePath, 'utf8');
     const { data, content } = matter(fileContent);
+    const slugger = new GithubSlugger();
     
     // Calculate route
     const relativePath = path.relative(CONTENT_DIR, filePath);
@@ -76,8 +68,7 @@ function generateIndex() {
     while ((match = headingRegex.exec(content)) !== null) {
       const level = match[1].length;
       const text = match[2].trim();
-      // Simple slugify - in a real app, match your rehype-slug configuration
-      const slug = slugify(text);
+      const slug = slugger.slug(text);
       const headingRoute = `${route}#${slug}`;
 
       index.push({

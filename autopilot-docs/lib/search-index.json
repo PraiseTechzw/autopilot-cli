@@ -179,7 +179,7 @@
   },
   {
     "title": "Branch Naming & Commits",
-    "route": "/docs/contributing#branch-naming-commits",
+    "route": "/docs/contributing#branch-naming--commits",
     "type": "heading",
     "parentTitle": "Contributing",
     "level": 2

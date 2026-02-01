@@ -5,3 +5,4 @@ export const DOCS_REPO_PATH = 'autopilot-docs/content/docs'; // Path within the 
 export const DOCS_EDIT_URL = `${REPO_URL}/edit/main/${DOCS_REPO_PATH}`;
 export const ISSUES_URL = `${REPO_URL}/issues`;
 export const RELEASES_URL = `${REPO_URL}/releases`;
+export const NPM_URL = 'https://www.npmjs.com/package/@traisetech/autopilot';
