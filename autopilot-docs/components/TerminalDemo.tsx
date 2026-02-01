@@ -6,7 +6,7 @@ import clsx from 'clsx';
 
 export interface TerminalStep {
   text: string;
-  type: 'command' | 'output' | 'success' | 'error' | 'info' | 'warning' | 'processing';
+  type: 'command' | 'output' | 'success' | 'error' | 'info' | 'warning' | 'processing' | 'debug' | 'section';
   delay?: number;
 }
 
@@ -34,6 +34,7 @@ export function TerminalDemo({ steps, className }: TerminalDemoProps) {
     if (currentStepIndex >= steps.length) return;
 
     const step = steps[currentStepIndex];
+    let timeoutId: NodeJS.Timeout;
     
     if (!isTyping) {
       setIsTyping(true);
@@ -49,11 +50,11 @@ export function TerminalDemo({ steps, className }: TerminalDemoProps) {
             charIndex++;
             // Random typing delay between 30ms and 80ms
             const delay = Math.random() * 50 + 30;
-            setTimeout(typeNextChar, delay);
+            timeoutId = setTimeout(typeNextChar, delay);
           } else {
             setIsTyping(false);
             // Add full line and move to next
-            setTimeout(() => {
+            timeoutId = setTimeout(() => {
               setLines(prev => [...prev, step]);
               setCurrentStepIndex(prev => prev + 1);
             }, 400);
@@ -64,22 +65,23 @@ export function TerminalDemo({ steps, className }: TerminalDemoProps) {
       } else if (step.type === 'processing') {
         // Show spinner for a while then move to next
         setLines(prev => [...prev, step]);
-        setTimeout(() => {
-          // Replace processing line with done or remove it? 
-          // For now let's just move to next step which usually contains the result
+        timeoutId = setTimeout(() => {
           setCurrentStepIndex(prev => prev + 1);
           setIsTyping(false);
         }, step.delay || 1500);
       } else {
         // Instant output with delay
-        const timeout = setTimeout(() => {
+        timeoutId = setTimeout(() => {
           setLines(prev => [...prev, step]);
           setCurrentStepIndex(prev => prev + 1);
           setIsTyping(false);
         }, step.delay || 300);
-        return () => clearTimeout(timeout);
       }
     }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [currentStepIndex, steps, isTyping]);
 
   // Auto scroll
@@ -137,13 +139,18 @@ export function TerminalDemo({ steps, className }: TerminalDemoProps) {
 
 function LineContent({ step, isLast }: { step: TerminalStep, isLast: boolean }) {
   if (step.type === 'processing') {
-    // Only show spinner if it's the last line (active processing)
-    // If it's not last, it means processing finished, so we can hide it or show "Done"
-    if (!isLast) return null; 
-    
+    if (isLast) {
+      return (
+        <div className="flex items-center text-blue-400 gap-2">
+          <Loader2 className="w-3 h-3 animate-spin" />
+          <span>{step.text}</span>
+        </div>
+      );
+    }
+    // If finished, show as static text (simulating history)
     return (
-      <div className="flex items-center text-blue-400 gap-2">
-        <Loader2 className="w-3 h-3 animate-spin" />
+      <div className="flex items-center text-blue-400 gap-2 opacity-80">
+        <span className="w-3 h-3" /> {/* Spacer to align text with spinner version */}
         <span>{step.text}</span>
       </div>
     );

@@ -15,13 +15,15 @@ const features = [
     bg: 'bg-blue-500/10',
     steps: [
       { text: 'autopilot start', type: 'command' },
-      { text: 'Watcher initialized. Listening for changes...', type: 'info', delay: 800 },
-      { text: 'Detected change in src/auth.ts', type: 'warning', delay: 1000 },
-      { text: 'Analyzing changes with AI...', type: 'processing', delay: 1500 },
-      { text: 'Generated commit message: "feat: implement jwt token refresh"', type: 'success', delay: 800 },
-      { text: 'Pushing to origin/main...', type: 'processing', delay: 1200 },
-      { text: 'Successfully pushed commit a7b8c9', type: 'success' },
-      { text: 'Waiting for next change...', type: 'info' }
+      { text: 'Starting Autopilot', type: 'section', delay: 200 },
+      { text: 'Press Ctrl+C to stop, or run "autopilot stop" in another terminal.', type: 'info', delay: 400 },
+      { text: 'Starting Autopilot watcher...', type: 'info', delay: 800 },
+      { text: 'Autopilot is watching /Users/demo/project', type: 'success', delay: 400 },
+      { text: 'Logs: /Users/demo/project/autopilot.log', type: 'info', delay: 2000 },
+      { text: 'Committing changes...', type: 'info', delay: 1500 },
+      { text: 'Commit done', type: 'success', delay: 800 },
+      { text: 'Pushing to remote...', type: 'info', delay: 1200 },
+      { text: 'Push complete', type: 'success' },
     ] as TerminalStep[]
   },
   {
@@ -33,13 +35,15 @@ const features = [
     bg: 'bg-yellow-500/10',
     steps: [
       { text: 'autopilot start', type: 'command' },
-      { text: 'Monitoring 42 files in /src', type: 'info', delay: 600 },
-      { text: 'Ignore rules loaded from .gitignore', type: 'info', delay: 400 },
-      { text: 'src/components/Button.tsx modified', type: 'warning', delay: 500 },
-      { text: 'Debouncing (waiting for file stability)...', type: 'processing', delay: 1200 },
-      { text: 'Stability reached. Triggering workflow.', type: 'success', delay: 600 },
-      { text: 'Commit generated and pushed in 1.2s', type: 'success' },
-      { text: 'Watching for changes...', type: 'info' }
+      { text: 'Starting Autopilot', type: 'section', delay: 200 },
+      { text: 'Autopilot is watching /Users/demo/project', type: 'success', delay: 800 },
+      { text: 'File event: change src/components/Button.tsx', type: 'debug', delay: 1000 },
+      { text: 'Debounce fired. Waiting...', type: 'debug', delay: 500 },
+      { text: 'Checking git status...', type: 'debug', delay: 1200 },
+      { text: 'Git dirty: true', type: 'debug', delay: 200 },
+      { text: 'Checking remote status...', type: 'debug', delay: 300 },
+      { text: 'Committing changes...', type: 'info', delay: 800 },
+      { text: 'Commit done', type: 'success' }
     ] as TerminalStep[]
   },
   {
@@ -51,13 +55,10 @@ const features = [
     bg: 'bg-green-500/10',
     steps: [
       { text: 'autopilot start', type: 'command' },
-      { text: 'Current branch: production', type: 'info', delay: 400 },
-      { text: 'Checking branch protection rules...', type: 'processing', delay: 1000 },
-      { text: 'PROTECTED BRANCH DETECTED', type: 'warning', delay: 500 },
-      { text: 'Auto-push is disabled on "production"', type: 'error', delay: 600 },
-      { text: 'Detected change in config.json', type: 'info', delay: 1500 },
-      { text: 'Created local commit 3f2a1d', type: 'success', delay: 800 },
-      { text: 'Changes saved locally. Push manually when ready.', type: 'info' }
+      { text: 'Starting Autopilot', type: 'section', delay: 200 },
+      { text: 'Starting Autopilot watcher...', type: 'info', delay: 800 },
+      { text: "Branch 'production' is blocked in config. Stopping.", type: 'error', delay: 600 },
+      { text: 'Watcher stopped', type: 'info' }
     ] as TerminalStep[]
   },
   {
@@ -69,13 +70,18 @@ const features = [
     bg: 'bg-purple-500/10',
     steps: [
       { text: 'autopilot init', type: 'command' },
-      { text: 'Scanning project structure...', type: 'processing', delay: 1000 },
-      { text: 'Created .autopilotrc.json', type: 'success', delay: 500 },
-      { text: 'Added .autopilot to .gitignore', type: 'success', delay: 500 },
-      { text: 'Initialization complete! Run "autopilot start"', type: 'info', delay: 1000 },
-      { text: 'autopilot start', type: 'command' },
-      { text: 'Loaded custom configuration from .autopilotrc.json', type: 'info' },
-      { text: 'Watching 15 files...', type: 'info' }
+      { text: '🚀 Autopilot Init', type: 'section', delay: 400 },
+      { text: 'Built by Praise Masunga (PraiseTechzw)', type: 'info', delay: 200 },
+      { text: 'Initializing git automation...', type: 'processing', delay: 400 },
+      { text: 'Git repository detected', type: 'success', delay: 400 },
+      { text: 'Created .autopilotignore', type: 'success', delay: 200 },
+      { text: 'Created .autopilotrc.json', type: 'success', delay: 200 },
+      { text: 'Updated .gitignore', type: 'success', delay: 200 },
+      { text: '✨ Initialization Complete', type: 'section', delay: 400 },
+      { text: 'Next steps:', type: 'info', delay: 200 },
+      { text: '  1. Review .autopilotrc.json to customize settings', type: 'info', delay: 200 },
+      { text: '  2. Review .autopilotignore to adjust ignore patterns', type: 'info', delay: 200 },
+      { text: '  3. Run "autopilot start" to begin watching', type: 'info', delay: 200 },
     ] as TerminalStep[]
   }
 ];
