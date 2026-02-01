@@ -1,0 +1,305 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+:root {
+  /* Premium Light Theme (Vercel-inspired) */
+  --background: #ffffff;
+  --foreground: #0a0a0a;
+  
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0a;
+  
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  
+  --secondary: #fafafa;
+  --secondary-foreground: #171717;
+  
+  --muted: #f5f5f5;
+  --muted-foreground: #737373;
+  
+  --accent: #f5f5f5;
+  --accent-foreground: #0a0a0a;
+  
+  --destructive: #ef4444;
+  --destructive-foreground: #fafafa;
+  
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #0a0a0a;
+  
+  --link: #0070f3;
+  --link-hover: #0051a2;
+
+  --code-bg: #f5f5f5;
+  --code-border: #e5e5e5;
+  
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Premium Dark Theme */
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  
+  --card: #0a0a0a;
+  --card-foreground: #ededed;
+  
+  --popover: #0a0a0a;
+  --popover-foreground: #ededed;
+  
+  --primary: #ffffff;
+  --primary-foreground: #0a0a0a;
+  
+  --secondary: #171717;
+  --secondary-foreground: #ededed;
+  
+  --muted: #171717;
+  --muted-foreground: #a3a3a3;
+  
+  --accent: #171717;
+  --accent-foreground: #ededed;
+  
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fafafa;
+  
+  --border: #262626;
+  --input: #262626;
+  --ring: #d4d4d8;
+  
+  --link: #3291ff;
+  --link-hover: #0070f3;
+
+  --code-bg: #1c1c1c;
+  --code-border: #333333;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-code-bg: var(--code-bg);
+  --color-code-border: var(--code-border);
+  
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: calc(var(--radius) - 1px);
+  --radius-lg: var(--radius);
+  
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* MDX Prose Overrides */
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--link);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--muted-foreground);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--code-bg);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+}
+
+/* Reset inline code styles when inside pre */
+pre code {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-weight: inherit !important;
+  color: inherit !important;
+  box-shadow: none !important;
+}
+
+/* Syntax Highlighting (GitHub Light / Dark inspired) */
+.hljs-comment,
+.hljs-quote {
+  color: #6e7781;
+}
+.hljs-doctag,
+.hljs-keyword,
+.hljs-formula {
+  color: #cf222e;
+}
+.hljs-section,
+.hljs-name,
+.hljs-selector-tag,
+.hljs-deletion,
+.hljs-subst {
+  color: #0550ae;
+}
+.hljs-literal {
+  color: #953800;
+}
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta .hljs-string {
+  color: #0a3069;
+}
+.hljs-attr,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-type,
+.hljs-selector-class,
+.hljs-selector-attr,
+.hljs-selector-pseudo,
+.hljs-number {
+  color: #953800;
+}
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-title {
+  color: #8250df;
+}
+.hljs-built_in,
+.hljs-title.class_,
+.hljs-class .hljs-title {
+  color: #953800;
+}
+.hljs-emphasis {
+  font-style: italic;
+}
+.hljs-strong {
+  font-weight: bold;
+}
+.hljs-link {
+  text-decoration: underline;
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: #8b949e;
+}
+.dark .hljs-doctag,
+.dark .hljs-keyword,
+.dark .hljs-formula {
+  color: #ff7b72;
+}
+.dark .hljs-section,
+.dark .hljs-name,
+.dark .hljs-selector-tag,
+.dark .hljs-deletion,
+.dark .hljs-subst {
+  color: #79c0ff;
+}
+.dark .hljs-literal {
+  color: #ffa657;
+}
+.dark .hljs-string,
+.dark .hljs-regexp,
+.dark .hljs-addition,
+.dark .hljs-attribute,
+.dark .hljs-meta .hljs-string {
+  color: #a5d6ff;
+}
+.dark .hljs-attr,
+.dark .hljs-variable,
+.dark .hljs-template-variable,
+.dark .hljs-type,
+.dark .hljs-selector-class,
+.dark .hljs-selector-attr,
+.dark .hljs-selector-pseudo,
+.dark .hljs-number {
+  color: #ffa657;
+}
+.dark .hljs-symbol,
+.dark .hljs-bullet,
+.dark .hljs-link,
+.dark .hljs-meta,
+.dark .hljs-selector-id,
+.dark .hljs-title {
+  color: #d2a8ff;
+}
+.dark .hljs-built_in,
+.dark .hljs-title.class_,
+.dark .hljs-class .hljs-title {
+  color: #ffa657;
+}
+
+.dark .prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--link);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--muted-foreground);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--code-bg);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted-foreground);
+}
+
+/* Inline Code Style */
+:not(pre) > code {
+  background-color: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.875em;
+  color: var(--foreground);
+}

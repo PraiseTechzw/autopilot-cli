@@ -1,0 +1,602 @@
+[
+  {
+    "title": "Changelog",
+    "description": "Latest updates and improvements to Autopilot CLI.",
+    "route": "/docs/changelog",
+    "type": "page"
+  },
+  {
+    "title": "v0.1.4",
+    "route": "/docs/changelog#v014",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.3",
+    "route": "/docs/changelog#v013",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.2",
+    "route": "/docs/changelog#v012",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.0",
+    "route": "/docs/changelog#v010",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "CLI Reference",
+    "description": "Complete reference for all Autopilot CLI commands.",
+    "route": "/docs/commands",
+    "type": "page"
+  },
+  {
+    "title": "CLI Reference",
+    "route": "/docs/commands#cli-reference",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 1
+  },
+  {
+    "title": "`autopilot init`",
+    "route": "/docs/commands#autopilot-init",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot start`",
+    "route": "/docs/commands#autopilot-start",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot stop`",
+    "route": "/docs/commands#autopilot-stop",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "Stop watching before switching branches",
+    "route": "/docs/commands#stop-watching-before-switching-branches",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 1
+  },
+  {
+    "title": "`autopilot status`",
+    "route": "/docs/commands#autopilot-status",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot doctor`",
+    "route": "/docs/commands#autopilot-doctor",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "Configuration",
+    "description": "Customize Autopilot CLI behavior using configuration files.",
+    "route": "/docs/configuration",
+    "type": "page"
+  },
+  {
+    "title": ".autopilotrc.json",
+    "route": "/docs/configuration#autopilotrcjson",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "Example Configuration",
+    "route": "/docs/configuration#example-configuration",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": ".autopilotignore",
+    "route": "/docs/configuration#autopilotignore",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "Ignore all markdown files in the drafts folder",
+    "route": "/docs/configuration#ignore-all-markdown-files-in-the-drafts-folder",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 1
+  },
+  {
+    "title": "Ignore a specific config file",
+    "route": "/docs/configuration#ignore-a-specific-config-file",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 1
+  },
+  {
+    "title": "Ignore all log files",
+    "route": "/docs/configuration#ignore-all-log-files",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 1
+  },
+  {
+    "title": "Recommended Defaults",
+    "route": "/docs/configuration#recommended-defaults",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "Use Case Examples",
+    "route": "/docs/configuration#use-case-examples",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "\"Commit Only\" Mode",
+    "route": "/docs/configuration#commit-only-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "\"Aggressive Sync\" Mode",
+    "route": "/docs/configuration#aggressive-sync-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Contributing",
+    "description": "How to set up your environment and contribute to Autopilot CLI.",
+    "route": "/docs/contributing",
+    "type": "page"
+  },
+  {
+    "title": "Development Setup",
+    "route": "/docs/contributing#development-setup",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Branch Naming & Commits",
+    "route": "/docs/contributing#branch-naming--commits",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Branch Naming",
+    "route": "/docs/contributing#branch-naming",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Commit Messages",
+    "route": "/docs/contributing#commit-messages",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Running Tests",
+    "route": "/docs/contributing#running-tests",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Unit Tests",
+    "route": "/docs/contributing#unit-tests",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Integration Tests",
+    "route": "/docs/contributing#integration-tests",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Pull Request Checklist",
+    "route": "/docs/contributing#pull-request-checklist",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Code Style",
+    "route": "/docs/contributing#code-style",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Introduction",
+    "description": "Intelligent Git automation that commits and pushes your code, so you can focus on building.",
+    "route": "/docs",
+    "type": "page"
+  },
+  {
+    "title": "What is Autopilot?",
+    "route": "/docs#what-is-autopilot",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 1
+  },
+  {
+    "title": "Quick Install",
+    "route": "/docs#quick-install",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "60-Second Quick Start",
+    "route": "/docs#60-second-quick-start",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "1. Initialize",
+    "route": "/docs#1-initialize",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "2. Start Watching",
+    "route": "/docs#2-start-watching",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "3. Check Status",
+    "route": "/docs#3-check-status",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "4. Stop",
+    "route": "/docs#4-stop",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "Explore Documentation",
+    "route": "/docs#explore-documentation",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "Installation",
+    "description": "Get Autopilot CLI up and running on your machine in seconds.",
+    "route": "/docs/installation",
+    "type": "page"
+  },
+  {
+    "title": "Installation",
+    "route": "/docs/installation#installation",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 1
+  },
+  {
+    "title": "Prerequisites",
+    "route": "/docs/installation#prerequisites",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Global Installation",
+    "route": "/docs/installation#global-installation",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Using npm",
+    "route": "/docs/installation#using-npm",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Using yarn",
+    "route": "/docs/installation#using-yarn",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Using pnpm",
+    "route": "/docs/installation#using-pnpm",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Verify Installation",
+    "route": "/docs/installation#verify-installation",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Troubleshooting",
+    "route": "/docs/installation#troubleshooting",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Windows PATH Issues",
+    "route": "/docs/installation#windows-path-issues",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Permission Errors (EACCES)",
+    "route": "/docs/installation#permission-errors-eacces",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Uninstalling",
+    "route": "/docs/installation#uninstalling",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Quick Start",
+    "description": "Go from zero to automated commits in under 5 minutes.",
+    "route": "/docs/quick-start",
+    "type": "page"
+  },
+  {
+    "title": "Quick Start Guide",
+    "route": "/docs/quick-start#quick-start-guide",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 1
+  },
+  {
+    "title": "1. Setup a Project",
+    "route": "/docs/quick-start#1-setup-a-project",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "2. Initialize Autopilot",
+    "route": "/docs/quick-start#2-initialize-autopilot",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "3. Recommended Workflow: Use a Dev Branch",
+    "route": "/docs/quick-start#3-recommended-workflow-use-a-dev-branch",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "4. Start the Watcher",
+    "route": "/docs/quick-start#4-start-the-watcher",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "5. Make Some Changes",
+    "route": "/docs/quick-start#5-make-some-changes",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "6. Monitor Status",
+    "route": "/docs/quick-start#6-monitor-status",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "7. Stop the Watcher",
+    "route": "/docs/quick-start#7-stop-the-watcher",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "Viewing Logs",
+    "route": "/docs/quick-start#viewing-logs",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "Safety Rails",
+    "description": "How Autopilot CLI protects your code and git history.",
+    "route": "/docs/safety",
+    "type": "page"
+  },
+  {
+    "title": "Why Safety Rails Exist",
+    "route": "/docs/safety#why-safety-rails-exist",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Blocked Branches",
+    "route": "/docs/safety#blocked-branches",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Remote Sync Checks",
+    "route": "/docs/safety#remote-sync-checks",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "No Empty Commits",
+    "route": "/docs/safety#no-empty-commits",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Ignored Noise Files",
+    "route": "/docs/safety#ignored-noise-files",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Best Practices",
+    "route": "/docs/safety#best-practices",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "1. Use Feature Branches",
+    "route": "/docs/safety#1-use-feature-branches",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 3
+  },
+  {
+    "title": "2. Keep Commits Small",
+    "route": "/docs/safety#2-keep-commits-small",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 3
+  },
+  {
+    "title": "3. Review Before Merge",
+    "route": "/docs/safety#3-review-before-merge",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 3
+  },
+  {
+    "title": "Troubleshooting",
+    "description": "Solutions for common issues and debugging steps for Autopilot CLI.",
+    "route": "/docs/troubleshooting",
+    "type": "page"
+  },
+  {
+    "title": "First Steps: The Doctor",
+    "route": "/docs/troubleshooting#first-steps-the-doctor",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 2
+  },
+  {
+    "title": "Common Issues",
+    "route": "/docs/troubleshooting#common-issues",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 2
+  },
+  {
+    "title": "Autopilot detects changes but never commits",
+    "route": "/docs/troubleshooting#autopilot-detects-changes-but-never-commits",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": ".autopilotignore",
+    "route": "/docs/troubleshooting#autopilotignore",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 1
+  },
+  {
+    "title": "Push fails or \"Authentication failed\"",
+    "route": "/docs/troubleshooting#push-fails-or-authentication-failed",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Autopilot start crashes immediately",
+    "route": "/docs/troubleshooting#autopilot-start-crashes-immediately",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Should be v18.0.0 or higher",
+    "route": "/docs/troubleshooting#should-be-v1800-or-higher",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 1
+  },
+  {
+    "title": "Stop or Status commands aren't working",
+    "route": "/docs/troubleshooting#stop-or-status-commands-arent-working",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Debugging Tools",
+    "route": "/docs/troubleshooting#debugging-tools",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 2
+  },
+  {
+    "title": "Manual Git Check",
+    "route": "/docs/troubleshooting#manual-git-check",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Log Files",
+    "route": "/docs/troubleshooting#log-files",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  }
+]

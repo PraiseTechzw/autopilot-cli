@@ -1,0 +1,88 @@
+---
+title: Contributing
+description: How to set up your environment and contribute to Autopilot CLI.
+---
+
+We love contributions! Whether it's fixing a bug, improving documentation, or proposing a new feature, your help is welcome.
+
+## Development Setup
+
+1.  **Fork and Clone**
+    Clone your fork of the repository:
+    ```bash
+    git clone https://github.com/your-username/autopilot-cli.git
+    cd autopilot-cli
+    ```
+
+2.  **Install Dependencies**
+    We use `npm` for dependency management.
+    ```bash
+    npm install
+    ```
+
+3.  **Run Tests**
+    Ensure everything is working correctly before you start.
+    ```bash
+    npm test
+    ```
+
+4.  **Link Locally**
+    To test the CLI on your machine while developing:
+    ```bash
+    npm link
+    ```
+    Now you can run `autopilot` in any other directory to test your changes.
+
+## Branch Naming & Commits
+
+### Branch Naming
+Please use descriptive branch names that include the type of change:
+
+-   `feature/new-command`
+-   `fix/debounce-bug`
+-   `docs/update-readme`
+-   `refactor/file-watcher`
+
+### Commit Messages
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification. This helps us generate changelogs automatically.
+
+```text
+feat: add new 'autopilot doctor' command
+fix: resolve race condition in git push
+docs: update installation guide
+chore: upgrade dependencies
+```
+
+## Running Tests
+
+### Unit Tests
+Run the standard unit test suite:
+```bash
+npm test
+```
+
+### Integration Tests
+Integration tests run the actual CLI against a temporary git repository. These are slower but essential for verifying git operations.
+
+```bash
+npm run test:integration
+```
+
+> **Note:** Integration tests may require a working git installation and internet access if checking remote operations.
+
+## Pull Request Checklist
+
+Before submitting your PR, please ensure:
+
+-   [ ] Tests pass locally (`npm test`).
+-   [ ] You have added tests for any new functionality.
+-   [ ] You have updated the documentation if user-facing behavior changed.
+-   [ ] Code follows the project's style guidelines.
+-   [ ] Commit messages are descriptive.
+
+## Code Style
+
+-   **Clean Code:** Keep functions small and focused.
+-   **Comments:** Comment complex logic, but prefer self-documenting code (clear variable names) over excessive comments.
+-   **Signature:** Please preserve the signature line in the main entry point if it exists.
+-   **Formatting:** We use Prettier. Run `npm run format` before committing.

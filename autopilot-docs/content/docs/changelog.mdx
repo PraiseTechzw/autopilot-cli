@@ -1,0 +1,43 @@
+---
+title: Changelog
+description: Latest updates and improvements to Autopilot CLI.
+---
+
+Stay up to date with the latest changes to Autopilot CLI. For a full history of releases, visit our [GitHub Releases](https://github.com/autopilot-cli/autopilot/releases) page.
+
+## v0.1.4
+
+**Release Date:** 2024-05-20
+
+This release focuses on stability and Windows compatibility improvements.
+
+-   **Fix:** Resolved path separator issues on Windows that caused some files to be ignored incorrectly.
+-   **Improvement:** Enhanced debounce logic to prevent "double commits" when saving multiple files at once.
+-   **Docs:** Added new [Troubleshooting](/docs/troubleshooting) guide.
+
+## v0.1.3
+
+**Release Date:** 2024-05-10
+
+Introducing the new "Doctor" command to help diagnose environment issues.
+
+-   **New:** Added `autopilot doctor` command to check for Node.js version, git configuration, and permissions.
+-   **New:** Support for `.autopilotignore` file to exclude specific files from auto-commits without adding them to `.gitignore`.
+-   **Fix:** `autopilot status` now correctly reports "Stopped" instead of crashing when the daemon is not running.
+
+## v0.1.2
+
+**Release Date:** 2024-05-01
+
+-   **New:** Added support for `minInterval` configuration in `.autopilotrc.json`.
+-   **Improvement:** Better error handling for network timeouts during `git push`.
+
+## v0.1.0
+
+**Release Date:** 2024-04-15
+
+Initial public release of Autopilot CLI.
+
+-   **Feature:** Automatic file watching and committing.
+-   **Feature:** Background daemon management with `start` and `stop` commands.
+-   **Feature:** Safety rails for blocked branches (e.g., `main`).

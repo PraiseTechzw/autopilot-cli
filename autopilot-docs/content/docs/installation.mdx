@@ -1,0 +1,118 @@
+---
+title: Installation
+description: Get Autopilot CLI up and running on your machine in seconds.
+---
+
+# Installation
+
+Getting started with Autopilot CLI is straightforward. Since it's a Node.js-based tool, you can install it using your favorite package manager.
+
+## Prerequisites
+
+Before installing, ensure you have the following installed on your system:
+
+- **Node.js**: Version **18.0.0** or higher is required.
+- **Git**: Autopilot relies on your system's git installation to perform operations.
+
+You can check your current Node.js version by running:
+
+```bash
+node --version
+```
+
+## Global Installation
+
+We recommend installing Autopilot globally so you can use the `autopilot` command from any project directory.
+
+### Using npm
+
+```bash
+npm install -g @traisetech/autopilot
+```
+
+### Using yarn
+
+```bash
+yarn global add @traisetech/autopilot
+```
+
+### Using pnpm
+
+```bash
+pnpm add -g @traisetech/autopilot
+```
+
+---
+
+## Verify Installation
+
+Once installed, verify that the command is available by checking the help menu:
+
+```bash
+autopilot --help
+```
+
+You should see an output similar to this:
+
+```text
+Usage: autopilot [options] [command]
+
+Intelligent Git automation that commits and pushes your code
+
+Options:
+  -V, --version   output the version number
+  -h, --help      display help for command
+
+Commands:
+  init            Initialize Autopilot in the current directory
+  start           Start the file watcher
+  status          Check the status of the Autopilot daemon
+  stop            Stop the Autopilot daemon
+  help [command]  display help for command
+```
+
+---
+
+## Troubleshooting
+
+### Windows PATH Issues
+
+If you see an error like `'autopilot' is not recognized as an internal or external command` after installation, it usually means your npm global binaries folder is not in your system's `PATH`.
+
+**To fix this on Windows:**
+
+1.  Open **System Properties** (search for "Edit the system environment variables").
+2.  Click **Environment Variables**.
+3.  Under **User variables**, find `Path` and click **Edit**.
+4.  Look for a path ending in `npm` or `nodejs`. It is often:
+    *   `%APPDATA%\npm`
+    *   `C:\Users\<YourUser>\AppData\Roaming\npm`
+5.  If it's missing, click **New** and add the path to your roaming npm folder.
+6.  Click **OK** on all windows.
+7.  **Restart your terminal** (or VS Code) for changes to take effect.
+
+### Permission Errors (EACCES)
+
+On macOS or Linux, if you receive a permission error during global installation, you may need to use `sudo` or fix your npm permissions.
+
+**Using sudo (quick fix):**
+
+```bash
+sudo npm install -g @traisetech/autopilot
+```
+
+**Fixing permissions (recommended):**
+
+We recommend using a version manager like `nvm` or `fnm` which handles permissions automatically without needing `sudo`.
+
+---
+
+## Uninstalling
+
+If you need to remove Autopilot CLI from your system:
+
+```bash
+npm uninstall -g @traisetech/autopilot
+```
+
+This will remove the global binary but will **not** delete any `.autopilotrc.json` configuration files you created in your projects. You can safely delete those manually if desired.

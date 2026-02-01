@@ -1,0 +1,150 @@
+---
+title: CLI Reference
+description: Complete reference for all Autopilot CLI commands.
+---
+
+# CLI Reference
+
+Autopilot CLI exposes a set of commands to manage the background watcher process and configuration.
+
+## `autopilot init`
+
+Initializes Autopilot in the current directory.
+
+**Syntax:**
+```bash
+autopilot init [options]
+```
+
+**What it does:**
+1.  Checks if the current directory is a git repository.
+2.  Creates a `.autopilotrc.json` configuration file with default settings.
+3.  Adds `.autopilot/` to your `.gitignore` file to prevent logs from being committed.
+
+**Common Output:**
+```text
+✔ Initialized Autopilot configuration
+✔ Added .autopilot/ to .gitignore
+```
+
+**Example:**
+```bash
+cd my-project
+autopilot init
+```
+
+---
+
+## `autopilot start`
+
+Starts the background file watcher daemon.
+
+**Syntax:**
+```bash
+autopilot start
+```
+
+**What it does:**
+*   Spawns a detached background process.
+*   Begins monitoring the current directory (and subdirectories) for file changes using `chokidar`.
+*   Respects `.gitignore` and `.autopilotrc.json` ignore rules.
+*   Automatically commits and pushes changes after the debounce period.
+
+**Common Output:**
+```text
+🚀 Autopilot watcher started in background (PID: 12345)
+Logs: .autopilot/autopilot.log
+```
+
+**Exit Behavior:**
+*   Returns immediately (does not block the terminal).
+*   The background process continues running until explicitly stopped or the system reboots.
+
+---
+
+## `autopilot stop`
+
+Stops the running Autopilot daemon for the current project.
+
+**Syntax:**
+```bash
+autopilot stop
+```
+
+**What it does:**
+1.  Reads the Process ID (PID) from `.autopilot/autopilot.pid`.
+2.  Sends a termination signal to that process.
+3.  Cleans up the PID file.
+
+**Common Output:**
+```text
+🛑 Autopilot watcher stopped (PID: 12345)
+```
+
+**Example:**
+```bash
+# Stop watching before switching branches
+autopilot stop
+git checkout main
+```
+
+---
+
+## `autopilot status`
+
+Checks the status of the Autopilot daemon.
+
+**Syntax:**
+```bash
+autopilot status
+```
+
+**What it does:**
+*   Checks if the PID file exists.
+*   Verifies if the process with that PID is actually running.
+*   Displays the current state (Running, Stopped, or Stale).
+
+**Common Output (Running):**
+```text
+✅ Autopilot is running (PID: 12345)
+```
+
+**Common Output (Stopped):**
+```text
+⚪ Autopilot is not running
+```
+
+---
+
+## `autopilot doctor`
+
+Diagnoses common issues with your Autopilot setup.
+
+**Syntax:**
+```bash
+autopilot doctor
+```
+
+**What it does:**
+Checks for:
+1.  **Git Repo**: Is the current directory a valid git repository?
+2.  **Node Version**: Is Node.js >= 18 installed?
+3.  **Config**: Does `.autopilotrc.json` exist and is it valid JSON?
+4.  **Permissions**: Can Autopilot write to the `.autopilot` directory?
+5.  **Remote**: Is a git remote configured?
+
+**Common Output:**
+```text
+🏥 Autopilot Doctor
+-------------------
+[✔] Git repository detected
+[✔] Node.js version v20.10.0
+[✔] Configuration file found
+[✔] Write permissions OK
+[✔] Git remote 'origin' configured
+
+Everything looks good! 🚀
+```
+
+**Example:**
+Use this command if `autopilot start` fails silently or if commits aren't happening as expected.

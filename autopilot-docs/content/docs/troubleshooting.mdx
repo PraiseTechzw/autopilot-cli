@@ -1,0 +1,106 @@
+---
+title: Troubleshooting
+description: Solutions for common issues and debugging steps for Autopilot CLI.
+---
+
+If you run into issues with Autopilot CLI, this guide will help you diagnose and fix them.
+
+## First Steps: The Doctor
+
+Before diving into specific issues, run the built-in diagnostic tool. It checks your environment, git configuration, and permissions.
+
+```bash
+autopilot doctor
+```
+
+If `autopilot doctor` reports all green checks but you still have issues, check the specific scenarios below.
+
+## Common Issues
+
+### Autopilot detects changes but never commits
+
+**Symptoms:** You see "Change detected" logs repeatedly, but no commit is ever created.
+
+**Cause:** This is usually caused by "noisy" files that change constantly (e.g., every second), which constantly resets the debounce timer. If the timer never finishes, the commit never happens.
+
+**Common Culprits:**
+-   VS Code time tracking extensions (writing to a local file).
+-   Build artifacts or hot-reload cache files not ignored.
+-   Log files being written to the source directory.
+
+**Fix:**
+Add the noisy files to your `.autopilotignore` or `.gitignore`.
+
+```text
+# .autopilotignore
+.vscode/arduino.json
+**/*.log
+dist/
+```
+
+### Push fails or "Authentication failed"
+
+**Symptoms:** Autopilot commits locally but fails to push to the remote.
+
+**Cause:** Autopilot uses your system's `git` credentials. If you haven't set up an SSH key or a credential helper (like `git-credential-manager`), background pushes might fail because they can't prompt for a password.
+
+**Fix:**
+Ensure you can run `git push` manually in your terminal without being asked for a password.
+-   **SSH:** Set up an SSH key and add it to GitHub/GitLab.
+-   **HTTPS:** Use a credential helper to cache your token.
+
+### Autopilot start crashes immediately
+
+**Symptoms:** You run `autopilot start` and it exits with an error.
+
+**Cause:**
+1.  **Node Version:** Autopilot requires Node.js v18+.
+2.  **Corrupted Install:** Sometimes global packages get into a bad state.
+
+**Fix:**
+Check your node version:
+```bash
+node -v
+# Should be v18.0.0 or higher
+```
+
+Reinstall the package:
+```bash
+npm uninstall -g autopilot-cli
+npm install -g autopilot-cli
+```
+
+### Stop or Status commands aren't working
+
+**Symptoms:** `autopilot status` says "Running" but it isn't, or `autopilot stop` says "No process found".
+
+**Cause:** The `.autopilot.pid` file (which stores the process ID) might be stale. This happens if the computer crashed or the process was killed forcefully (e.g., via Task Manager) without cleaning up.
+
+**Fix:**
+Manually delete the PID file to reset the state.
+
+```bash
+rm .autopilot.pid
+```
+
+## Debugging Tools
+
+### Manual Git Check
+
+Autopilot relies on `git status` to detect changes. You can see exactly what Autopilot sees by running:
+
+```bash
+git status --porcelain
+```
+
+If this command returns nothing, Autopilot assumes there is nothing to commit.
+
+### Log Files
+
+Autopilot writes detailed logs to `autopilot.log` in your project root. This file contains timestamps of every detection, commit, and error.
+
+```bash
+tail -f autopilot.log
+```
+
+Reviewing the last few lines of this file often reveals the exact error message from Git or the system.
