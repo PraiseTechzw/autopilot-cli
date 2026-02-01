@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project follows [Semantic Versioning](https://semver.org).
 
+## [0.1.7] - 2026-02-01
+
+### Added
+- **CLI Update Notifier**:
+  - Automatically checks for new versions on npm registry (once every 24 hours).
+  - Zero-dependency implementation using native Node.js `https`.
+  - Non-intrusive visual notification box on startup when updates are available.
+- **Documentation**:
+  - Added live NPM download statistics to landing page and documentation sidebar.
+  - Enhanced install command widget with one-click copy.
+
 ## [0.1.6] - 2026-02-01
 
 ### Added
