@@ -159,13 +159,22 @@ function LineContent({ step, isLast }: { step: TerminalStep, isLast: boolean }) 
         </div>
       );
     case 'success':
-      return <div className="text-emerald-400 flex gap-2"><span>✔</span>{step.text}</div>;
+      return <div className="text-emerald-400 flex gap-2"><span className="shrink-0">✅</span><span>{step.text}</span></div>;
     case 'error':
-      return <div className="text-red-400 flex gap-2"><span>✖</span>{step.text}</div>;
+      return <div className="text-red-400 flex gap-2"><span className="shrink-0">❌</span><span>{step.text}</span></div>;
     case 'warning':
-      return <div className="text-yellow-400 flex gap-2"><span>⚠</span>{step.text}</div>;
+      return <div className="text-yellow-400 flex gap-2"><span className="shrink-0">⚠️</span><span>{step.text}</span></div>;
     case 'info':
-      return <div className="text-blue-400 flex gap-2"><span>ℹ</span>{step.text}</div>;
+      return <div className="text-blue-400 flex gap-2"><span className="shrink-0">ℹ️</span><span>{step.text}</span></div>;
+    case 'debug':
+      return <div className="text-gray-500 flex gap-2"><span className="shrink-0">🔍</span><span>{step.text}</span></div>;
+    case 'section':
+      return (
+        <div className="text-gray-100 font-bold mt-4 mb-2">
+          <div>{step.text}</div>
+          <div className="text-gray-600 font-normal">──────────────────────────────────────────────────</div>
+        </div>
+      );
     default:
       return <div className="text-gray-300">{step.text}</div>;
   }
