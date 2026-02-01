@@ -62,8 +62,28 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300`}
       >
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var storageKey = 'autopilot-theme';
+                  var theme = localStorage.getItem(storageKey);
+                  var support = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  var d = document.documentElement;
+                  d.classList.remove('light', 'dark');
+                  if (theme === 'dark' || (!theme && support)) {
+                    d.classList.add('dark');
+                  } else {
+                    d.classList.add('light');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <ThemeProvider defaultTheme="system" storageKey="autopilot-theme">
           <SidebarProvider>
             <Topbar versionBadge={<VersionBadge />} />

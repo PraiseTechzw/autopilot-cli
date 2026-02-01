@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
   /* Premium Light Theme (Vercel-inspired) */
   --background: #ffffff;
