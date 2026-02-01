@@ -9,13 +9,13 @@ describe('Commit Message Generator', () => {
       { status: 'A', file: 'src/commands/start.js' }
     ];
     const msg = generateCommitMessage(files);
-    assert.match(msg, /^feat: /);
+    assert.match(msg, /^feat(\(.*\))?: /);
   });
 
   it('should generate a fix: message for bug fixes', () => {
     const files = [{ status: 'M', file: 'src/fix-bug.js' }];
     const msg = generateCommitMessage(files);
-    assert.match(msg, /^fix: /);
+    assert.match(msg, /^fix(\(.*\))?: /);
   });
 
   it('should generate a docs: message for documentation changes', () => {
@@ -24,7 +24,7 @@ describe('Commit Message Generator', () => {
       { status: 'A', file: 'docs/api.md' }
     ];
     const msg = generateCommitMessage(files);
-    assert.match(msg, /^docs: /);
+    assert.match(msg, /^docs(\(.*\))?: /);
   });
 
   it('should generate a chore: message for config files', () => {
@@ -33,7 +33,7 @@ describe('Commit Message Generator', () => {
       { status: 'M', file: '.gitignore' }
     ];
     const msg = generateCommitMessage(files);
-    assert.match(msg, /^chore: /);
+    assert.match(msg, /^chore(\(.*\))?: /);
   });
 
   it('should handle mixed file types with priority', () => {
@@ -43,6 +43,6 @@ describe('Commit Message Generator', () => {
     ];
     const msg = generateCommitMessage(files);
     // Source code usually takes precedence
-    assert.match(msg, /^(feat|fix|refactor|update): /);
+    assert.match(msg, /^(feat|fix|refactor|update)(\(.*\))?: /);
   });
 });

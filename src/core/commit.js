@@ -141,7 +141,7 @@ function determineContext(files, analysis) {
   } else if (analysis.hasUiChanges || analysis.hasThemeChanges) {
     type = 'style';
   } else if (fileNames.some(f => f.startsWith('src/'))) {
-    const isNew = files.some(f => f.status === 'A ' || f.status === '??');
+    const isNew = files.some(f => f.status === 'A' || f.status === '??');
     if (isNew) type = 'feat';
     else if (analysis.deletions.length > 0 && analysis.additions.length > 0) {
         if (analysis.deletions.some(d => d.content.includes('function') || d.content.includes('class'))) {
