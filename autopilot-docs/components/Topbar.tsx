@@ -48,15 +48,13 @@ export function Topbar({ onMenuClick }: TopbarProps) {
 
           <ThemeToggle />
           
-          {onMenuClick && (
-            <button 
-              onClick={onMenuClick} 
-              className="md:hidden p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors ml-1"
-              aria-label="Open menu"
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-          )}
+          <button 
+            onClick={toggle} 
+            className="md:hidden p-2 text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors ml-1"
+            aria-label="Open menu"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
         </div>
       </div>
     </header>
