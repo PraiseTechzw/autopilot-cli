@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { ArrowRight, Shield, Zap, GitCommit, Terminal, Check, Copy, Play, Settings, AlertCircle } from 'lucide-react';
+import { FeatureShowcase } from '@/components/FeatureShowcase';
 import { REPO_URL } from '@/lib/constants';
 
 export default function Home() {
@@ -127,18 +128,6 @@ export default function Home() {
       </section>
 
       {/* Footer is handled by layout */}
-    </div>
-  );
-}
-
-function FeatureCard({ icon, iconBg, title, description }: { icon: React.ReactNode, iconBg: string, title: string, description: string }) {
-  return (
-    <div className="bg-card p-8 rounded-2xl shadow-sm border border-border hover:shadow-md transition-shadow">
-      <div className={`w-12 h-12 ${iconBg} rounded-lg flex items-center justify-center mb-6 shadow-lg shadow-muted/50`}>
-        {icon}
-      </div>
-      <h3 className="text-xl font-bold mb-3 text-foreground">{title}</h3>
-      <p className="text-muted-foreground leading-relaxed">{description}</p>
     </div>
   );
 }
