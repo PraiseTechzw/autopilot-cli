@@ -1,6 +1,6 @@
 import { DocLayout } from '@/components/DocLayout';
 import { getAllDocs } from '@/lib/mdx';
-import { getLatestVersion, getWeeklyDownloads } from '@/lib/npm';
+import { getLatestVersion, getTotalDownloads } from '@/lib/npm';
 
 export default async function DocsLayout({
   children,
@@ -10,7 +10,7 @@ export default async function DocsLayout({
   const docs = getAllDocs();
   const [version, downloads] = await Promise.all([
     getLatestVersion(),
-    getWeeklyDownloads(),
+    getTotalDownloads(),
   ]);
 
   return (

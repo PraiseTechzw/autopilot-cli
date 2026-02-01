@@ -83,7 +83,7 @@ export function SidebarNav({ className, onLinkClick, stats }: { className?: stri
             </div>
             <div>
               <p className="text-xs font-semibold text-foreground">Latest Release</p>
-              <p className="text-[10px] text-muted-foreground">{stats?.version ? `v${stats.version}` : 'v—'}{stats?.downloads ? ` • ${stats.downloads.toLocaleString()} / week` : ''}</p>
+              <p className="text-[10px] text-muted-foreground">{stats?.version ? `v${stats.version}` : 'v—'}{stats?.downloads ? ` • ${stats.downloads.toLocaleString()} downloads` : ''}</p>
             </div>
           </div>
           <a

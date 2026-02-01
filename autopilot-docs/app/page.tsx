@@ -1,19 +1,18 @@
-'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
-import { ArrowRight, Terminal, Check, Copy, Play, AlertCircle } from 'lucide-react';
+import { ArrowRight, Download, Terminal } from 'lucide-react';
 import { FeatureShowcase } from '@/components/FeatureShowcase';
+import { InstallCommand } from '@/components/InstallCommand';
 import { REPO_URL } from '@/lib/constants';
+import { getWeeklyDownloads, getTotalDownloads } from '@/lib/npm';
 
-export default function Home() {
-  const [copied, setCopied] = useState(false);
+export default async function Home() {
+  const [weeklyDownloads, totalDownloads] = await Promise.all([
+    getWeeklyDownloads(),
+    getTotalDownloads()
+  ]);
 
-  const onCopy = () => {
-    navigator.clipboard.writeText('npm install -g @traisetech/autopilot');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const displayDownloads = totalDownloads || weeklyDownloads || 0;
+  const downloadLabel = totalDownloads ? 'Total Downloads' : 'Weekly Downloads';
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -34,7 +33,7 @@ export default function Home() {
     },
     author: {
       '@type': 'Person',
-      name: 'PraiseTech',
+      name: 'Praise Masunga',
     },
   };
 
@@ -70,22 +69,14 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="max-w-xl mx-auto relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-          <div className="relative bg-gray-900 rounded-lg p-4 text-left shadow-2xl flex items-center justify-between">
-            <div className="flex gap-3 overflow-x-auto">
-              <span className="text-green-400 select-none">$</span>
-              <code className="font-mono text-sm text-gray-100 whitespace-nowrap">
-                npm install -g @traisetech/autopilot
-              </code>
-            </div>
-            <button
-              onClick={onCopy}
-              className="ml-4 p-2 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors flex-shrink-0"
-              aria-label="Copy install command"
-            >
-              {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
-            </button>
+        <InstallCommand />
+
+        {/* Stats */}
+        <div className="mt-12 flex justify-center items-center gap-2 text-muted-foreground animate-fade-in">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-border">
+            <Download className="h-4 w-4 text-link" />
+            <span className="font-medium text-foreground">{displayDownloads.toLocaleString()}</span>
+            <span className="text-sm">{downloadLabel}</span>
           </div>
         </div>
       </section>
