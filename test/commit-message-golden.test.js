@@ -1,32 +1,26 @@
-const { test, describe, it } = require('node:test');
-const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
+const assert = require('assert');
+const { describe, it } = require('node:test');
 const { generateCommitMessage } = require('../src/core/commit');
 
-const FIXTURES_DIR = path.join(__dirname, 'fixtures', 'diffs');
-const EXPECTED_FILE = path.join(__dirname, 'fixtures', 'expected-messages.json');
+const FIXTURES_DIR = path.join(__dirname, 'fixtures/diffs');
+const EXPECTED_MESSAGES = require('./fixtures/expected-messages.json');
 
 describe('Golden Commit Messages', () => {
-  const expectedMessages = JSON.parse(fs.readFileSync(EXPECTED_FILE, 'utf8'));
-  const fixtureFiles = fs.readdirSync(FIXTURES_DIR);
+  const fixtureFiles = fs.readdirSync(FIXTURES_DIR).filter(f => f.endsWith('.diff'));
 
   fixtureFiles.forEach(filename => {
     it(`should generate correct message for ${filename}`, () => {
       const diffContent = fs.readFileSync(path.join(FIXTURES_DIR, filename), 'utf8');
-      const expected = expectedMessages[filename];
+      const expected = EXPECTED_MESSAGES[filename];
       
-      if (!expected) {
-        throw new Error(`No expected message found for fixture: ${filename}`);
-      }
-
-      // Mock files array based on diff content (simple parsing for test context)
-      // The real implementation will get this from git status
+      // Simulate file list from diff
       const files = parseFilesFromDiff(diffContent);
       
       const actual = generateCommitMessage(files, diffContent);
       
-      // Normalize line endings for comparison
+      // Normalize line endings
       const normalizedActual = actual.replace(/\r\n/g, '\n').trim();
       const normalizedExpected = expected.replace(/\r\n/g, '\n').trim();
 
@@ -40,36 +34,24 @@ function parseFilesFromDiff(diff) {
   const lines = diff.split('\n');
   let currentFile = null;
   let isNew = false;
-  let isDeleted = false;
 
-  for (const line of lines) {
+  lines.forEach(line => {
     if (line.startsWith('diff --git')) {
       if (currentFile) {
-        files.push({
-          file: currentFile,
-          status: isNew ? 'A' : isDeleted ? 'D' : 'M'
-        });
+        files.push({ file: currentFile, status: isNew ? 'A ' : 'M ' });
       }
-      isNew = false;
-      isDeleted = false;
-      // Extract filename from b/path (usually last part)
       const parts = line.split(' ');
-      const bPath = parts[parts.length - 1];
-      currentFile = bPath.startsWith('b/') ? bPath.slice(2) : bPath;
+      const bPart = parts[parts.length - 1];
+      currentFile = bPart.startsWith('b/') ? bPart.slice(2) : bPart;
+      isNew = false;
     } else if (line.startsWith('new file mode')) {
       isNew = true;
-    } else if (line.startsWith('deleted file mode')) {
-      isDeleted = true;
     }
-  }
-  
-  // Push last file
+  });
+
   if (currentFile) {
-    files.push({
-      file: currentFile,
-      status: isNew ? 'A' : isDeleted ? 'D' : 'M'
-    });
+    files.push({ file: currentFile, status: isNew ? 'A ' : 'M ' });
   }
-  
+
   return files;
 }

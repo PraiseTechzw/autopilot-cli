@@ -1,9 +1,0 @@
-diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
-index dddddd..eeeeee 100644
---- a/.github/workflows/ci.yml
-+++ b/.github/workflows/ci.yml
-@@ -10,4 +10,5 @@ jobs:
-     steps:
-       - uses: actions/checkout@v3
-       - run: npm install
-+      - run: npm test

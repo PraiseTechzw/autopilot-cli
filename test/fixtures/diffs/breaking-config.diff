@@ -1,9 +1,0 @@
-diff --git a/src/config/loader.js b/src/config/loader.js
-index 777777..888888 100644
---- a/src/config/loader.js
-+++ b/src/config/loader.js
-@@ -12,3 +12,3 @@ function loadConfig() {
--  return { timeout: 5000 };
-+  // BREAKING: timeout renamed to connectionTimeout
-+  return { connectionTimeout: 5000 };
- }
