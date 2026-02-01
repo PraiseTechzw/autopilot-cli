@@ -15,8 +15,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Autopilot CLI",
+  title: {
+    template: '%s | Autopilot CLI',
+    default: 'Autopilot CLI',
+  },
   description: "Intelligent Git automation with safety rails",
+  twitter: {
+    card: 'summary_large_image',
+  },
 };
 
 export default function RootLayout({

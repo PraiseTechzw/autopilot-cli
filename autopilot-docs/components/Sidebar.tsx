@@ -4,50 +4,56 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { navigation, NavSection } from '@/lib/navigation';
 import clsx from 'clsx';
-import { ChevronDown, ChevronRight, Package, ExternalLink } from 'lucide-react';
+import { ChevronDown, ChevronRight, Package, ExternalLink, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 
 function SidebarGroup({ section, pathname, onLinkClick }: { section: NavSection; pathname: string; onLinkClick?: () => void }) {
-  const isActiveGroup = section.items.some((item) => pathname === item.href);
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className="mb-4">
+    <div className="mb-8">
       {section.title && (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-between w-full text-left mb-2 text-sm font-semibold text-gray-900 dark:text-gray-100 uppercase tracking-wider hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+          className="flex items-center justify-between w-full text-left mb-3 group"
         >
-          {section.title}
-          {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+          <span className="text-[11px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+            {section.title}
+          </span>
+          {isOpen ? (
+            <ChevronDown className="h-3 w-3 text-gray-400 group-hover:text-gray-600 transition-colors" />
+          ) : (
+            <ChevronRight className="h-3 w-3 text-gray-400 group-hover:text-gray-600 transition-colors" />
+          )}
         </button>
       )}
-      {isOpen && (
-        <ul className="space-y-1">
-          {section.items.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={onLinkClick}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
-                  className={clsx(
-                    'block px-2 py-1.5 text-sm rounded-md transition-colors flex items-center gap-2',
-                    isActive
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 font-medium'
-                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-800'
-                  )}
-                >
-                  {item.title}
-                  {item.external && <ExternalLink className="h-3 w-3 opacity-50" />}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      
+      <div className={clsx("space-y-0.5 transition-all duration-300 ease-in-out", isOpen ? "opacity-100 max-h-[1000px]" : "opacity-0 max-h-0 overflow-hidden")}>
+        {section.items.map((item) => {
+          const isActive = pathname === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onLinkClick}
+              target={item.external ? '_blank' : undefined}
+              rel={item.external ? 'noopener noreferrer' : undefined}
+              className={clsx(
+                'group flex items-center gap-2 px-3 py-2 text-sm transition-all duration-200 border-l-2 relative',
+                isActive
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400 bg-gradient-to-r from-blue-50/80 to-transparent dark:from-blue-900/20'
+                  : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:border-gray-300 dark:hover:border-gray-700'
+              )}
+            >
+              {isActive && (
+                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] rounded-full" />
+              )}
+              <span className="relative z-10">{item.title}</span>
+              {item.external && <ExternalLink className="h-3 w-3 opacity-30 group-hover:opacity-100 transition-opacity ml-auto" />}
+            </Link>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -56,31 +62,34 @@ export function SidebarNav({ className, onLinkClick }: { className?: string; onL
   const pathname = usePathname();
 
   return (
-    <nav className={clsx(className, "flex flex-col justify-between")}>
-      <div>
+    <nav className={clsx(className, "flex flex-col h-full")}>
+      <div className="flex-1">
         {navigation.map((section, i) => (
           <SidebarGroup key={i} section={section} pathname={pathname} onLinkClick={onLinkClick} />
         ))}
       </div>
       
-      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800">
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-            Release
-          </span>
-          <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300">
-            v1.0.0
-          </span>
+      <div className="mt-auto pt-6 pb-4">
+        <div className="rounded-xl bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 border border-gray-200/50 dark:border-gray-700/50 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
+              <Sparkles className="h-4 w-4" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-gray-900 dark:text-gray-100">Latest Release</p>
+              <p className="text-[10px] text-gray-500">v1.0.0 is now available</p>
+            </div>
+          </div>
+          <a
+            href="https://www.npmjs.com/package/autopilot-cli"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full px-3 py-2 text-xs font-medium text-white bg-gray-900 dark:bg-gray-100 dark:text-gray-900 rounded-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-200"
+          >
+            <Package className="h-3 w-3" />
+            <span>View on npm</span>
+          </a>
         </div>
-        <a
-          href="https://www.npmjs.com/package/autopilot-cli"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700 dark:hover:bg-gray-700 transition-colors"
-        >
-          <Package className="h-4 w-4" />
-          <span>View on npm</span>
-        </a>
       </div>
     </nav>
   );
@@ -88,6 +97,6 @@ export function SidebarNav({ className, onLinkClick }: { className?: string; onL
 
 export function Sidebar() {
   return (
-    <SidebarNav className="w-64 flex-shrink-0 py-6 px-4 border-r border-gray-200 dark:border-gray-800 hidden md:block h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto" />
+    <SidebarNav className="w-64 flex-shrink-0 py-8 px-4 border-r border-gray-200/50 dark:border-gray-800/50 hidden md:flex h-[calc(100vh-4rem)] sticky top-16 overflow-y-auto scrollbar-none" />
   );
 }
