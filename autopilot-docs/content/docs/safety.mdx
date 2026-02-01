@@ -1,38 +1,68 @@
 ---
-title: Safety Features
-description: How Autopilot keeps your repository safe.
+title: Safety Rails
+description: How Autopilot CLI protects your code and git history.
 ---
 
-# Safety Features
+Automation is powerful, but safety is paramount. Autopilot CLI includes several built-in safety rails to ensure that your automatic commits don't break your repository, overwrite work, or clutter your history with noise.
 
-Autopilot includes several safety mechanisms to prevent accidents and ensure repository integrity.
+## Why Safety Rails Exist
 
-## 1. Blocked Branches
+The goal of Autopilot is to remove the friction of manual commits, not to replace thoughtful engineering practices. Safety rails are designed to:
+1.  Prevent accidental pushes to critical production environments.
+2.  Avoid merge conflicts by checking remote status.
+3.  Keep your git history clean and meaningful.
 
-Autopilot refuses to commit on branches listed in `blockedBranches` (default: `main`, `master`). This prevents accidental direct commits to production or protected branches.
+## Blocked Branches
 
-## 2. Remote Ahead Protection
+By default, Autopilot will **refuse to run** on critical branches to prevent accidental deployments or history pollution.
 
-Before performing actions, Autopilot fetches and checks if the remote branch is ahead of your local branch. If it is, Autopilot pauses and logs a warning, instructing you to pull changes first. This prevents merge conflicts.
+Protected branches by default:
+- `main`
+- `master`
 
-## 3. Required Checks
+You can customize this list in your `.autopilotrc.json`:
 
-If `requireChecks` is enabled in configuration, the commands specified in `checks` must pass (exit code 0) before a commit is created. This ensures you don't commit broken code.
+```json
+{
+  "blockedBranches": ["main", "master", "production", "release/*"]
+}
+```
 
-## 4. Debounce + Rate Limiting
+When you are on a blocked branch, Autopilot will enter a "Standby" mode and will not perform any commits until you switch to a feature branch.
 
-- **Debouncing**: `debounceSeconds` ensures Autopilot waits for you to stop typing/saving before checking status.
-- **Rate Limiting**: `minSecondsBetweenCommits` prevents creating too many commits in a short period.
+## Remote Sync Checks
 
-## 5. Ignore Patterns
+Before every auto-commit loop, Autopilot checks the status of your remote repository.
 
-- **.autopilotignore**: Supports standard glob patterns to exclude files.
-- **Built-in Ignores**: `.git`, `.autopilot.pid`, `autopilot.log`, and `.vscode/` (specific noise files) are automatically ignored.
+-   **Behind Remote:** If your local branch is behind the remote (i.e., there are new changes on the server), Autopilot will **pause** and alert you. It will never force push or automatically merge changes that could result in conflicts.
+-   **Ahead of Remote:** If you are ahead, Autopilot continues to work normally, pushing your new changes (if `autoPush` is enabled).
 
-## 6. Graceful Errors
+## No Empty Commits
 
-Errors are handled without crashing the watcher. Warnings are printed to the console, and verbose details are written to `autopilot.log`.
+Autopilot is smart enough to know when nothing has changed. It will never create an empty commit just because the timer triggered. It only commits when:
+1.  File changes are detected.
+2.  Those changes are not in ignored files.
 
-## 7. PID Tracking
+## Ignored Noise Files
 
-The watcher writes a `.autopilot.pid` file in the repository root on start and removes it on exit. This ensures only one instance of Autopilot runs per repository at a time.
+To keep your history clean, Autopilot automatically ignores common system and editor files, even if they aren't in your `.gitignore`.
+
+Default internal ignores:
+-   `.git/`
+-   `.vscode/`, `.idea/` (Editor settings)
+-   `autopilot.log` (Internal logs)
+-   `.autopilot.pid` (Process lock file)
+-   `node_modules/`
+
+## Best Practices
+
+To get the most out of Autopilot while staying safe:
+
+### 1. Use Feature Branches
+Always work on a feature branch (e.g., `feature/login-page` or `fix/nav-bug`). This isolates your rapid auto-commits from the stable codebase. You can then squash-merge your feature branch into `main` for a clean history.
+
+### 2. Keep Commits Small
+Autopilot naturally encourages small commits by running frequently. This is good! Small commits are easier to revert and debug. Don't set your `minInterval` too high (e.g., > 1 hour), or you lose the benefit of granular history.
+
+### 3. Review Before Merge
+Since Autopilot writes generic commit messages (e.g., "Auto-commit: modified user.ts"), it's good practice to review the diff of your feature branch before merging it into a shared branch.

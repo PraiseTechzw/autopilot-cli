@@ -1,81 +1,81 @@
 ---
 title: Configuration
-description: Customize Autopilot behavior with .autopilotrc.json
+description: Customize Autopilot CLI behavior using configuration files.
 ---
 
-# Configuration
+Autopilot CLI is designed to be zero-config out of the box, but it also offers powerful customization options to fit your workflow. You can configure Autopilot using `.autopilotrc.json` for behavior settings and `.autopilotignore` for file exclusion.
 
-Autopilot uses a `.autopilotrc.json` file for configuration. It is created automatically when you run `autopilot init`.
+## .autopilotrc.json
 
-## File Locations
+The `.autopilotrc.json` file in your project root controls how Autopilot monitors and commits changes.
 
-- **Config**: `.autopilotrc.json` (repo root)
-- **Ignore**: `.autopilotignore` (repo root)
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `minInterval` | `number` | `300` | Minimum time (in seconds) between automatic commits. Useful for debouncing rapid changes. |
+| `autoPush` | `boolean` | `true` | Whether to automatically push commits to the remote repository. |
+| `blockedBranches` | `string[]` | `['main', 'master']` | List of branches where Autopilot is disabled to prevent accidental direct commits to protected branches. |
+| `requireChecks` | `boolean` | `false` | If `true`, Autopilot will wait for local checks (like pre-commit hooks) to pass before committing. |
+| `ignore` | `string[]` | `[]` | Additional glob patterns to ignore, supplementing `.gitignore` and `.autopilotignore`. |
 
-## Full Example
+### Example Configuration
 
 ```json
 {
-  "debounceSeconds": 20,
-  "minSecondsBetweenCommits": 180,
+  "minInterval": 600,
   "autoPush": true,
-  "blockedBranches": ["main", "master"],
-  "requireChecks": false,
-  "checks": ["npm test"],
-  "commitMessageMode": "smart"
+  "blockedBranches": ["main", "production"],
+  "requireChecks": true
 }
 ```
 
-## Settings
+## .autopilotignore
 
-### `debounceSeconds`
-- **Type:** number
-- **Default:** 20
-- **Description:** Wait time (in seconds) after the last file change before checking git status. This prevents committing half-written code.
+Just like `.gitignore`, you can use an `.autopilotignore` file to tell Autopilot which files or directories to skip. This is useful for files that you want to track in Git but **don't** want Autopilot to commit automatically (e.g., specific config files, large assets, or work-in-progress drafts).
 
-### `minSecondsBetweenCommits`
-- **Type:** number
-- **Default:** 180
-- **Description:** Minimum time (in seconds) between commits. Helps prevent commit spam.
+The syntax is standard glob patterns:
 
-### `autoPush`
-- **Type:** boolean
-- **Default:** true
-- **Description:** Whether to push changes to `origin/<branch>` automatically after commit.
+```text
+# Ignore all markdown files in the drafts folder
+docs/drafts/*.md
 
-### `blockedBranches`
-- **Type:** string[]
-- **Default:** `["main", "master"]`
-- **Description:** List of branches where auto-commit is disabled. Useful for protecting production branches.
+# Ignore a specific config file
+local-config.json
 
-### `requireChecks`
-- **Type:** boolean
-- **Default:** false
-- **Description:** Run checks before committing. If any check fails, the commit is skipped.
-
-### `checks`
-- **Type:** string[]
-- **Default:** `[]`
-- **Description:** Shell commands executed sequentially when `requireChecks` is true. Example: `["npm run lint", "npm test"]`.
-
-### `commitMessageMode`
-- **Type:** `"smart" | "simple"`
-- **Default:** `"smart"`
-- **Description:** 
-  - `smart`: Uses file-based conventional commit messages (e.g., `fix: update utils.js`).
-  - `simple`: Uses a static message like `chore: update changes`.
-
-## Ignore File (.autopilotignore)
-
-You can specify files to ignore using gitignore-style patterns in `.autopilotignore`.
-
-Example:
-
-```
-node_modules/
-dist/
-.env
+# Ignore all log files
 *.log
 ```
 
-> **Note:** Autopilot always ignores `.git`, `.autopilot.pid`, and `autopilot.log` regardless of this file.
+> **Note:** Autopilot **always** respects your `.gitignore` file. You do not need to duplicate entries from `.gitignore` into `.autopilotignore`.
+
+## Recommended Defaults
+
+For most users, we recommend the following safety settings to balance automation with control:
+
+1.  **Protect Main Branches:** Always keep `main` and `master` in `blockedBranches`. Use Autopilot on feature branches.
+2.  **Reasonable Interval:** A `minInterval` of `300` (5 minutes) is usually a good balance. It ensures you have a granular history without overwhelming your log.
+3.  **Enable Checks:** If you use pre-commit hooks (husky, etc.), set `requireChecks: true` to ensure you don't commit broken code.
+
+## Use Case Examples
+
+### "Commit Only" Mode
+
+If you want Autopilot to create local checkpoints but **never push** to remote automatically (e.g., if you have strict CI/CD that runs on push), use this config:
+
+```json
+{
+  "autoPush": false,
+  "minInterval": 300
+}
+```
+
+### "Aggressive Sync" Mode
+
+For rapid prototyping or personal projects where you want every change saved and synced immediately:
+
+```json
+{
+  "autoPush": true,
+  "minInterval": 60,
+  "blockedBranches": []
+}
+```

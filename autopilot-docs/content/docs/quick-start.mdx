@@ -1,45 +1,92 @@
 ---
 title: Quick Start
-description: Get up and running with Autopilot in less than a minute.
+description: Go from zero to automated commits in under 5 minutes.
 ---
 
-# Quick Start
+# Quick Start Guide
 
-Follow these steps to start automating your Git workflow.
+This guide will walk you through setting up Autopilot CLI in a new project and demonstrating its core functionality.
 
-## 1. Initialize
+## 1. Setup a Project
 
-Navigate to your Git repository and initialize Autopilot:
+First, let's create a new directory and initialize a git repository. Autopilot requires an existing git repo to function.
 
 ```bash
-cd my-project
+mkdir my-new-project
+cd my-new-project
+git init
+```
+
+## 2. Initialize Autopilot
+
+Run the initialization command to generate the default configuration file:
+
+```bash
 autopilot init
 ```
 
-This will create a default `.autopilotrc.json` and `.autopilotignore` file in your project root.
+This creates a `.autopilotrc.json` file in your project root. You can inspect it, but the defaults are fine for now.
 
-## 2. Start Watching
+## 3. Recommended Workflow: Use a Dev Branch
 
-Start the background daemon to begin monitoring your files:
+By default, Autopilot is configured **NOT** to push to protected branches like `main` or `master` for safety reasons. We strongly recommend working on a feature or development branch.
+
+Create and switch to a new branch:
+
+```bash
+git checkout -b develop
+```
+
+## 4. Start the Watcher
+
+Now, start the background daemon. This command will spawn a separate process that watches your files.
 
 ```bash
 autopilot start
 ```
 
-Autopilot is now running in the background! Any changes you make will be automatically committed and pushed (after a debounce period).
+You should see a message confirming that the watcher has started.
 
-## 3. Check Status
+## 5. Make Some Changes
 
-Verify that Autopilot is running:
+Now for the magic. Create a new file or modify an existing one.
+
+```bash
+echo "Hello Autopilot" > README.md
+```
+
+Wait a few seconds (default debounce is ~30 seconds). Autopilot will detect the change, stage it, create a conventional commit message (e.g., `docs: update README.md`), and push it to your remote `develop` branch.
+
+## 6. Monitor Status
+
+You can check what the daemon is doing at any time:
 
 ```bash
 autopilot status
 ```
 
-## 4. Stop
+This will tell you if the service is `running`, `stopped`, or if it encountered an error.
 
-When you're done for the day or want to stop automation:
+## 7. Stop the Watcher
+
+When you are finished coding for the session, stop the background process:
 
 ```bash
 autopilot stop
 ```
+
+## Viewing Logs
+
+If something isn't working as expected, you can check the logs. Autopilot writes logs to the `.autopilot` directory in your project root (this directory is added to `.gitignore` automatically during init).
+
+To view the latest logs:
+
+```bash
+cat .autopilot/autopilot.log
+```
+
+**Common Log Entries:**
+- `[INFO] File changed: README.md` - Watcher detected a file event.
+- `[INFO] Debounce timer triggered` - Waiting for more changes before committing.
+- `[SUCCESS] Committed and pushed` - Operation completed successfully.
+- `[WARN] Protected branch detected` - Autopilot skipped the push to avoid messing up `main`.
