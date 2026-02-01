@@ -2,6 +2,7 @@ import { getDocBySlug, getDocSlugs } from '@/lib/mdx';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
+import { Pre } from '@/components/Pre';
 
 export async function generateStaticParams() {
   const files = getDocSlugs();
@@ -46,6 +47,8 @@ export default async function DocPage({
   if (!doc) {
     notFound();
   }
+
+  const editUrl = `https://github.com/PraiseTechzw/autopilot-cli/edit/main/autopilot-docs/content/docs/${slug === 'index' ? 'index' : slug}.mdx`;
 
   return (
     <article className="prose prose-blue dark:prose-invert max-w-none">

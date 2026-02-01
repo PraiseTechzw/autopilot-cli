@@ -1,67 +1,91 @@
+'use client';
+
 import Link from 'next/link';
-import { ArrowRight, Shield, Zap, GitCommit, Terminal } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Shield, Zap, GitCommit, Terminal, Check, Copy, Play, Settings, AlertCircle } from 'lucide-react';
 
 export default function Home() {
+  const [copied, setCopied] = useState(false);
+
+  const onCopy = () => {
+    navigator.clipboard.writeText('npm install -g @traisetech/autopilot');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="flex flex-col min-h-[calc(100vh-4rem)]">
       {/* Hero */}
-      <section className="py-20 px-4 text-center">
+      <section className="py-24 px-4 text-center">
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-          Git automation with safety rails
+          Autopilot CLI — Git automation with safety rails
         </h1>
-        <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-          Intelligent Git automation that commits and pushes your code, so you can focus on building.
+        <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
+          Automatic commits & pushes so you stay focused on coding.
         </p>
         
-        <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-12">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
           <Link 
-            href="/docs/quick-start"
-            className="px-8 py-3 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2"
+            href="/docs"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30"
           >
             Get Started <ArrowRight className="h-4 w-4" />
           </Link>
           <Link
-            href="/docs"
-            className="px-8 py-3 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            href="https://github.com/PraiseTechzw/autopilot-cli"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-semibold border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-2"
           >
-            Read the Docs
+            GitHub Repo
           </Link>
         </div>
 
-        <div className="max-w-md mx-auto bg-gray-900 rounded-lg p-4 text-left shadow-xl overflow-x-auto">
-          <div className="flex gap-2 mb-4">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
+        <div className="max-w-xl mx-auto relative group">
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+          <div className="relative bg-gray-900 rounded-lg p-4 text-left shadow-2xl flex items-center justify-between">
+            <div className="flex gap-3 overflow-x-auto">
+              <span className="text-green-400 select-none">$</span>
+              <code className="font-mono text-sm text-gray-100 whitespace-nowrap">
+                npm install -g @traisetech/autopilot
+              </code>
+            </div>
+            <button
+              onClick={onCopy}
+              className="ml-4 p-2 rounded-md hover:bg-gray-800 text-gray-400 hover:text-white transition-colors flex-shrink-0"
+              aria-label="Copy install command"
+            >
+              {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+            </button>
           </div>
-          <code className="font-mono text-sm text-gray-300">
-            <span className="text-green-400">$</span> npm install -g @traisetech/autopilot
-          </code>
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-900/50">
+      <section className="py-24 bg-gray-50 dark:bg-gray-900/50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Autopilot?</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <FeatureCard 
-              icon={<GitCommit className="h-8 w-8 text-blue-500" />}
+              icon={<GitCommit className="h-6 w-6 text-white" />}
+              iconBg="bg-blue-500"
               title="Smart Commits"
               description="Generates professional conventional commit messages automatically based on your changes."
             />
             <FeatureCard 
-              icon={<Zap className="h-8 w-8 text-yellow-500" />}
-              title="File Watcher"
+              icon={<Zap className="h-6 w-6 text-white" />}
+              iconBg="bg-yellow-500"
+              title="Watcher Engine"
               description="Real-time file monitoring with smart debouncing using chokidar to catch every save."
             />
             <FeatureCard 
-              icon={<Shield className="h-8 w-8 text-green-500" />}
+              icon={<Shield className="h-6 w-6 text-white" />}
+              iconBg="bg-green-500"
               title="Safety First"
               description="Blocks commits on protected branches and checks remote status to prevent conflicts."
             />
             <FeatureCard 
-              icon={<Terminal className="h-8 w-8 text-purple-500" />}
+              icon={<Settings className="h-6 w-6 text-white" />}
+              iconBg="bg-purple-500"
               title="Zero Config"
               description="Works out of the box, but fully configurable via .autopilotrc.json if needed."
             />
@@ -69,22 +93,81 @@ export default function Home() {
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="py-24 px-4">
+        <div className="container mx-auto max-w-4xl">
+          <h2 className="text-3xl font-bold text-center mb-16">How it works</h2>
+          
+          <div className="space-y-12 relative before:absolute before:inset-0 before:ml-5 md:before:ml-[50%] before:-translate-x-px md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:dark:via-gray-800 before:to-transparent">
+            <Step 
+              number="1"
+              title="Initialize"
+              description="Navigate to your project and run init. This sets up the configuration and ignore files."
+              command="autopilot init"
+              icon={<Terminal className="h-5 w-5" />}
+            />
+            <Step 
+              number="2"
+              title="Start Watching"
+              description="Start the background daemon. Autopilot will now monitor your files and sync changes automatically."
+              command="autopilot start"
+              icon={<Play className="h-5 w-5" />}
+              reverse
+            />
+            <Step 
+              number="3"
+              title="Manage"
+              description="Check status or stop the watcher when you're done for the day."
+              command="autopilot status"
+              icon={<AlertCircle className="h-5 w-5" />}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="py-8 border-t border-gray-200 dark:border-gray-800 mt-auto">
-        <div className="container mx-auto px-4 text-center text-gray-500">
-          <p>Built by <a href="https://github.com/PraiseTechzw" className="hover:text-blue-500 underline decoration-dotted">Praise Masunga (PraiseTechzw)</a></p>
+      <footer className="py-12 border-t border-gray-200 dark:border-gray-800 mt-auto bg-gray-50 dark:bg-gray-900/30">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500 dark:text-gray-400 font-medium">
+            Built by <a href="https://github.com/PraiseTechzw" className="text-blue-600 dark:text-blue-400 hover:underline decoration-2 underline-offset-2 transition-colors">Praise Masunga (PraiseTechzw)</a>
+          </p>
         </div>
       </footer>
     </div>
   );
 }
 
-function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
+function FeatureCard({ icon, iconBg, title, description }: { icon: React.ReactNode, iconBg: string, title: string, description: string }) {
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-      <div className="mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p className="text-gray-600 dark:text-gray-400">{description}</p>
+    <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow">
+      <div className={`w-12 h-12 ${iconBg} rounded-lg flex items-center justify-center mb-6 shadow-lg shadow-gray-200 dark:shadow-none`}>
+        {icon}
+      </div>
+      <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-gray-100">{title}</h3>
+      <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function Step({ number, title, description, command, icon, reverse }: { number: string, title: string, description: string, command: string, icon: React.ReactNode, reverse?: boolean }) {
+  return (
+    <div className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group ${reverse ? 'md:flex-row-reverse' : ''}`}>
+      <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-gray-950 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold z-10 shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2 shadow-sm">
+        {number}
+      </div>
+      
+      <div className={`w-[calc(100%-3.5rem)] md:w-[calc(50%-2rem)] p-6 bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow ml-4 md:ml-0`}>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300">
+            {icon}
+          </div>
+          <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{title}</h3>
+        </div>
+        <p className="text-gray-600 dark:text-gray-400 mb-4 text-sm leading-relaxed">{description}</p>
+        <div className="bg-gray-900 rounded-lg p-3 font-mono text-xs text-gray-300 flex items-center gap-2">
+          <span className="text-green-400">$</span> {command}
+        </div>
+      </div>
     </div>
   );
 }
