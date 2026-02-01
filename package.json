@@ -50,6 +50,7 @@
   },
   "homepage": "https://github.com/PraiseTechzw/autopilot-cli#readme",
   "dependencies": {
+    "@traisetech/autopilot": "^0.1.7",
     "chokidar": "^5.0.0",
     "commander": "^14.0.3",
     "execa": "^9.6.1",
