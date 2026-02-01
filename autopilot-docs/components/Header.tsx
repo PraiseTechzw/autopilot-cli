@@ -5,9 +5,10 @@ import { DocMetadata } from '@/lib/mdx';
 
 interface HeaderProps {
   docs: DocMetadata[];
+  onMenuClick?: () => void;
 }
 
-export function Header({ docs }: HeaderProps) {
+export function Header({ docs, onMenuClick }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
