@@ -72,6 +72,14 @@ function isNewer(latest, current) {
   return false;
 }
 
+function center(text, width) {
+  const visibleLen = text.replace(/\x1b\[[0-9;]*m/g, '').length;
+  const padding = Math.max(0, width - visibleLen);
+  const left = Math.floor(padding / 2);
+  const right = padding - left;
+  return ' '.repeat(left) + text + ' '.repeat(right);
+}
+
 /**
  * Check for updates and notify user
  */
@@ -124,14 +132,14 @@ async function checkForUpdate() {
       console.log('\n');
       console.log('   ╭──────────────────────────────────────────────────╮');
       console.log('   │                                                  │');
-      console.log('   │      Update available ' + v.dim + ' → ' + latest.green + '       │');
-      console.log('   │      Run ' + ('npm i -g ' + pkg.name).cyan + ' to update      │');
+      console.log(`   │      Update available ${v.dim()} → ${latest.green()}       │`);
+      console.log(`   │      Run ${('npm i -g ' + pkg.name).cyan()} to update      │`);
       console.log('   │                                                  │');
       console.log('   ╰──────────────────────────────────────────────────╯');
       console.log('\n');
     }
   } catch (error) {
-    // Fail silently to not disrupt user flow
+    // Fail silently
   }
 }
 

@@ -8,6 +8,7 @@ const statusWatcher = require('../src/commands/status');
 const doctor = require('../src/commands/doctor');
 const pkg = require('../package.json');
 const logger = require('../src/utils/logger');
+const { checkForUpdate } = require('../src/utils/update-check');
 
 // Validate command handlers
 const commands = {
@@ -65,4 +66,7 @@ program
   .addHelpCommand(true, 'Show help for command')
   .showHelpAfterError('(add --help for command information)');
 
-program.parse(process.argv);
+(async () => {
+  await checkForUpdate();
+  program.parse(process.argv);
+})();
