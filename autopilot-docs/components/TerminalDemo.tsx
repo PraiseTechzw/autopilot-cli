@@ -36,53 +36,51 @@ export function TerminalDemo({ steps, className }: TerminalDemoProps) {
     const step = steps[currentStepIndex];
     let timeoutId: NodeJS.Timeout;
     
-    if (!isTyping) {
-      setIsTyping(true);
-      setDisplayText('');
+    setIsTyping(true);
+    setDisplayText('');
+    
+    // If it's a command, type it out char by char with variable speed
+    if (step.type === 'command') {
+      let charIndex = 0;
       
-      // If it's a command, type it out char by char with variable speed
-      if (step.type === 'command') {
-        let charIndex = 0;
-        
-        const typeNextChar = () => {
-          if (charIndex < step.text.length) {
-            setDisplayText(prev => prev + step.text[charIndex]);
-            charIndex++;
-            // Random typing delay between 30ms and 80ms
-            const delay = Math.random() * 50 + 30;
-            timeoutId = setTimeout(typeNextChar, delay);
-          } else {
-            setIsTyping(false);
-            // Add full line and move to next
-            timeoutId = setTimeout(() => {
-              setLines(prev => [...prev, step]);
-              setCurrentStepIndex(prev => prev + 1);
-            }, 400);
-          }
-        };
-        
-        typeNextChar();
-      } else if (step.type === 'processing') {
-        // Show spinner for a while then move to next
+      const typeNextChar = () => {
+        if (charIndex < step.text.length) {
+          setDisplayText(prev => prev + step.text[charIndex]);
+          charIndex++;
+          // Random typing delay between 30ms and 80ms
+          const delay = Math.random() * 50 + 30;
+          timeoutId = setTimeout(typeNextChar, delay);
+        } else {
+          setIsTyping(false);
+          // Add full line and move to next
+          timeoutId = setTimeout(() => {
+            setLines(prev => [...prev, step]);
+            setCurrentStepIndex(prev => prev + 1);
+          }, 400);
+        }
+      };
+      
+      typeNextChar();
+    } else if (step.type === 'processing') {
+      // Show spinner for a while then move to next
+      setLines(prev => [...prev, step]);
+      timeoutId = setTimeout(() => {
+        setCurrentStepIndex(prev => prev + 1);
+        setIsTyping(false);
+      }, step.delay || 1500);
+    } else {
+      // Instant output with delay
+      timeoutId = setTimeout(() => {
         setLines(prev => [...prev, step]);
-        timeoutId = setTimeout(() => {
-          setCurrentStepIndex(prev => prev + 1);
-          setIsTyping(false);
-        }, step.delay || 1500);
-      } else {
-        // Instant output with delay
-        timeoutId = setTimeout(() => {
-          setLines(prev => [...prev, step]);
-          setCurrentStepIndex(prev => prev + 1);
-          setIsTyping(false);
-        }, step.delay || 300);
-      }
+        setCurrentStepIndex(prev => prev + 1);
+        setIsTyping(false);
+      }, step.delay || 300);
     }
 
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [currentStepIndex, steps, isTyping]);
+  }, [currentStepIndex, steps]);
 
   // Auto scroll
   useEffect(() => {
