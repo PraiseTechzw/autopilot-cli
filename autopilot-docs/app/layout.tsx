@@ -25,6 +25,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,14 +35,16 @@ export default function RootLayout({
   const docs = getAllDocs();
   
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100`}
       >
-        <AppHeader docs={docs} />
-        <main className="flex-1 flex flex-col">
-          {children}
-        </main>
+        <ThemeProvider defaultTheme="system" storageKey="autopilot-theme">
+          <AppHeader docs={docs} />
+          <main className="flex-1 flex flex-col">
+            {children}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );
