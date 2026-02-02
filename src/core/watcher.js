@@ -8,6 +8,7 @@ const path = require('path');
 const chokidar = require('chokidar');
 const logger = require('../utils/logger');
 const git = require('./git');
+const FocusEngine = require('./focus');
 const { generateCommitMessage } = require('./commit');
 const { savePid, removePid, registerProcessHandlers } = require('../utils/process');
 const { loadConfig } = require('../config/loader');
@@ -154,6 +155,10 @@ class Watcher {
     }
 
     this.logVerbose(`File event: ${type} ${relativePath}`);
+    
+    // Track focus
+    this.focusEngine.onFileEvent(relativePath);
+
     this.scheduleProcess();
   }
 
