@@ -6,6 +6,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const chokidar = require('chokidar');
+const readline = require('readline');
 const logger = require('../utils/logger');
 const git = require('./git');
 const FocusEngine = require('./focus');
@@ -145,51 +146,6 @@ class Watcher {
   }
 
   /**
-   * Ask user for approval
-   */
-  async askApproval(generatedMessage) {
-    logger.section('🤖 AI Generated Commit Message');
-    console.log(generatedMessage);
-    logger.section('--------------------------------');
-    
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-
-    const ask = () => new Promise(resolve => {
-      rl.question('👉 Approve? (Y/n/e): ', answer => resolve(answer.trim().toLowerCase()));
-    });
-
-    const edit = () => new Promise(resolve => {
-        rl.question('✏️  Enter new message: ', answer => resolve(answer.trim()));
-    });
-
-    try {
-      while (true) {
-        const answer = await ask();
-        
-        if (answer === '' || answer === 'y' || answer === 'yes') {
-          return { approved: true, message: generatedMessage };
-        }
-        
-        if (answer === 'n' || answer === 'no') {
-          return { approved: false };
-        }
-        
-        if (answer === 'e' || answer === 'edit') {
-          const newMessage = await edit();
-          if (newMessage) {
-             return { approved: true, message: newMessage };
-          }
-        }
-      }
-    } finally {
-      rl.close();
-    }
-  }
-
-  /**
    * Handle filesystem events
    */
   onFsEvent(type, filePath) {
@@ -310,7 +266,6 @@ class Watcher {
 
       // Interactive Review
       if (this.config?.ai?.interactive) {
-        logger.info('Waiting for user approval...');
         const approval = await this.askApproval(message);
         if (!approval.approved) {
           logger.warn('Commit skipped by user.');
