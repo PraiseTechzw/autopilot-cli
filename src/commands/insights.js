@@ -14,11 +14,17 @@ async function insights(options) {
     const logFile = path.join(repoPath, 'autopilot.log');
 
     if (!await fs.pathExists(logFile)) {
+      if (options.format === 'json') {
+        console.log(JSON.stringify({ error: 'No log found' }));
+        return;
+      }
       logger.error('No autopilot.log found. Start using autopilot to generate data!');
       return;
     }
 
-    logger.info('Analyzing productivity data...');
+    if (options.format !== 'json') {
+      logger.info('Analyzing productivity data...');
+    }
 
     const content = await fs.readFile(logFile, 'utf8');
     const lines = content.split('\n').filter(Boolean);

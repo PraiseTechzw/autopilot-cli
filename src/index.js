@@ -42,6 +42,7 @@ function run() {
   program
     .command('insights')
     .description('View productivity insights and focus analytics')
+    .option('-f, --format <type>', 'Output format (json, text)', 'text')
     .action(insights);
 
   program

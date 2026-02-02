@@ -28,12 +28,10 @@ class FocusEngine {
     this.lastLogTime = 0;
     this.msSinceLastCommit = 0;
     this.nudgeThresholdMs = 500000; // 500,000 ms as requested
-    this.nextNudgeMs = this.nudgeThresholdMs;
   }
 
   onCommit() {
     this.msSinceLastCommit = 0;
-    this.nextNudgeMs = this.nudgeThresholdMs;
     this.appendLog('FOCUS_COMMIT', { msSinceLastCommit: this.msSinceLastCommit });
   }
 
@@ -74,6 +72,16 @@ class FocusEngine {
       // Continuous activity
       fileStat.activeMs += delta;
       this.stats.totalActiveMs += globalDelta; // Add to global active time
+
+      this.msSinceLastCommit += delta;
+
+      // Nudge Check
+      if (!this.nextNudgeMs) this.nextNudgeMs = this.nudgeThresholdMs;
+      if (this.msSinceLastCommit > this.nextNudgeMs) {
+        logger.warn(`[Nudge] You have been working for ${Math.round(this.msSinceLastCommit / 60000)} mins without a commit! Consider breaking this task down.`);
+        this.appendLog('FOCUS_NUDGE', { reason: 'long_pending_time', ms: this.msSinceLastCommit });
+        this.nextNudgeMs += 300000; // Remind again in 5 mins
+      }
       
       // Heartbeat log every 5 minutes
       if (now - this.lastLogTime > 300000) {
@@ -151,6 +159,10 @@ class FocusEngine {
       currentMicroGoals: this.microGoals,
       fileBreakdown: this.stats.files
     };
+  }
+
+  async stop() {
+    await this.integrationManager.notifyFocusEnd();
   }
 }
 
