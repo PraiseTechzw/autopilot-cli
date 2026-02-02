@@ -8,6 +8,7 @@ const path = require('path');
 const chokidar = require('chokidar');
 const logger = require('../utils/logger');
 const git = require('./git');
+const FocusEngine = require('./focus');
 const { generateCommitMessage } = require('./commit');
 const { savePid, removePid, registerProcessHandlers } = require('../utils/process');
 const { loadConfig } = require('../config/loader');
@@ -130,6 +131,10 @@ class Watcher {
         await this.watcher.close();
         this.watcher = null;
       }
+      
+      if (this.focusEngine) {
+        await this.focusEngine.stop();
+      }
 
       await removePid(this.repoPath);
       this.isWatching = false;
@@ -154,6 +159,10 @@ class Watcher {
     }
 
     this.logVerbose(`File event: ${type} ${relativePath}`);
+    
+    // Track focus
+    this.focusEngine.onFileEvent(relativePath);
+
     this.scheduleProcess();
   }
 
@@ -251,11 +260,23 @@ class Watcher {
 
       if (this.config?.commitMessageMode !== 'simple') {
         const diff = await git.getDiff(this.repoPath, true); // Staged diff
-        message = generateCommitMessage(changedFiles, diff);
+        message = await generateCommitMessage(changedFiles, diff, this.config);
+      }
+
+      // Interactive Review
+      if (this.config?.ai?.interactive) {
+        logger.info('Waiting for user approval...');
+        const approval = await this.askApproval(message);
+        if (!approval.approved) {
+          logger.warn('Commit skipped by user.');
+          return;
+        }
+        message = approval.message;
       }
 
       await git.commit(this.repoPath, message);
       this.lastCommitAt = Date.now();
+      this.focusEngine.onCommit();
       logger.success('Commit done');
 
       // 7. Auto-push

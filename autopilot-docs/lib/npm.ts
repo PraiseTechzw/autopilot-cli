@@ -1,4 +1,23 @@
+import path from 'path';
+import fs from 'fs';
+
 export async function getLatestVersion(): Promise<string | null> {
+  // 1. Try to read local package.json (Source of Truth for the repo)
+  try {
+    // In dev/build, process.cwd() is usually the project root (autopilot-docs)
+    // We want the parent root's package.json
+    const localPackagePath = path.resolve(process.cwd(), '../package.json');
+    if (fs.existsSync(localPackagePath)) {
+      const pkg = JSON.parse(fs.readFileSync(localPackagePath, 'utf8'));
+      if (pkg.name === '@traisetech/autopilot') {
+        return pkg.version;
+      }
+    }
+  } catch (error) {
+    // Silently fail and fall back to NPM
+  }
+
+  // 2. Fallback to NPM registry (for production/standalone deployments)
   try {
     const res = await fetch('https://registry.npmjs.org/@traisetech/autopilot/latest', {
       next: { revalidate: 3600 }

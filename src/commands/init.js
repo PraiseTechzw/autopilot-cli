@@ -111,7 +111,41 @@ async function initRepo() {
 
     // Create files
     await createIgnoreFile(repoPath);
-    await createConfigFile(repoPath);
+
+    // Prompt for AI Setup
+    let configOverrides = {};
+    const useAi = await askQuestion('🤖 Enable AI-powered commit messages with Gemini? (y/N): ');
+    
+    if (useAi.toLowerCase().startsWith('y')) {
+      const apiKey = await askQuestion('🔑 Enter your Google Gemini API Key: ');
+      if (apiKey && apiKey.trim()) {
+        const { validateApiKey } = require('../core/gemini');
+        logger.info('Validating API Key...');
+        
+        const isValid = await validateApiKey(apiKey.trim());
+        
+        if (isValid) {
+          logger.success('API Key validated successfully!');
+          
+          const interactive = await askQuestion('📝 Do you want to review/edit messages before committing? (y/N): ');
+          
+          configOverrides = {
+            commitMessageMode: 'ai',
+            ai: {
+              enabled: true,
+              apiKey: apiKey.trim(),
+              model: 'gemini-pro',
+              interactive: interactive.toLowerCase().startsWith('y')
+            }
+          };
+        } else {
+          logger.warn('⚠️  Invalid API Key. AI features will be disabled.');
+          logger.info('You can update .autopilotrc.json later with a valid key.');
+        }
+      }
+    }
+
+    await createConfigFile(repoPath, configOverrides);
     await updateGitIgnore(repoPath);
 
     logger.section('✨ Initialization Complete');

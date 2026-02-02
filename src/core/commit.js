@@ -37,7 +37,7 @@ function generateCommitMessage(files, diffContent) {
   }
   
   if (isBreaking) {
-    message += `\n\nBREAKING CHANGE: ${breakingSummary || summary}`;
+    message += `\n\nBREAKING CHANGE: ${breakingSummary}`;
   }
 
   return message;

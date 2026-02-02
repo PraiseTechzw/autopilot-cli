@@ -10,7 +10,13 @@ const DEFAULT_CONFIG = {
   blockBranches: ['main', 'master'],
   requireChecks: false,
   checks: [],
-  commitMessageMode: 'smart', // smart | simple
+  commitMessageMode: 'smart', // smart | simple | ai
+  ai: {
+    enabled: false,
+    apiKey: '',
+    model: 'gemini-pro',
+    interactive: false
+  }
 };
 
 const DEFAULT_IGNORE_PATTERNS = [
