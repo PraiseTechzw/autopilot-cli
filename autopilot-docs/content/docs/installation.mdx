@@ -1,58 +1,138 @@
 ---
 title: Installation
-description: Get Autopilot CLI up and running on your machine in seconds.
+description: Comprehensive installation guide for Windows, macOS, and Linux.
 ---
 
 # Installation
 
-Getting started with Autopilot CLI is straightforward. Since it's a Node.js-based tool, you can install it using your favorite package manager.
+Getting started with Autopilot CLI is simple. It runs on any operating system that supports Node.js.
 
 ## Prerequisites
 
-Before installing, ensure you have the following installed on your system:
+Before installing, ensure you have the following requirements:
 
-- **Node.js**: Version **18.0.0** or higher is required.
-- **Git**: Autopilot relies on your system's git installation to perform operations.
+- **Node.js**: Version **18.0.0** or higher.
+- **Git**: Installed and available in your terminal path.
 
-You can check your current Node.js version by running:
+Check your versions:
 
 ```bash
 node --version
+git --version
 ```
 
-## Global Installation
+---
 
-We recommend installing Autopilot globally so you can use the `autopilot` command from any project directory.
+## Windows
 
-### Using npm
+### Method 1: npm (Recommended)
+
+Open **Command Prompt** or **PowerShell** as Administrator and run:
 
 ```bash
 npm install -g @traisetech/autopilot
 ```
 
-### Using yarn
+### Method 2: pnpm / yarn
+
+If you use other package managers:
 
 ```bash
+# pnpm
+pnpm add -g @traisetech/autopilot
+
+# yarn
 yarn global add @traisetech/autopilot
 ```
 
-### Using pnpm
+### Troubleshooting Windows
+
+**"Command not recognized" Error**
+If `autopilot` isn't found after installation, your npm folder is likely missing from your system `PATH`.
+
+1. Search for **"Edit the system environment variables"** in Start menu.
+2. Click **Environment Variables**.
+3. Under **User variables**, select `Path` and click **Edit**.
+4. Click **New** and add: `%APPDATA%\npm`
+5. Click **OK** and restart your terminal.
+
+---
+
+## macOS
+
+### Installation via npm
+
+We recommend using a Node version manager like `nvm` to avoid permission issues.
 
 ```bash
-pnpm add -g @traisetech/autopilot
+npm install -g @traisetech/autopilot
 ```
+
+If you get an `EACCES` permission error, try using `sudo`:
+
+```bash
+sudo npm install -g @traisetech/autopilot
+```
+
+### Verify Installation
+
+```bash
+autopilot --version
+```
+
+---
+
+## Linux
+
+Autopilot works on any distribution (Ubuntu, Fedora, Arch, etc.) with a compatible Node.js runtime.
+
+### 1. Install Node.js (if missing)
+
+We recommend using `nvm` (Node Version Manager) or your distro's package manager.
+
+**Ubuntu/Debian:**
+```bash
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+### 2. Install Autopilot
+
+```bash
+npm install -g @traisetech/autopilot
+```
+
+### 3. Permissions Note
+
+If you installed Node.js via the system package manager (`apt`, `pacman`, etc.), you might need `sudo` for global installs:
+
+```bash
+sudo npm install -g @traisetech/autopilot
+```
+
+---
+
+## No-Install Usage (npx)
+
+You can run Autopilot without installing it globally using `npx`. This ensures you always use the latest version.
+
+```bash
+npx @traisetech/autopilot start
+```
+
+*Note: For the best experience with the file watcher, a global installation is recommended.*
 
 ---
 
 ## Verify Installation
 
-Once installed, verify that the command is available by checking the help menu:
+Check that Autopilot is correctly installed by viewing the help menu:
 
 ```bash
 autopilot --help
 ```
 
-You should see an output similar to this:
+You should see:
 
 ```text
 Usage: autopilot [options] [command]
@@ -70,40 +150,6 @@ Commands:
   stop            Stop the Autopilot daemon
   help [command]  display help for command
 ```
-
----
-
-## Troubleshooting
-
-### Windows PATH Issues
-
-If you see an error like `'autopilot' is not recognized as an internal or external command` after installation, it usually means your npm global binaries folder is not in your system's `PATH`.
-
-**To fix this on Windows:**
-
-1.  Open **System Properties** (search for "Edit the system environment variables").
-2.  Click **Environment Variables**.
-3.  Under **User variables**, find `Path` and click **Edit**.
-4.  Look for a path ending in `npm` or `nodejs`. It is often:
-    *   `%APPDATA%\npm`
-    *   `C:\Users\<YourUser>\AppData\Roaming\npm`
-5.  If it's missing, click **New** and add the path to your roaming npm folder.
-6.  Click **OK** on all windows.
-7.  **Restart your terminal** (or VS Code) for changes to take effect.
-
-### Permission Errors (EACCES)
-
-On macOS or Linux, if you receive a permission error during global installation, you may need to use `sudo` or fix your npm permissions.
-
-**Using sudo (quick fix):**
-
-```bash
-sudo npm install -g @traisetech/autopilot
-```
-
-**Fixing permissions (recommended):**
-
-We recommend using a version manager like `nvm` or `fnm` which handles permissions automatically without needing `sudo`.
 
 ---
 
