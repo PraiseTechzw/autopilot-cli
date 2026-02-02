@@ -4,17 +4,25 @@
  */
 
 const path = require('path');
+const fs = require('fs-extra');
 const logger = require('../utils/logger');
+const IntegrationManager = require('../integrations/manager');
+const CalendarIntegration = require('../integrations/calendar');
 
 class FocusEngine {
   constructor(repoPath, config) {
     this.repoPath = repoPath;
+    this.logFile = path.join(repoPath, 'autopilot.log');
     this.config = config?.focus || {
       activeThresholdSeconds: 120, // 2 mins between events counts as continuous active time
       sessionTimeoutSeconds: 1800, // 30 mins gap = new session
-      trackingEnabled: true
+      trackingEnabled: true,
+      integrationsEnabled: true
     };
     
+    this.integrationManager = new IntegrationManager(this.config);
+    this.integrationManager.register(new CalendarIntegration(this.config));
+
     this.stats = {
       files: {}, // filePath -> { activeMs: 0, idleMs: 0, lastEvent: 0 }
       totalActiveMs: 0,
@@ -159,10 +167,6 @@ class FocusEngine {
       currentMicroGoals: this.microGoals,
       fileBreakdown: this.stats.files
     };
-  }
-
-  async stop() {
-    await this.integrationManager.notifyFocusEnd();
   }
 }
 

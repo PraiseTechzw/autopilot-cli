@@ -131,6 +131,10 @@ class Watcher {
         await this.watcher.close();
         this.watcher = null;
       }
+      
+      if (this.focusEngine) {
+        await this.focusEngine.stop();
+      }
 
       await removePid(this.repoPath);
       this.isWatching = false;

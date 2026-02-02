@@ -4,16 +4,29 @@
  */
 
 const path = require('path');
+const { generateAICommitMessage } = require('./gemini');
+const logger = require('../utils/logger');
 
 /**
  * Generate a conventional commit message based on diff analysis
  * @param {Array<{status: string, file: string}>} files - Array of changed file objects
  * @param {string} diffContent - Raw git diff content
- * @returns {string} Conventional commit message
+ * @param {Object} config - Configuration object
+ * @returns {Promise<string>} Conventional commit message
  */
-function generateCommitMessage(files, diffContent) {
+async function generateCommitMessage(files, diffContent, config = {}) {
   if (!files || files.length === 0) {
     return 'chore: update changes';
+  }
+
+  // AI Mode
+  if (config.commitMessageMode === 'ai' && config.ai?.enabled && config.ai?.apiKey) {
+    try {
+      logger.info('Generating AI commit message...');
+      return await generateAICommitMessage(diffContent, config.ai.apiKey);
+    } catch (error) {
+      logger.warn('AI generation failed, falling back to smart generation.');
+    }
   }
 
   // 1. Parse Diff for deep analysis
