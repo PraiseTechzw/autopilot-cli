@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 This project follows [Semantic Versioning](https://semver.org).
 
+## [0.1.8] - 2026-02-04
+
+### Reliability & Core
+- **Watcher Engine Overhaul**:
+  - Implemented dual ignore checks (chokidar + internal matcher) to guarantee no ignored files trigger builds.
+  - Added "Max Wait" fallback (60s) to prevent debounce starvation on busy repos.
+  - Hardcoded critical ignores (`.git`, `node_modules`, `autopilot.log`) to prevent infinite loops.
+- **Git Safety**:
+  - Added graceful fallback for push failures (logs warning instead of crashing).
+  - Enforced "tracked only" commits using `git status --porcelain`.
+- **Test Mode**:
+  - Added `AUTOPILOT_TEST_MODE=1` flag for deterministic CI testing (foreground run + auto-exit).
+
+### CI/CD & Standards
+- **GitHub Workflows**:
+  - `ci.yml`: Automated testing on Windows, Ubuntu, and macOS for every PR.
+  - `release.yml`: Automated GitHub Releases with changelog generation and tarball assets.
+  - `publish.yml`: Secure npm publishing via OIDC provenance.
+- **Repository Standards**:
+  - Added Issue Templates (Bug/Feature), PR Template, `SECURITY.md`, and `CODEOWNERS`.
+
+### Fixed
+- **Windows Paths**: Fixed path normalization issues causing ignore rules to fail on Windows.
+- **Self-Triggering**: Fixed issue where writing `autopilot.log` could trigger a new commit loop.
+
 ## [0.1.7] - 2026-02-01
 
 ### Added
