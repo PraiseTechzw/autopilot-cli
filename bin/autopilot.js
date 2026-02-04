@@ -8,7 +8,6 @@ const statusWatcher = require('../src/commands/status');
 const undoCommand = require('../src/commands/undo');
 const pauseCommand = require('../src/commands/pause');
 const resumeCommand = require('../src/commands/resume');
-const runDashboard = require('../src/commands/dashboard');
 const { insights } = require('../src/commands/insights');
 const doctor = require('../src/commands/doctor');
 const pkg = require('../package.json');
@@ -24,7 +23,6 @@ const commands = {
   undo: undoCommand,
   pause: pauseCommand,
   resume: resumeCommand,
-  dashboard: runDashboard,
   insights: insights,
   doctor: doctor
 };
@@ -85,7 +83,14 @@ program
 program
   .command('dashboard')
   .description('View real-time Autopilot dashboard')
-  .action(runDashboard);
+  .action(async () => {
+    try {
+      const { default: runDashboard } = await import('../src/commands/dashboard.mjs');
+      runDashboard();
+    } catch (error) {
+      console.error('Failed to launch dashboard:', error);
+    }
+  });
 
 program
   .command('insights')

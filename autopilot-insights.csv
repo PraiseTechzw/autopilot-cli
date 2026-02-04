@@ -1,0 +1,119 @@
+Hash,Date,Author,Message,Additions,Deletions
+c16097bc70318f5d80fdd94bc1d9e9e280975c53,2026-02-04T17:31:13.000Z,Praise Masunga,chore(in): update in,38,0
+3615cba0bff4d0d667536f125e22fff2805f8289,2026-02-04T17:28:03.000Z,Praise Masunga,chore(release): bump version to 1.1.0,381,70
+127cb23764b7d99f42c3b2ad4101125880cf1ff6,2026-02-04T17:21:25.000Z,Praise Masunga,feat: update files,607,22
+6fb95f572ab49ab678ffafb19844b2228051205f,2026-02-04T17:11:17.000Z,Praise Masunga,chore(.): update .,0,2
+dcc9d3e0983fde7121dbbd0a78217d3a76048d72,2026-02-04T17:05:12.000Z,Praise Masunga,Merge pull request #16 from PraiseTechzw/web,0,0
+811cb0a1b1d94779bfc39869aa155ebcb1864273,2026-02-04T17:04:24.000Z,Praise Masunga,chore(release): bump version to 1.1.0,26,1
+bd42b7d4b635b17cfff44019861340bcb7e4ddb9,2026-02-04T17:03:13.000Z,Praise Masunga,docs: add contributing guide and update README,57,41
+d8602ab4bde8032b59470963027e3d7c613966b0,2026-02-04T16:55:17.000Z,Praise Masunga,ci(workflow): enable coverage reporting,70,103
+e383b169e226021943744ded4699e8080855d636,2026-02-04T16:53:08.000Z,Praise Masunga,Merge pull request #15 from PraiseTechzw/web,0,0
+33ac8adca4e7af04827cc39452c128f9a9f669c9,2026-02-04T16:51:40.000Z,Praise Masunga,docs(.): update .,3,4
+68a8f36c983596abbdf6fb0e301eb2d2986780f3,2026-02-04T16:46:05.000Z,Praise Masunga,chore(.): update .,2,0
+72bcde862c5e00c231feb39cf52cc4517fcae294,2026-02-04T16:37:39.000Z,Praise Masunga,ci(workflow): enable coverage reporting,195,116
+13471ed5253487027c168aa3262162cc6df67607,2026-02-04T16:37:03.000Z,Praise Masunga,Merge pull request #14 from PraiseTechzw/web,0,0
+7e143e1b3355abd9c2d3c2bd32b159faf7f2e500,2026-02-04T16:32:56.000Z,Praise Masunga,style(ui): use theme variables for button colors,81,39
+872053ee2bfdf9bdd307681c501283c7cfbd9b0e,2026-02-04T16:30:14.000Z,Praise Masunga,Merge pull request #13 from PraiseTechzw/web,0,0
+c364c9baae5482ecb2345d1d266a4acfc89af797,2026-02-04T16:29:18.000Z,Praise Masunga,docs(intro): update installation instructions,54,0
+8b625df12a9ce179d7422c496c9765f4acd1af70,2026-02-04T16:28:24.000Z,Praise Masunga,"feat: add CI workflows, improve ignore rules, and enhance watcher",394,61
+3f4671d46f483efde7a12f7163df665127cccf4f,2026-02-02T18:09:40.000Z,Praise Masunga,Merge pull request #12 from PraiseTechzw/web,0,0
+4c265d5e5353e26ccf309688d7fddd9497147fb1,2026-02-02T17:35:58.000Z,Praise Masunga,docs(docs): update docs,94,48
+b0c2a6b48121fb0bae2bc57542fcaefdf46f9e47,2026-02-02T17:29:33.000Z,Praise Masunga,Merge pull request #11 from PraiseTechzw/web,0,0
+c15856f28ed9accf6788078d7b7aaf10fbc65a7c,2026-02-02T17:28:27.000Z,Praise Masunga,refactor: update files,61,41
+b8ce293c1ef03d99e41a25a11141f917b21621ef,2026-02-02T17:21:11.000Z,Praise Masunga,test(parser): add coverage for empty input,188,46
+921bdf024d1cc95bad79a91002411d84616bbc85,2026-02-02T17:13:09.000Z,Praise Masunga,chore(core): update core,45,0
+c5ba8995d3751d556d03ccbb7b92c8b43cda1a3e,2026-02-02T16:56:14.000Z,Praise Masunga,refactor: update files,52,19
+235e0febc2184b50a8c337a019931b47bef2804b,2026-02-02T16:53:01.000Z,Praise Masunga,feat: update files,143,8
+45bd525c905d7e8cf31d4ce7353e310165856702,2026-02-02T16:49:12.000Z,Praise Masunga,feat: update files,116,3
+c01a4d598624e54296d7b7ea3bf4872f81b1b42f,2026-02-02T16:41:49.000Z,Praise Masunga,feat: update files,122,0
+7a1b5446c2fec0f091de33ebdc5258286cb6005e,2026-02-02T16:38:31.000Z,Praise Masunga,feat: update files,130,0
+6c25f3fdc143f9920993da4682eee6943c9939ea,2026-02-02T16:24:58.000Z,Praise Masunga,docs(lib): update lib,19,0
+e145d47ce7f5d278e5ab3513ab7e68aec69eac9b,2026-02-01T15:04:20.000Z,Praise Masunga,chore: update configuration,1,0
+65a2bfe39a98c625ba43d58cd78778649db122a1,2026-02-01T14:52:59.000Z,Praise Masunga,Merge pull request #9 from PraiseTechzw/main,0,0
+4316f40347fe6e4877e7e28a6d7fe6adedbfaae0,2026-02-01T14:52:04.000Z,Praise Masunga,Merge pull request #8 from PraiseTechzw/web,0,0
+36b8465dbe19b4dac7730c9a9edeb3a07aa57c1f,2026-02-01T14:50:45.000Z,Praise Masunga,docs: update documentation,24,0
+514ed04e85979315560d34f2c1bbe824f8117bb6,2026-02-01T14:49:22.000Z,Praise Masunga,0.1.7,1,1
+945b6cb363f57dee26ab28b35f881eba311cc6b2,2026-02-01T14:48:37.000Z,Praise Masunga,Merge pull request #7 from PraiseTechzw/web,0,0
+2856ecde82c3c71cef721d260644369c0041042b,2026-02-01T14:47:16.000Z,Praise Masunga,feat: add update check with centered notification display,16,4
+b0fefde656f136ec2b7fc67525eeef4fcd37c727,2026-02-01T14:43:39.000Z,Praise Masunga,feat: add new features,143,0
+e0174a95fdb45caf463c23991a73f5d4ec79a5ca,2026-02-01T14:40:38.000Z,Praise Masunga,Merge pull request #6 from PraiseTechzw/web,0,0
+2cce62fc3301f5ec8393dc01aadb72d75dfedc98,2026-02-01T14:38:43.000Z,Praise Masunga,chore: update changes,17,12
+1e61a383862bf19e524a15cf336916082f60673c,2026-02-01T14:34:46.000Z,Praise Masunga,chore: update changes,22,31
+8ea210c8071910ea17bd273c0de95ce950539abc,2026-02-01T14:28:14.000Z,Praise Masunga,chore: update changes,58,0
+85b56cd4e2eeeb26131c6725168570053dfea2e8,2026-02-01T14:23:29.000Z,Praise Masunga,Merge pull request #5 from PraiseTechzw/main,0,0
+a9f7211ad084b026e0148944508eea237ae75a13,2026-02-01T14:20:55.000Z,Praise Masunga,Merge pull request #4 from PraiseTechzw/web,0,0
+1a560088ae850ce010def3d9b95fae9b6311d9ed,2026-02-01T14:16:06.000Z,Praise Masunga,docs: update documentation,68,77
+bef64149f97952b88d7b3704ae34115618fb4297,2026-02-01T14:14:56.000Z,Praise Masunga,refactor(commit): reorder type detection logic for clarity,15,13
+f395b6e0a6fb05dcf48bbc8d2bbb4fe8144c70b2,2026-02-01T14:10:31.000Z,Praise Masunga,test: update tests,6,6
+0c62079e22122db2825cb5d40cb7cf4c418135fd,2026-02-01T14:08:14.000Z,Praise Masunga,feat(commit): enhance commit message generator with file grouping,2,5
+1d3c27a287864cc5a91f1ad407a1c135a3822dcf,2026-02-01T14:06:45.000Z,Praise Masunga,fix: resolve issues,192,282
+27f687d305edebe8cf1739def1465ba5f7db617c,2026-02-01T11:51:39.000Z,Praise Masunga,fix: resolve issues,398,190
+0d4260dc3bddbb824e430bba6f4a7d68dc6ae577,2026-02-01T11:47:42.000Z,Praise Masunga,test: update tests,263,0
+9a949ee2f9ee405c7b0918caa6fc3a5e2570914a,2026-02-01T11:28:55.000Z,Praise Masunga,feat: add new features,146,87
+618219964b76b5a3bc2347688cbc9b3e8c6a1832,2026-02-01T11:21:09.000Z,Praise Masunga,chore: update changes,5,1
+6d273c6308ecc044dc0077213158486cfffba9e4,2026-02-01T11:18:55.000Z,Praise Masunga,Merge branch 'web' of https://github.com/PraiseTechzw/autopilot-cli into web,0,0
+85bce993860409d3a5cc63dc4405aa1f99f04e96,2026-02-01T11:17:01.000Z,Praise Masunga,"feat: interactive showcase, theme system, and SEO updates",503,172
+0b9b4660796449293ff2f22b1febb5eb01d0860c,2026-02-01T08:58:55.000Z,Praise Masunga,chore: update changes,81,9
+7e2029cc7ec9b73c0b56732e31c84c5d228020ee,2026-02-01T08:50:43.000Z,Praise Masunga,Merge pull request #3 from PraiseTechzw/web,0,0
+191fed229901ed0e77b642f2704f7dc18f8d0edc,2026-02-01T08:48:38.000Z,Praise Masunga,chore: update changes,38,40
+95ce71e341c2b13916f810b8352b359e1af26119,2026-02-01T08:41:43.000Z,Praise Masunga,chore: update changes,55,42
+16e8d8c2050203c4a861a955ec3a986b1b1e89cc,2026-02-01T08:35:59.000Z,Praise Masunga,chore: update changes,13,4
+750e36c518d1f488087e43ef186dee88a9ee1f68,2026-02-01T08:30:40.000Z,Praise Masunga,chore: update changes,92,82
+0ce673c30bf5a3ee8694e04de03fc71c1dd18f36,2026-02-01T08:27:15.000Z,Praise Masunga,chore: update changes,299,12
+1537ab99ccbee9d54d949e2a67ae8f4f2dace3bf,2026-02-01T08:23:41.000Z,Praise Masunga,chore: update changes,43,13
+c28f5060786d3bb7e14ffc7fa414fa6e7e38538b,2026-02-01T08:18:17.000Z,Praise Masunga,chore: update changes,0,80
+522ffc9157502bbb38f6c2d354813289b9220717,2026-02-01T08:11:10.000Z,Praise Masunga,chore: update changes,14,21
+235215b53e979bceacabdd78054b6faa074f93b1,2026-02-01T08:07:44.000Z,Praise Masunga,chore: update changes,7,8
+cabe32d7f8bf18ac5c9975e6135035f5dc2ce735,2026-02-01T07:58:32.000Z,Praise Masunga,chore: update changes,146,26
+3cb988136034716867c665cc2bf0261fa8b1f995,2026-02-01T07:53:58.000Z,Praise Masunga,chore: update changes,47,44
+5eaa610d42aa6709ddabf1b44fd9023afb5debfa,2026-02-01T07:48:53.000Z,Praise Masunga,chore: update changes,31,31
+48d7bf430aa133341deb8f6b3741a029093e2496,2026-02-01T07:44:50.000Z,Praise Masunga,chore: update changes,120,34
+9bfb03fedd7e3e8d7f850494019e1fcbe70a691d,2026-02-01T07:38:54.000Z,Praise Masunga,chore: update configuration,41,14
+43ed0d1e90b3f21637ac03715088a4a4e50da64c,2026-02-01T07:31:52.000Z,Praise Masunga,chore: update configuration,16,1
+6efd6e7e8131690d9792a9105935efbfb055070e,2026-02-01T07:28:33.000Z,Praise Masunga,chore: update changes,172,21
+a300c975a64db16751eeffba063c7725b222470b,2026-02-01T07:21:25.000Z,Praise Masunga,chore: update changes,104,21
+4e27607492df4ab04ab4f54b320410fa9f3484c7,2026-02-01T07:18:08.000Z,Praise Masunga,chore: update changes,53,50
+781f256564b5fecf50f5dd7f1335a3d0e85d1271,2026-02-01T07:14:53.000Z,Praise Masunga,chore: update changes,184,27
+84fe9aeec6ee08ed3b569b5b2076a1f0c75057d5,2026-02-01T07:11:00.000Z,Praise Masunga,chore: update changes,152,6
+b7c20cbe261690a0de0bd0b6eab1980fab98ac47,2026-02-01T07:07:32.000Z,Praise Masunga,chore: update configuration,981,64
+716face4446580645158d4007989a33c226ede0e,2026-02-01T07:03:27.000Z,Praise Masunga,chore: update changes,156,28
+60606917c7738dfbc7644f72bdf621496a5468c7,2026-02-01T06:59:38.000Z,Praise Masunga,chore: update changes,172,66
+1d8e3a321772bb5bc6f6fa3995b3aa403b59eedf,2026-02-01T06:55:13.000Z,Praise Masunga,chore: update changes,198,117
+6ba7e32af239c174751e62235d7e27262cbc66ba,2026-02-01T06:51:46.000Z,Praise Masunga,chore: update changes,300,116
+4c4b1a9cf4046fe89ad9a27ee28c132fdbe17e3c,2026-02-01T06:48:29.000Z,Praise Masunga,chore: update changes,160,34
+bc250851af852804eed06242034366a6cac9b077,2026-02-01T06:44:57.000Z,Praise Masunga,chore: update changes,27,10
+4b6adbf51869683414c171459bce235fd50e9105,2026-02-01T06:41:14.000Z,Praise Masunga,chore: update changes,75,34
+094330a5ce159aedb716a1b230204260df8a9ffd,2026-02-01T06:34:52.000Z,Praise Masunga,chore: update changes,7,2
+d88003f80062ca73cd75a55c65ada8041f43403e,2026-02-01T06:28:40.000Z,Praise Masunga,chore: update changes,69,3
+95e8a6faeac06204abd66b39d30255dc36e56417,2026-02-01T06:25:28.000Z,Praise Masunga,chore: update changes,120,34
+156a673c4dfc8da2cedef05606bd88f07400e0b4,2026-02-01T06:18:12.000Z,Praise Masunga,chore: update changes,637,56
+81cf24775055f78d9bd42001d863d9bf5491c7c0,2026-02-01T06:13:57.000Z,Praise Masunga,chore: update configuration,265,6
+35bfe30d292afd28caa914ba5b396601dcbd2701,2026-02-01T06:09:17.000Z,Praise Masunga,docs: update documentation,299,0
+065dbecefbaf7e8ebaa284cd4db9bc2807888edc,2026-01-31T23:18:45.000Z,Praise Masunga,Merge pull request #2 from PraiseTechzw/dev,0,0
+bac0a4038ffeb73b8d43161826ec370c2f6dee5d,2026-01-31T23:18:03.000Z,Praise Masunga,docs: add comprehensive README with installation and usage guide,228,3
+135ef55563880830854f15f54b6efdf7a3ca79ec,2026-01-31T22:59:55.000Z,Praise Masunga,0.1.6,1,1
+a07375e1e00ee9ed3f0a9bbcc8d83f8d6381aaab,2026-01-31T22:59:43.000Z,Praise Masunga,Merge pull request #1 from PraiseTechzw/dev,0,0
+0400bd79110ee8e36fff2bbb76d2210df63e2fbf,2026-01-31T22:58:40.000Z,Praise Masunga,0.1.5,1,1
+5e06956c09339c7af2ff59bf73d6cd92db987811,2026-01-31T22:58:25.000Z,Praise Masunga,"chore: update autopilot config, npm scripts, and release package",9,4
+b68f63f17c1b0c696de9848a6778b40b7ef69445,2026-01-31T22:50:59.000Z,Praise Masunga,feat: add new features,430,509
+b7b6a63e027e3b559b23dec29579feb3e649569f,2026-01-31T22:29:24.000Z,Praise Masunga,0.1.4,1,1
+f6338b59caa185f13df585e52fc4b4e5e896351d,2026-01-31T22:28:46.000Z,Praise Masunga,feat: add test mode and improve test coverage,231,107
+da538c59a077776c601df9eeb192743acc28198d,2026-01-31T22:27:45.000Z,Praise Masunga,docs: update changelog for v0.1.4,45,0
+6baa58df02321fb7f2df322d316ce9379328333a,2026-01-31T22:07:30.000Z,Praise Masunga,docs: update README for package rename and improve structure,36,19
+5683ae252dd4761543ba9f5b62417836c626f535,2026-01-31T21:52:01.000Z,Praise Masunga,0.1.3,1,1
+f845539fb9463e8c5137d8919d516a48619238f6,2026-01-31T21:51:52.000Z,Praise Masunga,chore: npm pkg fix,2,2
+e065999bba3d525451d8bdb6556933ac8c602242,2026-01-31T21:40:32.000Z,Praise Masunga,0.1.2,1,9
+d01cf39870e9ea9e12c0062045cf2183006a7440,2026-01-31T21:40:05.000Z,Praise Masunga,chore: update package config for npm publish,27,5
+0067456f1b53c769892ecba26b82dbb9cff619cc,2026-01-31T21:32:57.000Z,Praise Masunga,chore: rename package to @praisetech/autopilot,1,1
+ba7380ad54f4ffa7c564c558dd91b46641ef573e,2026-01-31T21:23:02.000Z,Praise Masunga,docs: update README with simplified content and corrected links,61,797
+095bbda82778c6c52c288f19057c1fc965ce80a5,2026-01-31T21:22:23.000Z,Praise Masunga,feat: improve autopilot core functionality and add release scripts,633,665
+e45eb124f72354d247c55e6fbe910612ed313a0d,2026-01-31T21:10:05.000Z,Praise Masunga,refactor: restructure CLI and remove unused utilities,51,21
+296f752547c03e57190add08a9b9b2acf26fca10,2026-01-31T21:08:12.000Z,Praise Masunga,refactor: consolidate CLI entry point and move docs to docs folder,59,81
+03318fbc77fbf71e2c85c94038ec7d6c6654ea75,2026-01-31T20:50:09.000Z,Praise Masunga,chore: Update README structure for improved navigation and clarity,739,247
+ce28e4d8bd3a3d20c5fc9a5e748ed83bb83d03a4,2026-01-31T20:42:04.000Z,Praise Masunga,feat: Update documentation for Autopilot CLI with current capabilities and quick start guide,140,786
+52fcfdeeacfb51a47112b64b87baa004564f3efb,2026-01-31T20:39:04.000Z,Praise Masunga,feat: Enhance documentation and add 'doctor' command for diagnostics,1286,1776
+665fc6ad9cbf0e224159f9c9ef32a313369b0149,2026-01-31T19:56:13.000Z,Praise Masunga,feat: Add .autopilotignore and .autopilotrc.json configuration files,21,0
+2070b78af4825bec28dd0ed875e258f0e5fe95b4,2026-01-31T19:55:49.000Z,Praise Masunga,feat: Refactor init command and enhance logger utility with improved messaging,201,107
+3c85953cd9dd1d467b1607d318eee3e65ba82914,2026-01-31T19:55:42.000Z,Praise Masunga,"feat: Add comprehensive documentation for Autopilot CLI configuration, extension, and safety features",3198,22
+8a583867eeb4b952c82df47bc1919cf111e7b8e6,2026-01-31T19:55:36.000Z,Praise Masunga,add architecture design document for Autopilot CLI,441,0
+a38ffd39f5f8a7592979e23792f601821e910f95,2026-01-31T19:45:56.000Z,Praise Masunga,"Initial commit: add Autopilot CLI with core functionality, commands, configuration, and logging",945,0
