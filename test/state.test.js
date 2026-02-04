@@ -20,7 +20,7 @@ describe('StateManager', () => {
 
   it('should initialize as running (not paused)', () => {
     assert.strictEqual(stateManager.isPaused(), false);
-    assert.strictEqual(stateManager.getState(), null);
+    assert.deepStrictEqual(stateManager.getState(), { status: 'running', reason: null, pausedAt: null });
   });
 
   it('should pause with reason', () => {
@@ -33,7 +33,7 @@ describe('StateManager', () => {
     stateManager.pause('lunch');
     stateManager.resume();
     assert.strictEqual(stateManager.isPaused(), false);
-    assert.strictEqual(stateManager.getState(), null);
+    assert.deepStrictEqual(stateManager.getState(), { status: 'running', reason: null, pausedAt: null });
   });
 
   it('should persist state across instances', () => {

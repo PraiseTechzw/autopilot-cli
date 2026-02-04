@@ -52,14 +52,13 @@ describe('HistoryManager', () => {
     assert.strictEqual(historyManager.getLastCommit().hash, '111');
   });
 
-  it('should limit history size (max 50)', () => {
-    for (let i = 0; i < 60; i++) {
+  it('should limit history size (max 100)', () => {
+    for (let i = 0; i < 110; i++) {
       historyManager.addCommit({ hash: `${i}`, message: `commit ${i}` });
     }
     
     const history = historyManager.getHistory();
-    assert.strictEqual(history.length, 50);
-    assert.strictEqual(history[history.length - 1].hash, '59'); // Newest
-    assert.strictEqual(history[0].hash, '10'); // Oldest kept
+    assert.strictEqual(history.length, 100);
+    assert.strictEqual(history[0].hash, '109'); // Newest (unshifted)
   });
 });

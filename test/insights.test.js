@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 const { insights } = require('../src/commands/insights');
-const execa = require('execa');
+const git = require('../src/core/git');
 
 describe('Insights Command', () => {
   let tempDir;
@@ -23,14 +23,16 @@ describe('Insights Command', () => {
   });
 
   it('should run insights command without error', async () => {
-    // Mock git log execution
-    mock.method(execa, 'default', (cmd, args) => {
-        if (cmd === 'git' && args.includes('log')) {
+    // Mock git.runGit execution
+    mock.method(git, 'runGit', (root, args) => {
+        if (args.includes('log')) {
             return Promise.resolve({ 
-                stdout: 'hash|author|2023-01-01|feat: test\n1\t1\tfile.js' 
+                ok: true,
+                stdout: 'e5b7e2d6f5c8a9b0c1d2e3f4a5b6c7d8e9f0a1b2|author|2023-01-01|feat: test\n1\t1\tfile.js',
+                stderr: ''
             });
         }
-        return Promise.resolve({ stdout: '' });
+        return Promise.resolve({ ok: true, stdout: '', stderr: '' });
     });
 
     // We just want to ensure it runs through
@@ -38,14 +40,16 @@ describe('Insights Command', () => {
   });
 
   it('should export csv if requested', async () => {
-    // Mock git log execution
-    mock.method(execa, 'default', (cmd, args) => {
-        if (cmd === 'git' && args.includes('log')) {
+    // Mock git.runGit execution
+    mock.method(git, 'runGit', (root, args) => {
+        if (args.includes('log')) {
             return Promise.resolve({ 
-                stdout: 'hash|author|2023-01-01|feat: test\n1\t1\tfile.js' 
+                ok: true,
+                stdout: 'e5b7e2d6f5c8a9b0c1d2e3f4a5b6c7d8e9f0a1b2|author|2023-01-01|feat: test\n1\t1\tfile.js',
+                stderr: ''
             });
         }
-        return Promise.resolve({ stdout: '' });
+        return Promise.resolve({ ok: true, stdout: '', stderr: '' });
     });
 
     await insights({ export: 'csv' });
