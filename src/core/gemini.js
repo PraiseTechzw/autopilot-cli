@@ -5,7 +5,7 @@
 
 const logger = require('../utils/logger');
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 /**
  * Generate a commit message using Gemini API
@@ -84,7 +84,7 @@ ${truncatedDiff}
 /**
  * Validate Gemini API Key
  * @param {string} apiKey 
- * @returns {Promise<boolean>}
+ * @returns {Promise<{valid: boolean, error?: string}>}
  */
 async function validateApiKey(apiKey) {
   try {
@@ -97,9 +97,16 @@ async function validateApiKey(apiKey) {
         generationConfig: { maxOutputTokens: 1 }
       })
     });
-    return response.ok;
+    
+    if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.error?.message || response.statusText;
+        return { valid: false, error: errorMessage };
+    }
+
+    return { valid: true };
   } catch (e) {
-    return false;
+    return { valid: false, error: e.message };
   }
 }
 

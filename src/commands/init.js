@@ -158,13 +158,13 @@ async function initRepo() {
         }
 
         logger.info('Verifying API Key...');
-        const isValid = await validateApiKey(apiKey);
+        const result = await validateApiKey(apiKey);
         
-        if (isValid) {
+        if (result.valid) {
           logger.success('API Key verified successfully! ✨');
           break;
         } else {
-          logger.warn('API Key validation failed. Please check your key.');
+          logger.warn(`API Key validation failed: ${result.error}`);
           const retry = await askQuestion('Try again? (n to disable AI, p to proceed anyway) [Y/n/p]: ');
           const choice = retry.toLowerCase();
           
@@ -190,7 +190,7 @@ async function initRepo() {
       ai: {
         enabled: useAI,
         apiKey: apiKey,
-        model: 'gemini-pro',
+        model: 'gemini-1.5-flash',
         interactive: interactive
       },
       commitMessageMode: useAI ? 'ai' : 'smart'
