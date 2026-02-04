@@ -10,8 +10,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=flat-square)](https://nodejs.org)
 [![Downloads](https://img.shields.io/npm/dm/@traisetech/autopilot?style=flat-square&color=blue)](https://www.npmjs.com/package/@traisetech/autopilot)
-[![GitHub Stars](https://img.shields.io/github/stars/PraiseTechzw/autopilot?style=flat-square&color=gold)](https://github.com/PraiseTechzw/autopilot/stargazers)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/PraiseTechzw/autopilot/ci.yml?style=flat-square)](https://github.com/PraiseTechzw/autopilot/actions)
+[![GitHub Stars](https://img.shields.io/github/stars/PraiseTechzw/autopilot-cli?style=flat-square&color=gold)](https://github.com/PraiseTechzw/autopilot-cli/stargazers)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/PraiseTechzw/autopilot-cli/ci.yml?style=flat-square)](https://github.com/PraiseTechzw/autopilot-cli/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 **Built by [Praise Masunga](https://github.com/PraiseTechzw) (PraiseTechzw)**
@@ -169,11 +169,11 @@ Autopilot uses a `.autopilotrc.json` file for configuration. It is created autom
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `minInterval` | `number` | `30` | Minimum seconds between commits. |
-| `autoPush` | `boolean` | `true` | Whether to push changes automatically after commit. |
-| `blockedBranches` | `array` | `[]` | List of branches to disable auto-commit on. |
-| `requireChecks` | `boolean` | `false` | Run custom checks before committing. |
-| `ignore` | `array` | `[]` | Additional glob patterns to ignore. |
+| `minInterval` | number | 30 | Minimum seconds between commits. |
+| `autoPush` | boolean | true | Whether to push changes automatically after commit. |
+| `blockedBranches` | array | `[]` | List of branches to disable auto-commit on. |
+| `requireChecks` | boolean | false | Run custom checks before committing. |
+| `ignore` | array | `[]` | Additional glob patterns to ignore. |
 
 ---
 
@@ -181,16 +181,46 @@ Autopilot uses a `.autopilotrc.json` file for configuration. It is created autom
 
 Autopilot includes several safety mechanisms to prevent accidents:
 
-1.  **Branch Protection**: Will not run on branches listed in `blockedBranches`.
-2.  **Remote Sync**: Checks if local branch is behind remote before acting.
-3.  **Debouncing**: Waits for file changes to settle before committing.
-4.  **PID Management**: Ensures only one instance runs per repository.
+- **Branch Protection**: Will not run on branches listed in `blockedBranches`.
+- **Remote Sync**: Checks if local branch is behind remote before acting.
+- **Debouncing**: Waits for file changes to settle before committing.
+- **PID Management**: Ensures only one instance runs per repository.
+
+---
+
+## 🧪 Verification (Smoke Test)
+
+To verify that Autopilot is installed and working correctly on your system:
+
+1. **Check Version**:
+   ```bash
+   autopilot --version
+   ```
+
+2. **Run Doctor**:
+   ```bash
+   autopilot doctor
+   ```
+   This will check your Git environment, permissions, and configuration.
+
+3. **Test Run**:
+   Create a temporary directory and test:
+   ```bash
+   mkdir test-repo && cd test-repo
+   git init
+   autopilot init
+   autopilot start
+   echo "test" > test.txt
+   # Wait 5-10 seconds...
+   git log
+   autopilot stop
+   ```
 
 ---
 
 ## 🔧 Troubleshooting
 
-If you encounter issues, run the doctor command:
+If you encounter issues, run the `doctor` command:
 
 ```bash
 autopilot doctor
@@ -201,6 +231,9 @@ This will check for:
 - Configuration validity
 - Node.js version
 - Permissions
+- **Common Issue**: If commits aren't triggering, check if you are editing ignored files (e.g. `.vscode`, `node_modules`).
+
+For more details, visit our [Documentation Site](https://autopilot-cli.vercel.app/docs/troubleshooting).
 
 ---
 
@@ -208,20 +241,14 @@ This will check for:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-1.  Fork the repository
-2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4.  Push to the branch (`git push origin feature/AmazingFeature`)
-5.  Open a Pull Request
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
 ---
 
 ## 📜 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-<div align="center">
-  <b>Built by <a href="https://github.com/PraiseTechzw">Praise Masunga (PraiseTechzw)</a></b>
-</div>

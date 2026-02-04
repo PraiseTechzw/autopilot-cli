@@ -11,14 +11,14 @@ describe('Golden Commit Messages', () => {
   const fixtureFiles = fs.readdirSync(FIXTURES_DIR).filter(f => f.endsWith('.diff'));
 
   fixtureFiles.forEach(filename => {
-    it(`should generate correct message for ${filename}`, () => {
+    it(`should generate correct message for ${filename}`, async () => {
       const diffContent = fs.readFileSync(path.join(FIXTURES_DIR, filename), 'utf8');
       const expected = EXPECTED_MESSAGES[filename];
       
       // Simulate file list from diff
       const files = parseFilesFromDiff(diffContent);
       
-      const actual = generateCommitMessage(files, diffContent);
+      const actual = await generateCommitMessage(files, diffContent);
       
       // Normalize line endings
       const normalizedActual = actual.replace(/\r\n/g, '\n').trim();

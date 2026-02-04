@@ -2,7 +2,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs-extra');
 const path = require('path');
-const { execa } = require('execa'); // v5
+const execa = require('execa'); // v5
 const Watcher = require('../src/core/watcher');
 
 // Test configuration

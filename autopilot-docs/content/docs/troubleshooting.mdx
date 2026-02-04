@@ -21,22 +21,33 @@ If `autopilot doctor` reports all green checks but you still have issues, check 
 
 **Symptoms:** You see "Change detected" logs repeatedly, but no commit is ever created.
 
-**Cause:** This is usually caused by "noisy" files that change constantly (e.g., every second), which constantly resets the debounce timer. If the timer never finishes, the commit never happens.
+**Cause:**
+1.  **Debounce Reset:** "Noisy" files changing constantly (e.g., every second) keep resetting the debounce timer.
+2.  **Ignored Files:** You are editing files that are ignored by `.gitignore` or `.autopilotignore`.
+3.  **Blocked Branch:** You are on a protected branch (e.g., `main`, `master`, `production`) where auto-commits are disabled by default.
 
-**Common Culprits:**
--   VS Code time tracking extensions (writing to a local file).
--   Build artifacts or hot-reload cache files not ignored.
--   Log files being written to the source directory.
+**Fixes:**
 
-**Fix:**
-Add the noisy files to your `.autopilotignore` or `.gitignore`.
-
-```text
-# .autopilotignore
-.vscode/arduino.json
-**/*.log
-dist/
+**1. Check Blocked Branches:**
+Check your `.autopilotrc.json`. By default, `main` and `master` are blocked to prevent accidental pushes to production.
+```json
+"blockedBranches": ["main", "master", "production"]
 ```
+
+**2. Check Ignored Files:**
+Autopilot respects `.gitignore` and has internal hardcoded ignores for:
+- `.git/`
+- `node_modules/`
+- `.vscode/` (and other IDE folders)
+- `autopilot.log` & `.autopilot.pid`
+
+If you are editing a file inside `.vscode` or `node_modules`, Autopilot will intentionally ignore it to prevent noise.
+
+**3. Debounce Issues:**
+If a file changes every second, Autopilot keeps waiting for it to "settle".
+- Identify the noisy file (check `autopilot.log`).
+- Add it to `.autopilotignore`.
+- **Note:** Autopilot now has a "Max Wait" fallback (default 60s) which forces a commit even if changes are still happening, preventing total starvation.
 
 ### Push fails or "Authentication failed"
 
