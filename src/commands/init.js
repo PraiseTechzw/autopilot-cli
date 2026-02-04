@@ -9,6 +9,7 @@ const readline = require('readline');
 const logger = require('../utils/logger');
 const { getConfigPath, getIgnorePath, getGitPath } = require('../utils/paths');
 const { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS } = require('../config/defaults');
+const { validateApiKey } = require('../core/gemini');
 
 function askQuestion(query) {
   if (!process.stdin.isTTY) {
@@ -137,15 +138,51 @@ async function initRepo() {
 
     // Phase 3: AI Configuration
     const enableAI = await askQuestion('Enable AI commit messages (Gemini)? [y/N]: ');
-    const useAI = enableAI.toLowerCase() === 'y';
+    let useAI = enableAI.toLowerCase() === 'y';
     
     let apiKey = '';
     let interactive = false;
     
     if (useAI) {
-      apiKey = await askQuestion('Enter your Google Gemini API Key: ');
-      const interactiveAns = await askQuestion('Review AI messages before committing? [y/N]: ');
-      interactive = interactiveAns.toLowerCase() === 'y';
+      while (true) {
+        apiKey = await askQuestion('Enter your Google Gemini API Key: ');
+        
+        if (!apiKey) {
+           logger.warn('API Key cannot be empty if AI is enabled.');
+           const retry = await askQuestion('Try again? (n to disable AI) [Y/n]: ');
+           if (retry.toLowerCase() === 'n') {
+             useAI = false;
+             break;
+           }
+           continue;
+        }
+
+        logger.info('Verifying API Key...');
+        const isValid = await validateApiKey(apiKey);
+        
+        if (isValid) {
+          logger.success('API Key verified successfully! ✨');
+          break;
+        } else {
+          logger.warn('API Key validation failed. Please check your key.');
+          const retry = await askQuestion('Try again? (n to disable AI, p to proceed anyway) [Y/n/p]: ');
+          const choice = retry.toLowerCase();
+          
+          if (choice === 'n') {
+            useAI = false;
+            break;
+          } else if (choice === 'p') {
+            logger.warn('Proceeding with potentially invalid API key.');
+            break;
+          }
+          // Default is retry (loop)
+        }
+      }
+
+      if (useAI) {
+        const interactiveAns = await askQuestion('Review AI messages before committing? [y/N]: ');
+        interactive = interactiveAns.toLowerCase() === 'y';
+      }
     }
 
     const overrides = {

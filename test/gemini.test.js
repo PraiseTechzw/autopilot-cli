@@ -1,5 +1,6 @@
 const { test, describe, it, mock, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
+const logger = require('../src/utils/logger');
 
 // Mock fetch globally
 global.fetch = async () => {};
@@ -8,6 +9,7 @@ describe('Gemini AI Integration', () => {
   let gemini;
   
   beforeEach(() => {
+    mock.method(logger, 'error', () => {});
     gemini = require('../src/core/gemini');
   });
 

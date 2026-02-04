@@ -21,6 +21,9 @@ class StateManager {
   }
 
   getState() {
+    if (!fs.existsSync(this.stateFile)) {
+      return { status: 'running' };
+    }
     try {
       return fs.readJsonSync(this.stateFile);
     } catch (error) {
