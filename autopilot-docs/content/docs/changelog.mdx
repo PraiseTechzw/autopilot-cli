@@ -5,6 +5,55 @@ description: Latest updates and improvements to Autopilot CLI.
 
 Stay up to date with the latest changes to Autopilot CLI. For a full history of releases, visit our [GitHub Releases](https://github.com/PraiseTechzw/autopilot-cli/releases) page.
 
+## [2.0.0] - 2026-02-04
+
+### Added
+- **Safety System (Phase 1)**:
+  - **Undo/Rollback**: `autopilot undo` command to safely revert the last autopilot commit.
+  - **Team Mode**: Enhanced `autopilot init` with team configuration. Implements "Pull-Before-Push" to prevent conflicts.
+  - **Pre-Commit Validation**:
+    - **Secret Detection**: Blocks commits containing AWS, GitHub, or Stripe keys.
+    - **File Size Check**: Prevents committing files larger than 50MB.
+    - **Quality Gates**: Optional linting and test execution before commit.
+  - **Pause/Resume**: `autopilot pause` and `autopilot resume` for manual control of the automation loop.
+- **Visibility & UX (Phase 2)**:
+  - **Real-Time Dashboard**: `autopilot dashboard` providing a live view of file changes, last commit status, and system health.
+  - **Enhanced Insights**: `autopilot insights` with deep analytics:
+    - Commit Quality Score (0-100) based on conventional commit standards.
+    - Productivity metrics (peak hours, streaks).
+    - CSV export capability (`--export csv`).
+- **Intelligence (Phase 3)**:
+  - **AI Commit Messages**: Integration with Google Gemini for context-aware, senior-level commit message generation.
+  - **Workflow Presets**: `autopilot preset` command to quickly switch between workflows:
+    - `safe-team`: Optimized for collaboration (Team Mode + Secret Checks).
+    - `solo-speed`: Optimized for rapid individual development.
+    - `strict-ci`: Enforces testing and linting before every commit.
+
+## [0.1.8] - 2026-02-04
+
+### Reliability & Core
+- **Watcher Engine Overhaul**:
+  - Implemented dual ignore checks (chokidar + internal matcher) to guarantee no ignored files trigger builds.
+  - Added "Max Wait" fallback (60s) to prevent debounce starvation on busy repos.
+  - Hardcoded critical ignores (`.git`, `node_modules`, `autopilot.log`) to prevent infinite loops.
+- **Git Safety**:
+  - Added graceful fallback for push failures (logs warning instead of crashing).
+  - Enforced "tracked only" commits using `git status --porcelain`.
+- **Test Mode**:
+  - Added `AUTOPILOT_TEST_MODE=1` flag for deterministic CI testing (foreground run + auto-exit).
+
+### CI/CD & Standards
+- **GitHub Workflows**:
+  - `ci.yml`: Automated testing on Windows, Ubuntu, and macOS for every PR.
+  - `release.yml`: Automated GitHub Releases with changelog generation and tarball assets.
+  - `publish.yml`: Secure npm publishing via OIDC provenance.
+- **Repository Standards**:
+  - Added Issue Templates (Bug/Feature), PR Template, `SECURITY.md`, and `CODEOWNERS`.
+
+### Fixed
+- **Windows Paths**: Fixed path normalization issues causing ignore rules to fail on Windows.
+- **Self-Triggering**: Fixed issue where writing `autopilot.log` could trigger a new commit loop.
+
 ## v0.1.7
 
 **Release Date:** 2026-02-01
