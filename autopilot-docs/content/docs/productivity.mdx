@@ -1,0 +1,61 @@
+---
+title: Productivity & Leaderboard
+description: Track your focus, productivity streaks, and compete with yourself using Autopilot Insights.
+---
+
+# Productivity & Leaderboard
+
+Autopilot isn't just a commit tool—it's a productivity engine. The built-in **Focus Engine** tracks your coding activity, file modifications, and "in-the-zone" time to provide deep insights into your work habits.
+
+## The `insights` Command
+
+Run `autopilot insights` to see your personal productivity dashboard directly in your terminal.
+
+```bash
+autopilot insights
+```
+
+### Key Metrics
+
+*   **Commit Quality Score**: An AI-generated score (0-100) that evaluates your commit messages against Conventional Commits standards.
+*   **Focus Time**: Total time spent actively editing files.
+*   **Peak Hours**: A histogram showing when you are most productive.
+*   **Active Streaks**: Consecutive days with coding activity.
+
+## Your Personal Leaderboard
+
+While Autopilot is a local-first tool, you can export your data to create your own leaderboards or share stats with your team.
+
+### Exporting Data
+
+You can export your session data to a CSV file for analysis in Excel, Google Sheets, or custom dashboards.
+
+```bash
+autopilot insights --export csv
+```
+
+This generates an `autopilot-insights.csv` file containing:
+*   Timestamp
+*   Event Type (File Change, Commit, Push)
+*   File Path
+*   Duration
+
+### Gamifying Your Workflow
+
+Autopilot encourages better habits through "Nudges" and "Micro-Goals".
+
+*   **Nudges**: If you've been editing a file for a long time without committing, Autopilot will gently "nudge" you to save your work.
+*   **Micro-Goals**: (Coming Soon) Set daily targets for commits or focus time.
+
+## Dashboard Visualization
+
+For a real-time visual representation of your activity, use the dashboard command:
+
+```bash
+autopilot dashboard
+```
+
+This opens a live TUI (Text User Interface) showing:
+1.  **Status**: Current watcher state (Running/Paused).
+2.  **Recent Activity**: Live log of file changes.
+3.  **Next Action**: Countdown to the next auto-commit.

@@ -16,6 +16,46 @@ The `.autopilotrc.json` file in your project root controls how Autopilot monitor
 | `blockedBranches` | `string[]` | `['main', 'master']` | List of branches where Autopilot is disabled to prevent accidental direct commits to protected branches. |
 | `requireChecks` | `boolean` | `false` | If `true`, Autopilot will wait for local checks (like pre-commit hooks) to pass before committing. |
 | `ignore` | `string[]` | `[]` | Additional glob patterns to ignore, supplementing `.gitignore` and `.autopilotignore`. |
+| `ai` | `object` | `{}` | Configuration for AI features (see below). |
+| `team` | `object` | `{}` | Configuration for Team features (see below). |
+
+### AI Configuration
+
+Enable smart commit messages powered by Google Gemini.
+
+```json
+{
+  "ai": {
+    "enabled": true,
+    "apiKey": "YOUR_GEMINI_API_KEY",
+    "model": "gemini-2.5-flash",
+    "interactive": false
+  }
+}
+```
+
+*   **enabled**: Toggle AI features on/off.
+*   **apiKey**: Your Google Gemini API Key.
+*   **model**: The Gemini model to use (default: `gemini-2.5-flash`).
+*   **interactive**: If `true`, prompts you to review/edit the generated message before committing.
+
+### Team Configuration
+
+Settings to ensure smooth collaboration.
+
+```json
+{
+  "team": {
+    "pullBeforePush": true,
+    "preventSecrets": true,
+    "preventLargeFiles": true
+  }
+}
+```
+
+*   **pullBeforePush**: Automatically runs `git pull --rebase` before pushing to avoid conflicts.
+*   **preventSecrets**: Scans for AWS, Stripe, and GitHub keys before committing.
+*   **preventLargeFiles**: Blocks commits containing files larger than 50MB.
 
 ### Example Configuration
 
@@ -24,7 +64,11 @@ The `.autopilotrc.json` file in your project root controls how Autopilot monitor
   "minInterval": 600,
   "autoPush": true,
   "blockedBranches": ["main", "production"],
-  "requireChecks": true
+  "requireChecks": true,
+  "ai": {
+    "enabled": true,
+    "interactive": true
+  }
 }
 ```
 
