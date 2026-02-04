@@ -1,5 +1,6 @@
 const { test, describe, it, mock, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
+const logger = require('../src/utils/logger');
 
 // Mock fetch globally
 global.fetch = async () => {};
@@ -8,6 +9,7 @@ describe('Gemini AI Integration', () => {
   let gemini;
   
   beforeEach(() => {
+    mock.method(logger, 'error', () => {});
     gemini = require('../src/core/gemini');
   });
 
@@ -67,13 +69,17 @@ describe('Gemini AI Integration', () => {
 
   it('should validate api key', async () => {
     mock.method(global, 'fetch', () => Promise.resolve({ ok: true }));
-    const isValid = await gemini.validateApiKey('good-key');
-    assert.strictEqual(isValid, true);
+    const result = await gemini.validateApiKey('good-key');
+    assert.strictEqual(result.valid, true);
   });
 
   it('should reject invalid api key', async () => {
-    mock.method(global, 'fetch', () => Promise.resolve({ ok: false }));
-    const isValid = await gemini.validateApiKey('bad-key');
-    assert.strictEqual(isValid, false);
+    mock.method(global, 'fetch', () => Promise.resolve({ 
+        ok: false,
+        json: () => Promise.resolve({ error: { message: 'Invalid API Key' } })
+    }));
+    const result = await gemini.validateApiKey('bad-key');
+    assert.strictEqual(result.valid, false);
+    assert.strictEqual(result.error, 'Invalid API Key');
   });
 });

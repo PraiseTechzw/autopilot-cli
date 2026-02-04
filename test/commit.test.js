@@ -9,13 +9,13 @@ describe('Commit Message Generator', () => {
       { status: 'A', file: 'src/commands/start.js' }
     ];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^feat(\(.*\))?: /);
+    assert.match(msg, /^\[autopilot\] feat(\(.*\))?: /);
   });
 
   it('should generate a fix: message for bug fixes', async () => {
     const files = [{ status: 'M', file: 'src/fix-bug.js' }];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^fix(\(.*\))?: /);
+    assert.match(msg, /^\[autopilot\] fix(\(.*\))?: /);
   });
 
   it('should generate a docs: message for documentation changes', async () => {
@@ -24,7 +24,7 @@ describe('Commit Message Generator', () => {
       { status: 'A', file: 'docs/api.md' }
     ];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^docs(\(.*\))?: /);
+    assert.match(msg, /^\[autopilot\] docs(\(.*\))?: /);
   });
 
   it('should generate a chore: message for config files', async () => {
@@ -33,7 +33,7 @@ describe('Commit Message Generator', () => {
       { status: 'M', file: '.gitignore' }
     ];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^chore(\(.*\))?: /);
+    assert.match(msg, /^\[autopilot\] chore(\(.*\))?: /);
   });
 
   it('should handle mixed file types with priority', async () => {
@@ -43,6 +43,6 @@ describe('Commit Message Generator', () => {
     ];
     const msg = await generateCommitMessage(files);
     // Source code usually takes precedence
-    assert.match(msg, /^(feat|fix|refactor|update)(\(.*\))?: /);
+    assert.match(msg, /^\[autopilot\] (feat|fix|refactor|update)(\(.*\))?: /);
   });
 });

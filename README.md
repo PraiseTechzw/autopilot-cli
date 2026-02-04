@@ -87,6 +87,10 @@ autopilot start
 - **⚡ Watcher Engine**: Real-time file monitoring with smart debouncing using `chokidar`.
 - **🛡️ Safety First**: Blocks commits on protected branches and checks remote status.
 - **🔄 Automated Flow**: Fetches, stages, commits, and pushes (optional) automatically.
+- **👥 Team Mode**: Pull-before-push and conflict abortion for collaborative safety.
+- **🖥️ Dashboard**: Real-time terminal dashboard with status and activity feed.
+- **⏮️ Undo System**: Safely rollback the last autopilot commit with one command.
+- **📊 Insights**: Track your productivity, commit streaks, and quality score.
 - **⚙️ Zero Config**: Works out of the box, but fully configurable via `.autopilotrc.json`.
 - **🩺 Self-Healing**: Includes a `doctor` command to diagnose and fix issues.
 
@@ -100,134 +104,103 @@ Install Autopilot globally using npm:
 npm install -g @traisetech/autopilot
 ```
 
+Or run it directly via npx:
+
+```bash
+npx @traisetech/autopilot start
+```
+
 ---
 
 ## 🚀 Quick Start
 
-### 1. Initialize
-Navigate to your Git repository and initialize Autopilot:
+1. **Navigate to your Git repository:**
+   ```bash
+   cd /path/to/my-project
+   ```
 
-```bash
-cd my-project
-autopilot init
-```
+2. **Initialize Autopilot:**
+   ```bash
+   autopilot init
+   ```
+   Follow the interactive prompts to configure settings (or accept defaults).
 
-### 2. Start Watching
-Start the background daemon to begin monitoring your files:
+3. **Start the watcher:**
+   ```bash
+   autopilot start
+   ```
 
-```bash
-autopilot start
-```
+   **Autopilot is now running!** It will monitor file changes and automatically commit/push them based on your configuration.
 
-### 3. Check Status
-Verify that Autopilot is running:
-
-```bash
-autopilot status
-```
-
-### 4. Stop
-When you're done for the day:
-
-```bash
-autopilot stop
-```
+4. **View the Dashboard (New):**
+   Open a new terminal and run:
+   ```bash
+   autopilot dashboard
+   ```
 
 ---
 
-## 💻 Commands
+## 🛠️ Commands
 
 | Command | Description |
 |---------|-------------|
-| `autopilot init` | Initializes configuration and ignore files in the current directory. |
-| `autopilot start` | Starts the background watcher daemon. |
-| `autopilot stop` | Stops the running watcher daemon. |
-| `autopilot status` | Shows the current status of the watcher process. |
-| `autopilot doctor` | Runs diagnostics to verify environment and configuration. |
-| `autopilot --help` | Displays help information. |
+| `autopilot init` | Initialize configuration in the current repo. |
+| `autopilot start` | Start the watcher process (foreground). |
+| `autopilot stop` | Stop the running watcher process. |
+| `autopilot status` | Check if Autopilot is running. |
+| `autopilot dashboard` | View real-time status and activity UI. |
+| `autopilot undo` | Revert the last Autopilot commit. |
+| `autopilot pause [reason]` | Temporarily pause automation. |
+| `autopilot resume` | Resume automation. |
+| `autopilot insights` | View productivity stats and analytics. |
+| `autopilot doctor` | Diagnose configuration and environment issues. |
 
 ---
 
 ## ⚙️ Configuration
 
-Autopilot uses a `.autopilotrc.json` file for configuration. It is created automatically when you run `autopilot init`.
+Autopilot uses an `.autopilotrc.json` file in your project root.
 
 ```json
 {
-  "minInterval": 30,
+  "debounceSeconds": 20,
+  "minSecondsBetweenCommits": 180,
   "autoPush": true,
-  "blockedBranches": ["main", "production"],
-  "requireChecks": false,
-  "ignore": [
-    "*.log",
-    "temp/",
-    "dist/",
-    "node_modules"
-  ]
+  "blockBranches": ["main", "master"],
+  "teamMode": true,
+  "preventSecrets": true,
+  "maxFileSizeMB": 50
 }
 ```
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `minInterval` | number | 30 | Minimum seconds between commits. |
-| `autoPush` | boolean | true | Whether to push changes automatically after commit. |
-| `blockedBranches` | array | `[]` | List of branches to disable auto-commit on. |
-| `requireChecks` | boolean | false | Run custom checks before committing. |
-| `ignore` | array | `[]` | Additional glob patterns to ignore. |
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for full details.
 
 ---
 
 ## 🛡️ Safety Features
 
-Autopilot includes several safety mechanisms to prevent accidents:
+Autopilot includes multiple layers of protection:
 
-- **Branch Protection**: Will not run on branches listed in `blockedBranches`.
-- **Remote Sync**: Checks if local branch is behind remote before acting.
-- **Debouncing**: Waits for file changes to settle before committing.
-- **PID Management**: Ensures only one instance runs per repository.
-
----
-
-## 🔧 Troubleshooting
-
-If you encounter issues, run the `doctor` command:
-
-```bash
-autopilot doctor
-```
-
-This will check for:
-- Git repository status
-- Configuration validity
-- Node.js version
-- Permissions
-- **Common Issue**: If commits aren't triggering, check if you are editing ignored files (e.g. `.vscode`, `node_modules`).
-- **Autopilot detects changes but never commits**: This can happen if files are constantly changing (resetting the debounce timer) or if you are on a blocked branch. Check `autopilot.log` for details.
-
-For more details, visit our [Documentation Site](https://autopilot-cli.vercel.app/docs/troubleshooting).
-
----
-
-## 🧪 Verification (Smoke Test)
-
-To verify that Autopilot is working correctly on your machine or in a CI environment, you can run the built-in verification suite. This runs the linter, the doctor diagnostic tool, and the full test suite.
-
-```bash
-# Run the full verification suite
-npm run verify
-```
-
-If everything is green, you are good to go!
+1. **Branch Protection**: Prevents running on blocked branches (default: `main`, `master`).
+2. **Secret Detection**: Scans for AWS keys, GitHub tokens, and other secrets before committing.
+3. **File Size Limits**: Prevents committing accidental large files (>50MB).
+4. **Team Mode**: Ensures local changes are rebased on top of remote changes to prevent conflicts.
+5. **Undo**: Allows quick recovery from unwanted auto-commits.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions, issues, and feature requests are welcome!
-Feel free to check the [issues page](https://github.com/PraiseTechzw/autopilot-cli/issues).
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests.
+1. Fork the repo
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
-## 📝 License
+---
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

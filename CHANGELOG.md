@@ -16,6 +16,16 @@ This project follows [Semantic Versioning](https://semver.org).
   - **Pause/Resume**: `autopilot pause` and `autopilot resume` for manual control of the automation loop.
 - **Visibility & UX (Phase 2)**:
   - **Real-Time Dashboard**: `autopilot dashboard` providing a live view of file changes, last commit status, and system health.
+  - **Enhanced Insights**: `autopilot insights` with deep analytics:
+    - Commit Quality Score (0-100) based on conventional commit standards.
+    - Productivity metrics (peak hours, streaks).
+    - CSV export capability (`--export csv`).
+- **Intelligence (Phase 3)**:
+  - **AI Commit Messages**: Integration with Google Gemini for context-aware, senior-level commit message generation.
+  - **Workflow Presets**: `autopilot preset` command to quickly switch between workflows:
+    - `safe-team`: Optimized for collaboration (Team Mode + Secret Checks).
+    - `solo-speed`: Optimized for rapid individual development.
+    - `strict-ci`: Enforces testing and linting before every commit.
 
 ## [0.1.8] - 2026-02-04
 

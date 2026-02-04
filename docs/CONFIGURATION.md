@@ -23,7 +23,10 @@ This document reflects the current `.autopilotrc.json` options.
   "blockBranches": ["main", "master"],
   "requireChecks": false,
   "checks": ["npm test"],
-  "commitMessageMode": "smart"
+  "commitMessageMode": "smart",
+  "teamMode": false,
+  "maxFileSizeMB": 50,
+  "preventSecrets": true
 }
 ```
 
@@ -65,6 +68,21 @@ This document reflects the current `.autopilotrc.json` options.
 - **Type:** `"smart" | "simple"`
 - **Default:** `"smart"`
 - **Description:** Smart uses file-based conventional commit messages; simple uses `chore: update changes`.
+
+### `teamMode`
+- **Type:** boolean
+- **Default:** `false`
+- **Description:** Enables pull-before-push and stricter conflict handling. Recommended for collaborative environments.
+
+### `maxFileSizeMB`
+- **Type:** number
+- **Default:** `50`
+- **Description:** Prevents committing files larger than this size (in MB).
+
+### `preventSecrets`
+- **Type:** boolean
+- **Default:** `true`
+- **Description:** Scans staged files for common secret patterns (AWS keys, GitHub tokens) before committing.
 
 ---
 

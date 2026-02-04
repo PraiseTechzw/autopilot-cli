@@ -1,19 +1,19 @@
 const fs = require('fs-extra');
 const path = require('path');
 const logger = require('../utils/logger');
-const execa = require('execa');
+const git = require('../core/git');
 const { createObjectCsvWriter } = require('csv-writer');
 
 async function getGitStats(repoPath) {
   try {
     // Get commit log with stats
     // Format: hash|author|date|subject|body
-    const { stdout } = await execa('git', [
+    const { stdout } = await git.runGit(repoPath, [
       'log',
       '--pretty=format:%H|%an|%ad|%s',
       '--date=iso',
       '--numstat'
-    ], { cwd: repoPath });
+    ]);
 
     const lines = stdout.split('\n');
     const commits = [];
@@ -153,7 +153,7 @@ function calculateMetrics(commits) {
 
 async function insights(options) {
   try {
-    const repoPath = process.cwd();
+    const repoPath = options.cwd || process.cwd();
     logger.info('Analyzing repository history...');
 
     const commits = await getGitStats(repoPath);

@@ -9,6 +9,7 @@ const readline = require('readline');
 const logger = require('../utils/logger');
 const { getConfigPath, getIgnorePath, getGitPath } = require('../utils/paths');
 const { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS } = require('../config/defaults');
+const { validateApiKey } = require('../core/gemini');
 
 function askQuestion(query) {
   if (!process.stdin.isTTY) {
@@ -132,40 +133,70 @@ async function initRepo() {
     // Create files
     await createIgnoreFile(repoPath);
 
-    // Prompt for AI Setup
-    let configOverrides = {};
-    const useAi = await askQuestion('🤖 Enable AI-powered commit messages with Gemini? (y/N): ');
+    const teamMode = await askQuestion('Enable team mode? (pull before push) [y/N]: ');
+    const useTeamMode = teamMode.toLowerCase() === 'y';
+
+    // Phase 3: AI Configuration
+    const enableAI = await askQuestion('Enable AI commit messages (Gemini)? [y/N]: ');
+    let useAI = enableAI.toLowerCase() === 'y';
     
-    if (useAi.toLowerCase().startsWith('y')) {
-      const apiKey = await askQuestion('🔑 Enter your Google Gemini API Key: ');
-      if (apiKey && apiKey.trim()) {
-        const { validateApiKey } = require('../core/gemini');
-        logger.info('Validating API Key...');
+    let apiKey = '';
+    let interactive = false;
+    
+    if (useAI) {
+      while (true) {
+        apiKey = await askQuestion('Enter your Google Gemini API Key: ');
         
-        const isValid = await validateApiKey(apiKey.trim());
-        
-        if (isValid) {
-          logger.success('API Key validated successfully!');
-          
-          const interactive = await askQuestion('📝 Do you want to review/edit messages before committing? (y/N): ');
-          
-          configOverrides = {
-            commitMessageMode: 'ai',
-            ai: {
-              enabled: true,
-              apiKey: apiKey.trim(),
-              model: 'gemini-pro',
-              interactive: interactive.toLowerCase().startsWith('y')
-            }
-          };
-        } else {
-          logger.warn('⚠️  Invalid API Key. AI features will be disabled.');
-          logger.info('You can update .autopilotrc.json later with a valid key.');
+        if (!apiKey) {
+           logger.warn('API Key cannot be empty if AI is enabled.');
+           const retry = await askQuestion('Try again? (n to disable AI) [Y/n]: ');
+           if (retry.toLowerCase() === 'n') {
+             useAI = false;
+             break;
+           }
+           continue;
         }
+
+        logger.info('Verifying API Key...');
+        const result = await validateApiKey(apiKey);
+        
+        if (result.valid) {
+          logger.success('API Key verified successfully! ✨');
+          break;
+        } else {
+          logger.warn(`API Key validation failed: ${result.error}`);
+          const retry = await askQuestion('Try again? (n to disable AI, p to proceed anyway) [Y/n/p]: ');
+          const choice = retry.toLowerCase();
+          
+          if (choice === 'n') {
+            useAI = false;
+            break;
+          } else if (choice === 'p') {
+            logger.warn('Proceeding with potentially invalid API key.');
+            break;
+          }
+          // Default is retry (loop)
+        }
+      }
+
+      if (useAI) {
+        const interactiveAns = await askQuestion('Review AI messages before committing? [y/N]: ');
+        interactive = interactiveAns.toLowerCase() === 'y';
       }
     }
 
-    await createConfigFile(repoPath, configOverrides);
+    const overrides = {
+      teamMode: useTeamMode,
+      ai: {
+        enabled: useAI,
+        apiKey: apiKey,
+        model: 'gemini-2.5-flash',
+        interactive: interactive
+      },
+      commitMessageMode: useAI ? 'ai' : 'smart'
+    };
+
+    const created = await createConfigFile(repoPath, overrides);
     await updateGitIgnore(repoPath);
 
     logger.section('✨ Initialization Complete');

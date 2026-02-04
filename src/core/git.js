@@ -105,6 +105,21 @@ async function fetch(root) {
 }
 
 /**
+ * Run a generic git command
+ * @param {string} root - Repository root path
+ * @param {string[]} args - Git arguments
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
+ */
+async function runGit(root, args) {
+  try {
+    const { stdout, stderr } = await execa('git', args, { cwd: root });
+    return { ok: true, stdout, stderr };
+  } catch (error) {
+    return { ok: false, stdout: '', stderr: error.message };
+  }
+}
+
+/**
  * Check if remote is ahead/behind
  * @param {string} root - Repository root path
  * @returns {Promise<{ok: boolean, ahead: boolean, behind: boolean, raw: string}>} Status object
@@ -233,6 +248,7 @@ module.exports = {
   addAll,
   commit,
   fetch,
+  runGit,
   isRemoteAhead,
   push,
   getDiff,

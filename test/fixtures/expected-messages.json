@@ -1,12 +1,12 @@
 {
-  "ui-tokens.diff": "style(ui): use theme variables for button colors\n\n- Updated Button component to use CSS variables instead of hardcoded classes\n- Added hover states using theme tokens\n- Enabled color transitions",
-  "theme-vars.diff": "style(theme): update color variables\n\n- Updated primary color definitions\n- Added new text and surface color variables\n- Refined hover states for primary color",
-  "search-feature.diff": "feat(search): implement search component\n\n- Created new Search component\n- Implemented query state management\n- Added input field for documentation search",
-  "docs-update.diff": "docs(intro): update installation instructions\n\n- Updated global install command\n- Added Quick Start section with init command",
-  "fix-bug.diff": "fix(parser): handle empty input gracefully\n\n- Fixed crash when input is undefined or empty\n- Added null return for invalid input",
-  "refactor-core.diff": "refactor(utils): modernize helpers module\n\n- Replaced custom logging with logger module\n- Switched to date-fns for date formatting\n- Simplified module exports",
-  "breaking-change.diff": "refactor(api)!: change connect method signature\n\n- Changed connect method to accept an object parameter\n- Added retries to configuration\n\nBREAKING CHANGE: connect method now requires an object with url, timeout, and retries instead of positional arguments",
-  "test-update.diff": "test(parser): add coverage for empty input\n\n- Added test case for empty input handling\n- Verified null return behavior",
-  "release-prep.diff": "chore(release): bump version to 1.1.0\n\n- Updated package version",
-  "ci-config.diff": "ci(workflow): enable coverage reporting\n\n- Switched to npm ci for reliable builds\n- Added coverage reporting to test step"
+  "ui-tokens.diff": "[autopilot] style(ui): use theme variables for button colors\n\n- Updated Button component to use CSS variables instead of hardcoded classes\n- Added hover states using theme tokens\n- Enabled color transitions",
+  "theme-vars.diff": "[autopilot] style(theme): update color variables\n\n- Updated primary color definitions\n- Added new text and surface color variables\n- Refined hover states for primary color",
+  "search-feature.diff": "[autopilot] feat(search): implement search component\n\n- Created new Search component\n- Implemented query state management\n- Added input field for documentation search",
+  "docs-update.diff": "[autopilot] docs(intro): update installation instructions\n\n- Updated global install command\n- Added Quick Start section with init command",
+  "fix-bug.diff": "[autopilot] fix(parser): handle empty input gracefully\n\n- Fixed crash when input is undefined or empty\n- Added null return for invalid input",
+  "refactor-core.diff": "[autopilot] refactor(utils): modernize helpers module\n\n- Replaced custom logging with logger module\n- Switched to date-fns for date formatting\n- Simplified module exports",
+  "breaking-change.diff": "[autopilot] refactor(api)!: change connect method signature\n\n- Changed connect method to accept an object parameter\n- Added retries to configuration\n\nBREAKING CHANGE: connect method now requires an object with url, timeout, and retries instead of positional arguments",
+  "test-update.diff": "[autopilot] test(parser): add coverage for empty input\n\n- Added test case for empty input handling\n- Verified null return behavior",
+  "release-prep.diff": "[autopilot] chore(release): bump version to 1.1.0\n\n- Updated package version",
+  "ci-config.diff": "[autopilot] ci(workflow): enable coverage reporting\n\n- Switched to npm ci for reliable builds\n- Added coverage reporting to test step"
 }
