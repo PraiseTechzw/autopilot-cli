@@ -36,7 +36,9 @@
     "lint": "node -c bin/autopilot.js && node -c src/index.js",
     "verify": "node bin/autopilot.js --help && node bin/autopilot.js doctor && node --test",
     "prepublishOnly": "npm run verify",
-    "release:patch": "npm run verify && npm version patch && git push --follow-tags && echo \"\n🚀 Ready to publish! Run: npm publish --access public\""
+    "release:patch": "npm run verify && npm version patch && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
+    "release:minor": "npm run verify && npm version minor && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
+    "release:major": "npm run verify && npm version major && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\""
   },
   "engines": {
     "node": ">=18.0.0"
