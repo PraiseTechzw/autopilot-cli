@@ -13,9 +13,9 @@ const DEFAULT_CONFIG = {
   commitMessageMode: 'smart', // smart | simple | ai
   ai: {
     enabled: false,
-    apiKey: '',
-    model: 'gemini-pro',
-    interactive: false
+    apiKey: '', // Store in env var or secure config
+    model: 'gemini-2.5-flash',
+    interactive: true
   },
   // Phase 1: Team Mode
   teamMode: false,

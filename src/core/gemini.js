@@ -5,15 +5,17 @@
 
 const logger = require('../utils/logger');
 
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const BASE_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/';
+const DEFAULT_MODEL = 'gemini-2.5-flash';
 
 /**
  * Generate a commit message using Gemini API
  * @param {string} diff - The git diff content
  * @param {string} apiKey - Google Gemini API Key
+ * @param {string} [model] - Gemini Model ID (default: gemini-2.5-flash)
  * @returns {Promise<string>} Generated commit message
  */
-async function generateAICommitMessage(diff, apiKey) {
+async function generateAICommitMessage(diff, apiKey, model = DEFAULT_MODEL) {
   if (!diff || !diff.trim()) {
     return 'chore: update changes';
   }
@@ -39,7 +41,8 @@ ${truncatedDiff}
 `;
 
   try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    const url = `${BASE_API_URL}${model}:generateContent?key=${apiKey}`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -84,12 +87,14 @@ ${truncatedDiff}
 /**
  * Validate Gemini API Key
  * @param {string} apiKey 
+ * @param {string} [model] - Gemini Model ID (default: gemini-2.5-flash)
  * @returns {Promise<{valid: boolean, error?: string}>}
  */
-async function validateApiKey(apiKey) {
+async function validateApiKey(apiKey, model = DEFAULT_MODEL) {
   try {
+    const url = `${BASE_API_URL}${model}:generateContent?key=${apiKey}`;
     // Simple test call with empty prompt
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
+    const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
