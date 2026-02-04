@@ -22,6 +22,7 @@ export const navigation: NavSection[] = [
     title: 'Guides',
     items: [
       { title: 'Configuration', href: '/docs/configuration' },
+      { title: 'Productivity & Leaderboard', href: '/docs/productivity' },
       { title: 'Safety Features', href: '/docs/safety' },
       { title: 'Troubleshooting', href: '/docs/troubleshooting' },
     ],
