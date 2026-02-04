@@ -51,7 +51,7 @@
   "homepage": "https://github.com/PraiseTechzw/autopilot-cli#readme",
   "dependencies": {
     "@traisetech/autopilot": "^0.1.7",
-    "chokidar": "^5.0.0",
+    "chokidar": "^3.6.0",
     "commander": "^14.0.3",
     "csv-writer": "^1.6.0",
     "execa": "^5.1.1",
