@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project follows [Semantic Versioning](https://semver.org).
 
+## [2.0.0] - 2026-02-04
+
+### Added
+- **Safety System (Phase 1)**:
+  - **Undo/Rollback**: `autopilot undo` command to safely revert the last autopilot commit.
+  - **Team Mode**: Enhanced `autopilot init` with team configuration. Implements "Pull-Before-Push" to prevent conflicts.
+  - **Pre-Commit Validation**:
+    - **Secret Detection**: Blocks commits containing AWS, GitHub, or Stripe keys.
+    - **File Size Check**: Prevents committing files larger than 50MB.
+    - **Quality Gates**: Optional linting and test execution before commit.
+  - **Pause/Resume**: `autopilot pause` and `autopilot resume` for manual control of the automation loop.
+- **Visibility & UX (Phase 2)**:
+  - **Real-Time Dashboard**: `autopilot dashboard` providing a live view of file changes, last commit status, and system health.
+
 ## [0.1.8] - 2026-02-04
 
 ### Reliability & Core

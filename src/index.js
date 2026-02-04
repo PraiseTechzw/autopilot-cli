@@ -8,6 +8,7 @@ const { doctor } = require('./commands/doctor');
 const { insights } = require('./commands/insights');
 const pauseCommand = require('./commands/pause');
 const resumeCommand = require('./commands/resume');
+const runDashboard = require('./commands/dashboard');
 const pkg = require('../package.json');
 
 function run() {
@@ -55,6 +56,11 @@ function run() {
     .action(resumeCommand);
 
   program
+    .command('dashboard')
+    .description('View real-time Autopilot dashboard')
+    .action(runDashboard);
+
+  program
     .command('doctor')
     .description('Diagnose and validate autopilot setup')
     .action(doctor);
@@ -63,6 +69,7 @@ function run() {
     .command('insights')
     .description('View productivity insights and focus analytics')
     .option('-f, --format <type>', 'Output format (json, text)', 'text')
+    .option('-e, --export <type>', 'Export insights (csv)')
     .action(insights);
 
   program
