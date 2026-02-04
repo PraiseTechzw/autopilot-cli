@@ -45,5 +45,3 @@ dist/
 build/
 autopilot.log
 .autopilot.pid
-*.tgz
-
