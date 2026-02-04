@@ -1,0 +1,67 @@
+name: Bug Report
+description: Create a report to help us improve Autopilot CLI
+title: "[BUG] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  
+  - type: input
+    id: version
+    attributes:
+      label: Autopilot Version
+      description: Run `autopilot --version`
+      placeholder: 0.1.7
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js Version
+      description: Run `node -v`
+      placeholder: v18.16.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Please list the steps to reproduce the issue.
+      placeholder: |
+        1. Go to '...'
+        2. Run command '...'
+        3. See error '...'
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Please include relevant snippets from `autopilot.log` or console output.
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs Actual Behavior
+      description: What did you expect to happen, and what actually happened?
+    validations:
+      required: true

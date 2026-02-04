@@ -23,18 +23,18 @@ class Watcher {
     this.isWatching = false;
     this.isProcessing = false;
     this.debounceTimer = null;
+    this.maxWaitTimer = null;
+    this.firstChangeTime = null;
     this.lastCommitAt = 0;
     this.logFilePath = path.join(repoPath, 'autopilot.log');
     this.ignorePatterns = [];
+    this.ignoredFilter = null;
+    this.focusEngine = new FocusEngine(repoPath);
   }
 
   logVerbose(message) {
-    // Helper to log debug messages to file/stdout if needed
-    // For now, we use logger.debug which writes to stdout if DEBUG is set
-    // We also want to ensure we don't create a loop by logging to the file we watch
-    // But since we ignore autopilot.log, it should be fine.
+    // Helper to log debug messages
     logger.debug(message);
-    // TODO: Append to log file if configured
   }
 
   async reloadConfig() {
@@ -73,12 +73,12 @@ class Watcher {
         return;
       }
 
-      // Create robust ignore filter
-      const ignoredFilter = createIgnoredFilter(this.repoPath, this.ignorePatterns);
+      // Create robust ignore filter and store it
+      this.ignoredFilter = createIgnoredFilter(this.repoPath, this.ignorePatterns);
 
       // Start Chokidar with function-based ignore
       this.watcher = chokidar.watch(this.repoPath, {
-        ignored: ignoredFilter,
+        ignored: this.ignoredFilter,
         ignoreInitial: true,
         persistent: true,
         awaitWriteFinish: {
@@ -104,12 +104,15 @@ class Watcher {
       
       // Test Mode Support
       if (process.env.AUTOPILOT_TEST_MODE) {
-        logger.warn('TEST MODE: Running in dry-run mode for 8 seconds...');
+        logger.warn('TEST MODE: Running in foreground for test duration...');
+        // In test mode, we might want to exit after some time or wait for signal
+        // The user requirement says "auto-exits after configurable seconds"
+        const testDuration = process.env.AUTOPILOT_TEST_DURATION || 10000;
         setTimeout(async () => {
           logger.info('TEST MODE: Auto-stopping watcher...');
           await this.stop();
           process.exit(0);
-        }, 8000);
+        }, Number(testDuration));
       }
       
     } catch (error) {
@@ -126,6 +129,11 @@ class Watcher {
       if (this.debounceTimer) {
         clearTimeout(this.debounceTimer);
         this.debounceTimer = null;
+      }
+      
+      if (this.maxWaitTimer) {
+        clearTimeout(this.maxWaitTimer);
+        this.maxWaitTimer = null;
       }
 
       if (this.watcher) {
@@ -152,14 +160,22 @@ class Watcher {
     if (this.isProcessing) return;
     
     // Normalize path relative to repo for logging and checks
-    const relativePath = normalizePath(path.relative(this.repoPath, filePath));
+    // normalizePath ensures forward slashes
+    const absolutePath = path.isAbsolute(filePath) ? filePath : path.join(this.repoPath, filePath);
+    const relativePath = normalizePath(path.relative(this.repoPath, absolutePath));
     
-    // Double check ignore (safety net) - although chokidar should catch most
-    if (relativePath.includes('.git/') || relativePath.endsWith('autopilot.log') || relativePath.includes('.vscode/')) {
+    // Internal Ignore Check (Redundant but safe)
+    // We use the same filter function passed to Chokidar
+    if (this.ignoredFilter && this.ignoredFilter(absolutePath)) {
         return;
     }
 
-    this.logVerbose(`File event: ${type} ${relativePath}`);
+    // Additional strict check for critical files just in case
+    if (relativePath.includes('.git/') || relativePath.endsWith('autopilot.log')) {
+        return;
+    }
+
+    this.logVerbose(`Change detected: ${type} ${relativePath}`);
     
     // Track focus
     this.focusEngine.onFileEvent(relativePath);
@@ -172,9 +188,22 @@ class Watcher {
    */
   scheduleProcess() {
     const debounceMs = (this.config?.debounceSeconds || 5) * 1000;
+    const maxWaitMs = (this.config?.maxWaitSeconds || 60) * 1000; // Default 60s max wait
     
+    // Reset debounce timer
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
+    }
+
+    // Start Max Wait timer if not running
+    if (!this.firstChangeTime) {
+      this.firstChangeTime = Date.now();
+      logger.debug(`Starting max wait timer (${maxWaitMs}ms)`);
+      
+      this.maxWaitTimer = setTimeout(() => {
+        logger.debug('Max wait reached. Forcing process.');
+        this.processChanges();
+      }, maxWaitMs);
     }
 
     logger.debug('Debounce fired. Waiting...');
@@ -193,6 +222,32 @@ class Watcher {
     return true;
   }
 
+  async askApproval(message) {
+      const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+      });
+
+      return new Promise((resolve) => {
+          logger.info(`Proposed commit message: "${message}"`);
+          rl.question('Accept? (y/n/edit): ', (answer) => {
+              rl.close();
+              const ans = answer.toLowerCase();
+              if (ans === 'y' || ans === 'yes') {
+                  resolve({ approved: true, message });
+              } else if (ans === 'edit') {
+                   const rlEdit = readline.createInterface({ input: process.stdin, output: process.stdout });
+                   rlEdit.question('Enter new message: ', (newMessage) => {
+                       rlEdit.close();
+                       resolve({ approved: true, message: newMessage });
+                   });
+              } else {
+                  resolve({ approved: false });
+              }
+          });
+      });
+  }
+
   /**
    * Main processing loop
    */
@@ -200,12 +255,23 @@ class Watcher {
     if (this.isProcessing) return;
     this.isProcessing = true;
 
+    // Clear timers
+    if (this.debounceTimer) {
+        clearTimeout(this.debounceTimer);
+        this.debounceTimer = null;
+    }
+    if (this.maxWaitTimer) {
+        clearTimeout(this.maxWaitTimer);
+        this.maxWaitTimer = null;
+    }
+    this.firstChangeTime = null;
+
     try {
       logger.debug('Checking git status...');
 
       // 1. Min interval check
       const now = Date.now();
-      const minInterval = (this.config?.minSecondsBetweenCommits || 180) * 1000;
+      const minInterval = (this.config?.minSecondsBetweenCommits || 30) * 1000;
       if (this.lastCommitAt > 0 && now - this.lastCommitAt < minInterval) {
         logger.debug(`Skip commit: Minimum interval not met (${Math.round((minInterval - (now - this.lastCommitAt))/1000)}s remaining)`);
         return;
@@ -229,15 +295,10 @@ class Watcher {
 
       // 4. Safety: Remote check (fetch -> behind?)
       logger.debug('Checking remote status...');
-      // Note: isRemoteAhead might need network, timeout safely?
-      try {
-          const remoteStatus = await git.isRemoteAhead(this.repoPath);
-          if (remoteStatus.behind) {
-            logger.warn('Skip commit: Local branch is behind remote. Please pull changes.');
-            return;
-          }
-      } catch (e) {
-          logger.debug(`Remote check failed (offline?): ${e.message}`);
+      const remoteStatus = await git.isRemoteAhead(this.repoPath);
+      if (remoteStatus.behind) {
+        logger.warn('Skip commit: Local branch is behind remote. Please pull changes.');
+        return;
       }
 
       // 5. Safety: Custom checks
@@ -264,8 +325,8 @@ class Watcher {
         message = await generateCommitMessage(changedFiles, diff, this.config);
       }
 
-      // Interactive Review
-      if (this.config?.ai?.interactive) {
+      // Interactive Review (Skip in test mode if not mocked)
+      if (this.config?.ai?.interactive && !process.env.AUTOPILOT_TEST_MODE) {
         const approval = await this.askApproval(message);
         if (!approval.approved) {
           logger.warn('Commit skipped by user.');
@@ -277,20 +338,23 @@ class Watcher {
       await git.commit(this.repoPath, message);
       this.lastCommitAt = Date.now();
       this.focusEngine.onCommit();
-      logger.success('Commit done');
+      logger.success('Commit complete');
 
       // 7. Auto-push
       if (this.config?.autoPush) {
         logger.info('Pushing to remote...');
-        await git.push(this.repoPath);
-        logger.success('Push complete');
+        const pushResult = await git.push(this.repoPath);
+        if (!pushResult.ok) {
+             logger.warn(`Push failed (will retry next time): ${pushResult.stderr}`);
+        } else {
+             logger.success('Push complete');
+        }
       }
 
     } catch (error) {
       logger.error(`Process error: ${error.message}`);
     } finally {
       this.isProcessing = false;
-      this.debounceTimer = null;
     }
   }
 }
