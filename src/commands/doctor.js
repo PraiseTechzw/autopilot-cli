@@ -6,7 +6,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const process = require('process');
-const { execa } = require('execa');
+const execa = require('execa');
 const logger = require('../utils/logger');
 const git = require('../core/git');
 

@@ -3,7 +3,7 @@
  * Built by Praise Masunga (PraiseTechzw)
  */
 
-const { execa } = require('execa');
+const execa = require('execa');
 
 /**
  * Get current branch name
@@ -134,12 +134,15 @@ async function isRemoteAhead(root) {
 /**
  * Push changes to remote
  * @param {string} root - Repository root path
- * @param {string} branch - Branch to push
+ * @param {string} [branch] - Branch to push (optional, defaults to current)
  * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
  */
 async function push(root, branch) {
   try {
-    const { stdout, stderr } = await execa('git', ['push', 'origin', branch], { cwd: root });
+    const targetBranch = branch || await getBranch(root);
+    if (!targetBranch) throw new Error('Could not determine branch to push');
+
+    const { stdout, stderr } = await execa('git', ['push', 'origin', targetBranch], { cwd: root });
     return { ok: true, stdout, stderr };
   } catch (error) {
     return { ok: false, stdout: '', stderr: error.message };

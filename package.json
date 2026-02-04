@@ -34,7 +34,7 @@
     "dev": "node bin/autopilot.js",
     "test": "node --test",
     "lint": "node -c bin/autopilot.js && node -c src/index.js",
-    "verify": "node --test && node bin/autopilot.js --help",
+    "verify": "node bin/autopilot.js --help && node bin/autopilot.js doctor && node --test",
     "prepublishOnly": "npm run verify",
     "release:patch": "npm run verify && npm version patch && git push --follow-tags && echo \"\n🚀 Ready to publish! Run: npm publish --access public\""
   },
@@ -53,7 +53,7 @@
     "@traisetech/autopilot": "^0.1.7",
     "chokidar": "^5.0.0",
     "commander": "^14.0.3",
-    "execa": "^9.6.1",
+    "execa": "^5.1.1",
     "fs-extra": "^11.3.3"
   }
 }
