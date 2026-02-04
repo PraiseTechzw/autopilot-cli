@@ -2,18 +2,19 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "main" ]
 
 jobs:
-  test:
-    name: Test on ${{ matrix.os }}
+  build:
+    name: Build & Verify
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         node-version: [18.x, 20.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
     - uses: actions/checkout@v4
@@ -27,8 +28,10 @@ jobs:
     - name: Install dependencies
       run: npm ci
       
-    - name: Verify (Lint + Test + Doctor)
+    # Run the full verification suite (Lint + Doctor + Tests)
+    # This ensures "npm run verify" is the single source of truth for quality
+    - name: Verify (Lint, Doctor, Tests)
       run: npm run verify
       env:
         CI: true
-        AUTOPILOT_TEST_MODE: 1
+        AUTOPILOT_TEST_MODE: "1"

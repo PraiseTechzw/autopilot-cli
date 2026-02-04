@@ -1,21 +1,11 @@
 # Security Policy
 
-## Supported Versions
-
-Only the latest major version of Autopilot CLI is currently supported with security updates.
-
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
-| < 0.1.0 | :x:                |
-
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Autopilot CLI, please do NOT open a public issue.
+We take security seriously. If you discover a security vulnerability within Autopilot CLI, please report it to us immediately.
 
-Instead, please report it via:
+**DO NOT** create a public GitHub issue for security vulnerabilities.
 
-1.  **Email**: praise@traisetech.com (or equivalent contact)
-2.  **GitHub Security Advisory**: Use the "Report a vulnerability" button on the GitHub repository if available.
+Instead, please report vulnerabilities by emailing **praise@praisetech.zw** (or the current maintainer).
 
-We will acknowledge your report within 48 hours and provide a timeline for the fix.
+We will acknowledge receipt of your report within 48 hours and will provide a timeline for addressing the vulnerability.

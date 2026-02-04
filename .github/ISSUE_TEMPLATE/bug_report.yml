@@ -1,13 +1,12 @@
 name: Bug Report
-description: File a bug report
-title: "[BUG]: "
-labels: ["bug"]
+description: Create a report to help us improve Autopilot CLI
+title: "[Bug]: "
+labels: ["bug", "triage"]
 body:
   - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
-  
   - type: textarea
     id: description
     attributes:
@@ -16,49 +15,29 @@ body:
       placeholder: Autopilot fails to commit when...
     validations:
       required: true
-
   - type: textarea
     id: reproduction
     attributes:
-      label: Reproduction Steps
+      label: Steps to Reproduce
       description: Steps to reproduce the behavior.
       placeholder: |
-        1. Run 'autopilot start'
+        1. Run 'autopilot init'
         2. Edit 'foo.js'
-        3. See error...
+        3. Wait 10 seconds
+        4. See error...
     validations:
       required: true
-
   - type: input
-    id: version
+    id: environment
     attributes:
-      label: Autopilot Version
-      description: What version of autopilot-cli are you using? (Run `autopilot -v`)
-      placeholder: v0.1.7
+      label: Environment
+      description: OS, Node version, and Autopilot version.
+      placeholder: Windows 11, Node v20.10.0, Autopilot v0.1.7
     validations:
       required: true
-
-  - type: input
-    id: node-version
-    attributes:
-      label: Node.js Version
-      description: What version of Node.js are you using? (Run `node -v`)
-      placeholder: v18.16.0
-    validations:
-      required: true
-
-  - type: input
-    id: os
-    attributes:
-      label: Operating System
-      description: What OS are you running on?
-      placeholder: Windows 11, macOS Sonoma, Ubuntu 22.04
-    validations:
-      required: true
-
   - type: textarea
     id: logs
     attributes:
-      label: Log Output
-      description: Please copy and paste any relevant logs from `autopilot.log` or the terminal.
+      label: Relevant Log Output
+      description: Please copy and paste any relevant logs from autopilot.log or the terminal.
       render: shell
