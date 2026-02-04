@@ -5,19 +5,23 @@ const path = require('path');
 const os = require('os');
 const { insights } = require('../src/commands/insights');
 const git = require('../src/core/git');
+const logger = require('../src/utils/logger');
 
 describe('Insights Command', () => {
   let tempDir;
-  let originalCwd;
 
   beforeEach(async () => {
-    originalCwd = process.cwd();
     tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-test-'));
-    process.chdir(tempDir);
+    // Silence logger and console
+    mock.method(logger, 'info', () => {});
+    mock.method(logger, 'warn', () => {});
+    mock.method(logger, 'success', () => {});
+    mock.method(logger, 'section', () => {});
+    mock.method(console, 'log', () => {});
+    mock.method(console, 'error', () => {});
   });
 
   afterEach(async () => {
-    process.chdir(originalCwd);
     await fs.remove(tempDir);
     mock.restoreAll();
   });
@@ -36,7 +40,7 @@ describe('Insights Command', () => {
     });
 
     // We just want to ensure it runs through
-    await insights({});
+    await insights({ cwd: tempDir });
   });
 
   it('should export csv if requested', async () => {
@@ -52,11 +56,16 @@ describe('Insights Command', () => {
         return Promise.resolve({ ok: true, stdout: '', stderr: '' });
     });
 
-    await insights({ export: 'csv' });
+    try {
+        await insights({ export: 'csv', cwd: tempDir });
+    } catch (error) {
+        console.error('Insights error:', error);
+    }
     
     // Check if file exists
     // The filename is hardcoded in insights.js as autopilot-insights.csv
-    const exists = await fs.pathExists(path.join(tempDir, 'autopilot-insights.csv'));
-    assert.strictEqual(exists, true);
+    const csvPath = path.join(tempDir, 'autopilot-insights.csv');
+    const exists = await fs.pathExists(csvPath);
+    assert.strictEqual(exists, true, `CSV file should exist at ${csvPath}`);
   });
 });

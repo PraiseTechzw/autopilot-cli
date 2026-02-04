@@ -153,7 +153,7 @@ function calculateMetrics(commits) {
 
 async function insights(options) {
   try {
-    const repoPath = process.cwd();
+    const repoPath = options.cwd || process.cwd();
     logger.info('Analyzing repository history...');
 
     const commits = await getGitStats(repoPath);
