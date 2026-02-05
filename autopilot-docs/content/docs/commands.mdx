@@ -185,3 +185,27 @@ autopilot insights [--export csv]
 *   **Commit Quality Score**: AI-based analysis of your commit habits.
 *   **Productivity Metrics**: Peak coding hours, active streaks.
 *   **Export**: Export data to CSV for external analysis (e.g., spreadsheet leaderboards).
+
+---
+
+## `autopilot leaderboard`
+
+Interacts with the global Autopilot leaderboard.
+
+**Syntax:**
+```bash
+autopilot leaderboard [--sync]
+```
+
+**Options:**
+- `--sync`: Pushes your local productivity stats (focus time, streaks, scores) to the global leaderboard.
+- (No args): Opens the leaderboard in your default browser.
+
+**Example:**
+```bash
+# Sync your latest stats
+autopilot leaderboard --sync
+
+# View rankings
+autopilot leaderboard
+```

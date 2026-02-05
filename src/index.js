@@ -9,6 +9,7 @@ const { insights } = require('./commands/insights');
 const pauseCommand = require('./commands/pause');
 const resumeCommand = require('./commands/resume');
 const runDashboard = require('./commands/dashboard');
+const { leaderboard } = require('./commands/leaderboard');
 const pkg = require('../package.json');
 
 function run() {
@@ -18,6 +19,12 @@ function run() {
     .name('autopilot')
     .description('Git automation with safety rails')
     .version(pkg.version, '-v, --version', 'Show version');
+
+  program
+    .command('leaderboard')
+    .description('View or sync with the global leaderboard')
+    .option('--sync', 'Sync your local stats to the leaderboard')
+    .action(leaderboard);
 
   program
     .command('init')

@@ -6,6 +6,69 @@
     "type": "page"
   },
   {
+    "title": "[2.0.0] - 2026-02-04",
+    "route": "/docs/changelog#200---2026-02-04",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Added",
+    "route": "/docs/changelog#added",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Docs/Website",
+    "route": "/docs/changelog#docswebsite",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "[0.1.8] - 2026-02-04",
+    "route": "/docs/changelog#018---2026-02-04",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Reliability & Core",
+    "route": "/docs/changelog#reliability--core",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "CI/CD & Standards",
+    "route": "/docs/changelog#cicd--standards",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "v0.1.7",
+    "route": "/docs/changelog#v017",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.6",
+    "route": "/docs/changelog#v016",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
     "title": "v0.1.4",
     "route": "/docs/changelog#v014",
     "type": "heading",
@@ -20,8 +83,8 @@
     "level": 2
   },
   {
-    "title": "v0.1.2",
-    "route": "/docs/changelog#v012",
+    "title": "v0.1.1",
+    "route": "/docs/changelog#v011",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 2
@@ -68,13 +131,6 @@
     "level": 2
   },
   {
-    "title": "Stop watching before switching branches",
-    "route": "/docs/commands#stop-watching-before-switching-branches",
-    "type": "heading",
-    "parentTitle": "CLI Reference",
-    "level": 1
-  },
-  {
     "title": "`autopilot status`",
     "route": "/docs/commands#autopilot-status",
     "type": "heading",
@@ -82,8 +138,43 @@
     "level": 2
   },
   {
+    "title": "`autopilot pause`",
+    "route": "/docs/commands#autopilot-pause",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot resume`",
+    "route": "/docs/commands#autopilot-resume",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot undo`",
+    "route": "/docs/commands#autopilot-undo",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot preset`",
+    "route": "/docs/commands#autopilot-preset",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
     "title": "`autopilot doctor`",
     "route": "/docs/commands#autopilot-doctor",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot insights`",
+    "route": "/docs/commands#autopilot-insights",
     "type": "heading",
     "parentTitle": "CLI Reference",
     "level": 2
@@ -100,6 +191,20 @@
     "type": "heading",
     "parentTitle": "Configuration",
     "level": 2
+  },
+  {
+    "title": "AI Configuration",
+    "route": "/docs/configuration#ai-configuration",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Team Configuration",
+    "route": "/docs/configuration#team-configuration",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
   },
   {
     "title": "Example Configuration",
@@ -247,6 +352,13 @@
     "level": 1
   },
   {
+    "title": "What's New in v2.0",
+    "route": "/docs#whats-new-in-v20",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
     "title": "Quick Install",
     "route": "/docs#quick-install",
     "type": "heading",
@@ -297,7 +409,7 @@
   },
   {
     "title": "Installation",
-    "description": "Get Autopilot CLI up and running on your machine in seconds.",
+    "description": "Comprehensive installation guide for Windows, macOS, and Linux.",
     "route": "/docs/installation",
     "type": "page"
   },
@@ -316,29 +428,57 @@
     "level": 2
   },
   {
-    "title": "Global Installation",
-    "route": "/docs/installation#global-installation",
+    "title": "Windows",
+    "route": "/docs/installation#windows",
     "type": "heading",
     "parentTitle": "Installation",
     "level": 2
   },
   {
-    "title": "Using npm",
-    "route": "/docs/installation#using-npm",
+    "title": "Method 1: npm (Recommended)",
+    "route": "/docs/installation#method-1-npm-recommended",
     "type": "heading",
     "parentTitle": "Installation",
     "level": 3
   },
   {
-    "title": "Using yarn",
-    "route": "/docs/installation#using-yarn",
+    "title": "Method 2: pnpm / yarn",
+    "route": "/docs/installation#method-2-pnpm--yarn",
     "type": "heading",
     "parentTitle": "Installation",
     "level": 3
   },
   {
-    "title": "Using pnpm",
-    "route": "/docs/installation#using-pnpm",
+    "title": "pnpm",
+    "route": "/docs/installation#pnpm",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 1
+  },
+  {
+    "title": "yarn",
+    "route": "/docs/installation#yarn",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 1
+  },
+  {
+    "title": "Troubleshooting Windows",
+    "route": "/docs/installation#troubleshooting-windows",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "macOS",
+    "route": "/docs/installation#macos",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Installation via npm",
+    "route": "/docs/installation#installation-via-npm",
     "type": "heading",
     "parentTitle": "Installation",
     "level": 3
@@ -348,34 +488,110 @@
     "route": "/docs/installation#verify-installation",
     "type": "heading",
     "parentTitle": "Installation",
-    "level": 2
+    "level": 3
   },
   {
-    "title": "Troubleshooting",
-    "route": "/docs/installation#troubleshooting",
+    "title": "Linux",
+    "route": "/docs/installation#linux",
     "type": "heading",
     "parentTitle": "Installation",
     "level": 2
   },
   {
-    "title": "Windows PATH Issues",
-    "route": "/docs/installation#windows-path-issues",
+    "title": "1. Install Node.js (if missing)",
+    "route": "/docs/installation#1-install-nodejs-if-missing",
     "type": "heading",
     "parentTitle": "Installation",
     "level": 3
   },
   {
-    "title": "Permission Errors (EACCES)",
-    "route": "/docs/installation#permission-errors-eacces",
+    "title": "2. Install Autopilot",
+    "route": "/docs/installation#2-install-autopilot",
     "type": "heading",
     "parentTitle": "Installation",
     "level": 3
+  },
+  {
+    "title": "3. Permissions Note",
+    "route": "/docs/installation#3-permissions-note",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "No-Install Usage (npx)",
+    "route": "/docs/installation#no-install-usage-npx",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Verify Installation",
+    "route": "/docs/installation#verify-installation-1",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
   },
   {
     "title": "Uninstalling",
     "route": "/docs/installation#uninstalling",
     "type": "heading",
     "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Productivity & Leaderboard",
+    "description": "Track your focus, productivity streaks, and compete with yourself using Autopilot Insights.",
+    "route": "/docs/productivity",
+    "type": "page"
+  },
+  {
+    "title": "Productivity & Leaderboard",
+    "route": "/docs/productivity#productivity--leaderboard",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 1
+  },
+  {
+    "title": "The `insights` Command",
+    "route": "/docs/productivity#the-insights-command",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 2
+  },
+  {
+    "title": "Key Metrics",
+    "route": "/docs/productivity#key-metrics",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
+    "title": "Your Personal Leaderboard",
+    "route": "/docs/productivity#your-personal-leaderboard",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 2
+  },
+  {
+    "title": "Exporting Data",
+    "route": "/docs/productivity#exporting-data",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
+    "title": "Gamifying Your Workflow",
+    "route": "/docs/productivity#gamifying-your-workflow",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
+    "title": "Dashboard Visualization",
+    "route": "/docs/productivity#dashboard-visualization",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
     "level": 2
   },
   {
@@ -542,13 +758,6 @@
     "type": "heading",
     "parentTitle": "Troubleshooting",
     "level": 3
-  },
-  {
-    "title": ".autopilotignore",
-    "route": "/docs/troubleshooting#autopilotignore",
-    "type": "heading",
-    "parentTitle": "Troubleshooting",
-    "level": 1
   },
   {
     "title": "Push fails or \"Authentication failed\"",
