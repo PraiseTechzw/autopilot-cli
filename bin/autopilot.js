@@ -9,6 +9,7 @@ const undoCommand = require('../src/commands/undo');
 const pauseCommand = require('../src/commands/pause');
 const resumeCommand = require('../src/commands/resume');
 const { insights } = require('../src/commands/insights');
+const { leaderboard } = require('../src/commands/leaderboard');
 const doctor = require('../src/commands/doctor');
 const presetCommand = require('../src/commands/preset');
 const pkg = require('../package.json');
@@ -25,6 +26,7 @@ const commands = {
   pause: pauseCommand,
   resume: resumeCommand,
   insights: insights,
+  leaderboard: leaderboard,
   doctor: doctor,
   preset: presetCommand
 };
@@ -100,6 +102,12 @@ program
   .option('-f, --format <type>', 'Output format (json, text)', 'text')
   .option('-e, --export <type>', 'Export insights (csv)')
   .action(insights);
+
+program
+  .command('leaderboard')
+  .description('View or sync with the global leaderboard')
+  .option('--sync', 'Sync your local stats to the leaderboard')
+  .action(leaderboard);
 
 program
   .command('preset [action] [name]')
