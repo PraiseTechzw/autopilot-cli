@@ -228,4 +228,4 @@ async function insights(options) {
   }
 }
 
-module.exports = { insights };
+module.exports = { insights, getGitStats, calculateMetrics };

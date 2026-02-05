@@ -4,60 +4,40 @@ import { useState, useEffect } from 'react';
 import { Trophy, Medal, Flame, Timer, GitCommit, Activity, ArrowUp, ArrowDown, Minus } from 'lucide-react';
 import clsx from 'clsx';
 
-// Simulated data
-const INITIAL_USERS = [
-  { id: 1, name: 'AlexChen', avatar: 'AC', score: 9850, commits: 142, focusTime: '42h 15m', streak: 12, trend: 'up' },
-  { id: 2, name: 'SarahDev', avatar: 'SD', score: 9420, commits: 128, focusTime: '38h 40m', streak: 8, trend: 'up' },
-  { id: 3, name: 'MikeBuilds', avatar: 'MB', score: 8900, commits: 115, focusTime: '35h 20m', streak: 5, trend: 'down' },
-  { id: 4, name: 'JessicaL', avatar: 'JL', score: 8750, commits: 108, focusTime: '32h 10m', streak: 15, trend: 'same' },
-  { id: 5, name: 'DavidK', avatar: 'DK', score: 8200, commits: 95, focusTime: '28h 50m', streak: 3, trend: 'up' },
-  { id: 6, name: 'EmmaCode', avatar: 'EC', score: 7800, commits: 88, focusTime: '26h 30m', streak: 7, trend: 'down' },
-  { id: 7, name: 'RyanP', avatar: 'RP', score: 7500, commits: 82, focusTime: '24h 15m', streak: 4, trend: 'same' },
-  { id: 8, name: 'OliviaW', avatar: 'OW', score: 7200, commits: 75, focusTime: '22h 45m', streak: 2, trend: 'up' },
-  { id: 9, name: 'DanielM', avatar: 'DM', score: 6900, commits: 68, focusTime: '20h 10m', streak: 1, trend: 'down' },
-  { id: 10, name: 'SophieT', avatar: 'ST', score: 6500, commits: 60, focusTime: '18h 20m', streak: 6, trend: 'same' },
-];
+// Simulated data removed
+
 
 export default function LeaderboardPage() {
-  const [users, setUsers] = useState(INITIAL_USERS);
-  const [isLive, setIsLive] = useState(true);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Simulate real-time updates
+  const fetchLeaderboard = async () => {
+    try {
+      const res = await fetch('/api/leaderboard');
+      const data = await res.json();
+      
+      const formattedUsers = data.map((u: any, index: number) => ({
+        ...u,
+        name: u.username,
+        avatar: u.username.substring(0, 2).toUpperCase(),
+        // Convert minutes to "42h 15m" format
+        focusTime: `${Math.floor(u.focusMinutes / 60)}h ${u.focusMinutes % 60}m`,
+        trend: 'same' // Placeholder as we don't store history yet
+      }));
+      
+      setUsers(formattedUsers);
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch leaderboard:', error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!isLive) return;
-
-    const interval = setInterval(() => {
-      setUsers(currentUsers => {
-        const newUsers = [...currentUsers];
-        // Randomly update a user
-        const randomIndex = Math.floor(Math.random() * newUsers.length);
-        const user = newUsers[randomIndex];
-        
-        // Random score increase
-        const scoreIncrease = Math.floor(Math.random() * 50) + 10;
-        const newScore = user.score + scoreIncrease;
-        
-        // Random commit increase
-        const newCommits = user.commits + (Math.random() > 0.7 ? 1 : 0);
-        
-        newUsers[randomIndex] = {
-          ...user,
-          score: newScore,
-          commits: newCommits,
-          trend: 'up' // Briefly show up trend
-        };
-
-        // Re-sort
-        return newUsers.sort((a, b) => b.score - a.score).map((u, i) => ({
-          ...u,
-          // Update trend based on new position relative to old position (simplified for demo)
-          trend: i < randomIndex ? 'up' : (i > randomIndex ? 'down' : 'same')
-        }));
-      });
-    }, 3000);
-
+    fetchLeaderboard();
+    const interval = setInterval(fetchLeaderboard, 10000); // Poll every 10s
     return () => clearInterval(interval);
-  }, [isLive]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
