@@ -94,12 +94,14 @@ test('Missing Commands Integration', async (t) => {
     // Mock history
     const historyPath = path.join(tmpDir, '.autopilot', 'history.json');
     await fs.ensureDir(path.dirname(historyPath));
-    await fs.writeJson(historyPath, [
-      { hash: hash1, message: 'feat: add file1', timestamp: Date.now() },
-      { hash: hash2, message: 'feat: add file2', timestamp: Date.now() }
-    ]);
+    await fs.writeJson(historyPath, {
+      commits: [
+        { hash: hash2, message: 'feat: add file2', timestamp: new Date().toISOString() },
+        { hash: hash1, message: 'feat: add file1', timestamp: new Date().toISOString() }
+      ]
+    });
 
-    // Undo last commit
+    // Undo last commit (which is hash2)
     const { code, stdout } = await run(['undo'], tmpDir);
     assert.strictEqual(code, 0);
     assert.match(stdout, /Undid/);
@@ -109,9 +111,9 @@ test('Missing Commands Integration', async (t) => {
     assert.strictEqual(currentHead, hash1);
 
     // Verify autopilot history
-    const history = await fs.readJson(historyPath);
-    assert.strictEqual(history.length, 1);
-    assert.strictEqual(history[0].hash, hash1);
+    const historyData = await fs.readJson(historyPath);
+    assert.strictEqual(historyData.commits.length, 1);
+    assert.strictEqual(historyData.commits[0].hash, hash1);
   });
 
   await t.test('stop command', async () => {
@@ -149,6 +151,31 @@ test('Missing Commands Integration', async (t) => {
     } catch (e) {
         // Expected if it was killed
     }
+  });
+
+  await t.test('dashboard command', async () => {
+    const child = spawn(process.execPath, [BIN_PATH, 'dashboard'], {
+      cwd: tmpDir,
+      env: { ...process.env },
+      stdio: 'pipe'
+    });
+
+    let output = '';
+    child.stdout.on('data', d => output += d.toString());
+    child.stderr.on('data', d => output += d.toString());
+
+    await new Promise((resolve) => {
+      // Give it time to render
+      setTimeout(() => {
+        child.kill();
+        resolve();
+      }, 2000);
+    });
+
+    // It should not have printed "Failed to launch dashboard"
+    assert.doesNotMatch(output, /Failed to launch dashboard/);
+    // It should have printed something (even control codes)
+    assert.ok(output.length > 0, 'Dashboard produced no output');
   });
 
 });
