@@ -82,17 +82,26 @@ autopilot start
 ---
 
 ## ✨ Features
-
-- **🧠 Smart Commits**: Generates professional conventional commit messages automatically.
+ 
+- **🧠 AI Commit Messages**: Gemini 2.5-powered, context-aware conventional commit messages.
 - **⚡ Watcher Engine**: Real-time file monitoring with smart debouncing using `chokidar`.
 - **🛡️ Safety First**: Blocks commits on protected branches and checks remote status.
 - **🔄 Automated Flow**: Fetches, stages, commits, and pushes (optional) automatically.
-- **👥 Team Mode**: Pull-before-push and conflict abortion for collaborative safety.
+- **👥 Team Mode**: Pull-before-push and conflict abortion with preset workflows.
 - **🖥️ Dashboard**: Real-time terminal dashboard with status and activity feed.
 - **⏮️ Undo System**: Safely rollback the last autopilot commit with one command.
-- **📊 Insights**: Track your productivity, commit streaks, and quality score.
+- **📊 Focus Engine & Insights**: Track active coding time, streaks, peak hours, and commit quality.
 - **⚙️ Zero Config**: Works out of the box, but fully configurable via `.autopilotrc.json`.
 - **🩺 Self-Healing**: Includes a `doctor` command to diagnose and fix issues.
+
+---
+ 
+## 🆕 What's New in v2.0
+ 
+- AI commit generation via Google Gemini (opt-in, with graceful fallback).
+- Team presets (`safe-team`, `solo-speed`, `strict-ci`) for different workflows.
+- Safety net with `autopilot undo`, secret detection, and large-file prevention.
+- Productivity Focus Engine with `autopilot insights` and CSV export.
 
 ---
 
