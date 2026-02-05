@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 This project follows [Semantic Versioning](https://semver.org).
 
+## [2.0.1] - 2026-02-05
+
+### Fixed
+- **Dashboard Stability**: Fixed a crash in `autopilot dashboard` caused by incorrect named import of `getRunningPid`.
+- **Command Reliability**: Added regression tests for `dashboard`, `pause`, `resume`, `stop`, and `status` commands to ensure stability.
+
 ## [2.0.0] - 2026-02-04
 
 ### Added

@@ -6,6 +6,20 @@
     "type": "page"
   },
   {
+    "title": "[2.0.1] - 2026-02-05",
+    "route": "/docs/changelog#201---2026-02-05",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed-1",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
     "title": "[2.0.0] - 2026-02-04",
     "route": "/docs/changelog#200---2026-02-04",
     "type": "heading",
