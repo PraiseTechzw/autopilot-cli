@@ -8,7 +8,9 @@ import path from 'path';
 import StateManager from '../core/state.js';
 import git from '../core/git.js';
 import HistoryManager from '../core/history.js';
-import { getPid } from '../utils/process.js';
+import processUtils from '../utils/process.js';
+
+const { getRunningPid } = processUtils;
 
 const e = React.createElement;
 
@@ -29,7 +31,7 @@ const Dashboard = () => {
     const fetchData = async () => {
       try {
         // 1. Check process status
-        const currentPid = await getPid(root);
+        const currentPid = await getRunningPid(root);
         setPid(currentPid);
         
         // 2. Check Paused State
