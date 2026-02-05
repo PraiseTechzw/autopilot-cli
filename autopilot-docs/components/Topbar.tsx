@@ -27,6 +27,14 @@ export function Topbar({ versionBadge }: TopbarProps) {
             </span>
           </Link>
           {versionBadge}
+          <nav className="hidden md:flex items-center gap-6 ml-6">
+            <Link href="/leaderboard" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Leaderboard
+            </Link>
+            <Link href="/docs" className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+              Documentation
+            </Link>
+          </nav>
         </div>
 
         <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
