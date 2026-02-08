@@ -1,3 +1,5 @@
+const fs = require('fs-extra');
+const path = require('path');
 const { getGitStats, calculateMetrics } = require('./insights');
 const logger = require('../utils/logger');
 const open = require('open');
@@ -5,6 +7,33 @@ const crypto = require('crypto');
 
 // Default API URL (can be overridden by config)
 const DEFAULT_API_URL = 'http://localhost:3000';
+
+async function calculateFocusTime(repoPath) {
+  const logPath = path.join(repoPath, 'autopilot.log');
+  if (!await fs.pathExists(logPath)) return 0;
+
+  try {
+    const content = await fs.readFile(logPath, 'utf8');
+    const lines = content.split('\n').filter(l => l.trim());
+    let totalMs = 0;
+    
+    for (const line of lines) {
+      try {
+        const entry = JSON.parse(line);
+        if (entry.type === 'FOCUS_SESSION_END' && entry.totalActiveMs) {
+          totalMs += entry.totalActiveMs;
+        }
+      } catch (e) {
+        // ignore bad lines
+      }
+    }
+    
+    return Math.round(totalMs / 60000); // minutes
+  } catch (error) {
+    logger.warn(`Failed to parse autopilot.log: ${error.message}`);
+    return 0;
+  }
+}
 
 async function leaderboard(options) {
   const apiUrl = process.env.AUTOPILOT_API_URL || DEFAULT_API_URL;
@@ -41,17 +70,19 @@ async function syncLeaderboard(apiUrl, options) {
     // Anonymize ID using hash
     const userId = crypto.createHash('sha256').update(userEmail).digest('hex').substring(0, 12);
 
+    // Get focus time from logs (or fallback to git stats proxy)
+    const logFocusMinutes = await calculateFocusTime(repoPath);
+    const gitFocusMinutes = Math.round(metrics.totalAdditions / 10);
+    const focusMinutes = logFocusMinutes > 0 ? logFocusMinutes : gitFocusMinutes;
+
     const stats = {
       id: userId,
       username: userName, // Display name (can be public)
       score: metrics.quality.score * 100 + metrics.totalCommits * 10, // Example scoring
       commits: metrics.totalCommits,
-      focusMinutes: Math.round(metrics.totalAdditions / 10), // Rough proxy if focus engine not linked
+      focusMinutes: focusMinutes,
       streak: metrics.streak.current
     };
-
-    // If Focus Engine logs exist, use them for more accurate focus time
-    // TODO: Read autopilot.log for accurate focus time
 
     logger.info(`Syncing stats for ${stats.username} (ID: ${userId})...`);
     logger.info('Note: Only metrics are shared. No code or file contents are transmitted.');

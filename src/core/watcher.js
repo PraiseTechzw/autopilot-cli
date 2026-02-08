@@ -388,7 +388,13 @@ class Watcher {
         logger.info('Pushing to remote...');
         const pushResult = await git.push(this.repoPath);
         if (!pushResult.ok) {
-             logger.warn(`Push failed (will retry next time): ${pushResult.stderr}`);
+             logger.warn(`Push failed: ${pushResult.stderr}`);
+             
+             // Safety: Pause on critical push failures (Auth, Permissions, or Persistent errors)
+             // This aligns with "Failure Behavior: If a push fails -> pause watcher"
+             logger.error('Push failed! Pausing Autopilot to prevent issues.');
+             this.stateManager.pause(`Push failed: ${pushResult.stderr.split('\n')[0]}`);
+             logger.info('Run "autopilot resume" to restart after fixing the issue.');
         } else {
              logger.success('Push complete');
         }

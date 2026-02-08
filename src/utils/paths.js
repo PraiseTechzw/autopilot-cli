@@ -39,6 +39,9 @@ const getGitPath = (repoPath) => {
  * @returns {string} Config directory path
  */
 const getConfigDir = () => {
+  if (process.env.AUTOPILOT_CONFIG_DIR) {
+    return process.env.AUTOPILOT_CONFIG_DIR;
+  }
   return path.join(os.homedir(), '.autopilot');
 };
 

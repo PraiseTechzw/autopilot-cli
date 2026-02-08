@@ -119,6 +119,7 @@ program
 program
   .command('config [action] [key] [value]')
   .description('Manage configuration (list, get, set)')
+  .option('-g, --global', 'Use global configuration')
   .action(configCommand);
 
 program

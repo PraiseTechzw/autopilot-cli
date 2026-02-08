@@ -9,7 +9,8 @@ const readline = require('readline');
 const logger = require('../utils/logger');
 const { getConfigPath, getIgnorePath, getGitPath } = require('../utils/paths');
 const { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS } = require('../config/defaults');
-const { validateApiKey } = require('../core/gemini');
+const gemini = require('../core/gemini');
+const grok = require('../core/grok');
 
 function askQuestion(query) {
   if (!process.stdin.isTTY) {
@@ -137,17 +138,27 @@ async function initRepo() {
     const useTeamMode = teamMode.toLowerCase() === 'y';
 
     // Phase 3: AI Configuration
-    const enableAI = await askQuestion('Enable AI commit messages (Gemini)? [y/N]: ');
+    const enableAI = await askQuestion('Enable AI commit messages? [y/N]: ');
     let useAI = enableAI.toLowerCase() === 'y';
     
     let apiKey = '';
+    let grokApiKey = '';
+    let provider = 'gemini';
     let interactive = false;
     
     if (useAI) {
+      // Select Provider
+      const providerAns = await askQuestion('Select AI Provider (gemini/grok) [gemini]: ');
+      provider = providerAns.toLowerCase() === 'grok' ? 'grok' : 'gemini';
+      
       while (true) {
-        apiKey = await askQuestion('Enter your Google Gemini API Key: ');
+        const keyPrompt = provider === 'grok' 
+          ? 'Enter your xAI Grok API Key: ' 
+          : 'Enter your Google Gemini API Key: ';
+          
+        const keyInput = await askQuestion(keyPrompt);
         
-        if (!apiKey) {
+        if (!keyInput) {
            logger.warn('API Key cannot be empty if AI is enabled.');
            const retry = await askQuestion('Try again? (n to disable AI) [Y/n]: ');
            if (retry.toLowerCase() === 'n') {
@@ -157,11 +168,18 @@ async function initRepo() {
            continue;
         }
 
-        logger.info('Verifying API Key...');
-        const result = await validateApiKey(apiKey);
+        logger.info(`Verifying ${provider} API Key...`);
+        let result;
+        if (provider === 'grok') {
+          result = await grok.validateGrokApiKey(keyInput);
+        } else {
+          result = await gemini.validateApiKey(keyInput);
+        }
         
         if (result.valid) {
           logger.success('API Key verified successfully! ✨');
+          if (provider === 'grok') grokApiKey = keyInput;
+          else apiKey = keyInput;
           break;
         } else {
           logger.warn(`API Key validation failed: ${result.error}`);
@@ -173,6 +191,8 @@ async function initRepo() {
             break;
           } else if (choice === 'p') {
             logger.warn('Proceeding with potentially invalid API key.');
+            if (provider === 'grok') grokApiKey = keyInput;
+            else apiKey = keyInput;
             break;
           }
           // Default is retry (loop)
@@ -189,8 +209,10 @@ async function initRepo() {
       teamMode: useTeamMode,
       ai: {
         enabled: useAI,
+        provider: provider,
         apiKey: apiKey,
-        model: 'gemini-2.5-flash',
+        grokApiKey: grokApiKey,
+        model: provider === 'grok' ? 'grok-beta' : 'gemini-2.5-flash',
         interactive: interactive
       },
       commitMessageMode: useAI ? 'ai' : 'smart'

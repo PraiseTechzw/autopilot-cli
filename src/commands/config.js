@@ -4,7 +4,9 @@
  */
 
 const logger = require('../utils/logger');
-const { loadConfig, saveConfig } = require('../config/loader');
+const { loadConfig, saveConfig, getGlobalConfigPath } = require('../config/loader');
+const fs = require('fs-extra');
+const { getConfigPath } = require('../utils/paths');
 
 /**
  * Helper to get value by dot notation
@@ -36,24 +38,20 @@ const parseValue = (val) => {
   return val;
 };
 
-async function config(cmd, key, value) {
-  const repoPath = process.cwd();
-  
-  // Reload fresh config (don't rely on defaults merged yet if we want to see raw?)
-  // Actually loadConfig returns merged defaults.
-  // For 'set', we might want to read the raw file to avoid writing defaults into it?
-  // But saveConfig overwrites the whole file. 
-  // Let's rely on loadConfig which returns the effective config. 
-  // Wait, if we save the result of loadConfig, we might save all defaults into the user's config file.
-  // This is acceptable behavior for 'git config' style tools often, 
-  // but cleaner to only save what's changed.
-  // Let's just use loadConfig/saveConfig as implemented for now. 
-  // Users can inspect .autopilotrc manually if they want minimal diffs.
-  
-  let currentConfig = await loadConfig(repoPath);
+async function config(cmd, key, value, options) {
+  const repoPath = options?.cwd || process.cwd();
+  const isGlobal = options?.global || false;
 
   if (cmd === 'list') {
+    // If list --global, show only global config?
+    // Or just show effective config?
+    // Let's show effective config, maybe annotated if we had time.
+    // But for now, just loadConfig which merges them.
+    const currentConfig = await loadConfig(repoPath);
     console.log(JSON.stringify(currentConfig, null, 2));
+    if (isGlobal) {
+        logger.info('(Note: Showing effective merged config. Use --global to set global values.)');
+    }
     return;
   }
 
@@ -62,6 +60,8 @@ async function config(cmd, key, value) {
       logger.error('Usage: autopilot config get <key>');
       return;
     }
+    // Get always shows effective value
+    const currentConfig = await loadConfig(repoPath);
     const val = getByDot(currentConfig, key);
     if (val === undefined) {
       logger.warn(`Key '${key}' not set`);
@@ -79,24 +79,28 @@ async function config(cmd, key, value) {
 
     const typedValue = parseValue(value);
     
-    // We need to be careful not to save the FULL merged config with defaults 
-    // back to disk if we can avoid it, but our current loader architecture 
-    // merges them. 
-    // Ideally we should read the RAW config file, update that, and save.
-    // Let's import fs to read raw.
-    const fs = require('fs-extra');
-    const { getConfigPath } = require('../utils/paths');
-    const configPath = getConfigPath(repoPath);
-    
+    // We need to read the specific file (local or global) to avoid merging defaults into it
     let rawConfig = {};
+    let configPath;
+
+    if (isGlobal) {
+        configPath = getGlobalConfigPath();
+    } else {
+        configPath = getConfigPath(repoPath);
+    }
+    
     if (await fs.pathExists(configPath)) {
-      rawConfig = await fs.readJson(configPath);
+      try {
+        rawConfig = await fs.readJson(configPath);
+      } catch (e) {
+        // Ignore read errors, start fresh
+      }
     }
     
     setByDot(rawConfig, key, typedValue);
     
-    await saveConfig(repoPath, rawConfig);
-    logger.success(`Set ${key} = ${typedValue}`);
+    await saveConfig(repoPath, rawConfig, isGlobal);
+    logger.success(`Set ${key} = ${typedValue} ${isGlobal ? '(Global)' : '(Local)'}`);
     return;
   }
 
