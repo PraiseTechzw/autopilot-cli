@@ -117,6 +117,11 @@ program
   .action(presetCommand);
 
 program
+  .command('config [action] [key] [value]')
+  .description('Manage configuration (list, get, set)')
+  .action(configCommand);
+
+program
   .command('doctor')
   .description('Diagnose and validate autopilot setup')
   .action(doctor);
