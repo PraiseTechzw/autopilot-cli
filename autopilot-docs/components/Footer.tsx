@@ -11,7 +11,7 @@ export function Footer() {
               Autopilot CLI
             </p>
             <p className="text-sm text-muted-foreground">
-              Automated git operations for busy developers.
+              An intelligent Git automation CLI.
             </p>
           </div>
           
@@ -29,7 +29,7 @@ export function Footer() {
             &copy; {new Date().getFullYear()} Autopilot CLI. Released under MIT License.
           </p>
           <p>
-            Built by <a href="https://github.com/PraiseTechzw" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-foreground transition-colors">Praise Masunga (PraiseTechzw)</a>
+            A product of <a href="https://praisetech.tech" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-foreground transition-colors">PraiseTech</a>. Built by <a href="https://github.com/PraiseTechzw" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-foreground transition-colors">Praise Masunga</a>.
           </p>
         </div>
       </div>
