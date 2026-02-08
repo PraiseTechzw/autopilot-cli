@@ -10,28 +10,16 @@ const originalCwd = process.cwd();
 
 beforeEach(async () => {
   await fs.ensureDir(tmpDir);
-  try {
-    process.chdir(tmpDir);
-  } catch (err) {
-    // If chdir fails, ensure we clean up and throw
-    await fs.remove(tmpDir);
-    throw err;
-  }
 });
 
 afterEach(async () => {
-  try {
-    process.chdir(originalCwd);
-  } catch (err) {
-    console.error('Failed to restore CWD:', err);
-  }
   await fs.remove(tmpDir);
 });
 
 test('Config Command', async (t) => {
   await t.test('should set and get a value', async () => {
     // Set a value
-    await configCommand('set', 'ai.provider', 'grok');
+    await configCommand('set', 'ai.provider', 'grok', { cwd: tmpDir });
     
     // Verify file content
     const configPath = path.join(tmpDir, '.autopilotrc.json');
@@ -44,21 +32,21 @@ test('Config Command', async (t) => {
   });
 
   await t.test('should handle boolean values', async () => {
-    await configCommand('set', 'autoPush', 'false');
+    await configCommand('set', 'autoPush', 'false', { cwd: tmpDir });
     
     const savedConfig = await fs.readJson(path.join(tmpDir, '.autopilotrc.json'));
     assert.strictEqual(savedConfig.autoPush, false);
   });
 
   await t.test('should handle number values', async () => {
-    await configCommand('set', 'debounceSeconds', '10');
+    await configCommand('set', 'debounceSeconds', '10', { cwd: tmpDir });
     
     const savedConfig = await fs.readJson(path.join(tmpDir, '.autopilotrc.json'));
     assert.strictEqual(savedConfig.debounceSeconds, 10);
   });
 
   await t.test('should create nested objects if needed', async () => {
-    await configCommand('set', 'new.nested.key', 'value');
+    await configCommand('set', 'new.nested.key', 'value', { cwd: tmpDir });
     
     const savedConfig = await fs.readJson(path.join(tmpDir, '.autopilotrc.json'));
     assert.strictEqual(savedConfig.new.nested.key, 'value');
@@ -68,7 +56,7 @@ test('Config Command', async (t) => {
     // Setup initial config
     await fs.writeJson(path.join(tmpDir, '.autopilotrc.json'), { existing: 'data' });
     
-    await configCommand('set', 'newKey', 'newValue');
+    await configCommand('set', 'newKey', 'newValue', { cwd: tmpDir });
     
     const savedConfig = await fs.readJson(path.join(tmpDir, '.autopilotrc.json'));
     assert.strictEqual(savedConfig.existing, 'data');

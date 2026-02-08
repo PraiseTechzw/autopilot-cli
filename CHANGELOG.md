@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 This project follows [Semantic Versioning](https://semver.org).
 
+## [2.1.0] - 2026-02-08
+
+### Added
+- **Global Configuration**:
+  - Added support for global config via `~/.autopilot/config.json`.
+  - Added `--global` flag to `autopilot config` command.
+  - Implemented config merging (Local > Global > Defaults).
+- **xAI Grok Integration**:
+  - Added Grok as a supported AI provider for commit message generation.
+  - Configurable via `ai.provider: 'grok'` and `grokApiKey`.
+- **Safety**:
+  - Watcher now automatically pauses on push failures to prevent error loops.
+  - Added "Push Failed" state to StateManager.
+- **Leaderboard**:
+  - Implemented accurate focus time calculation by parsing `autopilot.log`.
+  - Fallback to git stats for proxy metrics if logs are missing.
+
+### Fixed
+- **Test Suite**: Resolved cross-test contamination in config tests and watcher integration tests.
+- **Windows Compatibility**: Fixed issues with `process.cwd()` mocking in tests on Windows.
+
 ## [2.0.1] - 2026-02-05
 
 ### Fixed
