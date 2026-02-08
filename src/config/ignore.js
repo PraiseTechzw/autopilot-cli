@@ -79,20 +79,20 @@ const createIgnoredFilter = (repoPath, userPatterns = []) => {
   ];
 
   return (absolutePath) => {
-    // 1. Normalize paths
-    const normalizedAbs = normalizePath(absolutePath);
+    // 1. Get relative path safely using path.relative
+    // This handles Windows casing and separators correctly
+    const relativeRaw = path.relative(repoPath, absolutePath);
     
-    // 2. Get relative path
-    let relativePath = normalizedAbs;
-    if (normalizedAbs.startsWith(normalizedRepoPath)) {
-      relativePath = normalizedAbs.slice(normalizedRepoPath.length);
-      if (relativePath.startsWith('/')) {
-        relativePath = relativePath.slice(1);
-      }
+    // If outside repo, ignore (or handle differently? Chokidar usually stays inside)
+    if (relativeRaw.startsWith('..') || path.isAbsolute(relativeRaw)) {
+        return false;
     }
 
+    // Normalize to forward slashes for matching
+    const relativePath = normalizePath(relativeRaw);
+
     // Handle root path case
-    if (!relativePath) return false;
+    if (!relativePath || relativePath === '.') return false;
 
     // 3. Check critical matches
     const parts = relativePath.split('/');

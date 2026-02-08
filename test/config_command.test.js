@@ -6,17 +6,25 @@ const configCommand = require('../src/commands/config');
 const { loadConfig } = require('../src/config/loader');
 
 const tmpDir = path.join(require('os').tmpdir(), `autopilot-config-test-${Date.now()}`);
-
-// Mock process.cwd to return tmpDir
-const originalCwd = process.cwd;
+const originalCwd = process.cwd();
 
 beforeEach(async () => {
   await fs.ensureDir(tmpDir);
-  process.cwd = () => tmpDir;
+  try {
+    process.chdir(tmpDir);
+  } catch (err) {
+    // If chdir fails, ensure we clean up and throw
+    await fs.remove(tmpDir);
+    throw err;
+  }
 });
 
 afterEach(async () => {
-  process.cwd = originalCwd;
+  try {
+    process.chdir(originalCwd);
+  } catch (err) {
+    console.error('Failed to restore CWD:', err);
+  }
   await fs.remove(tmpDir);
 });
 
