@@ -95,6 +95,9 @@ test('CLI Integration', async (t) => {
     // Wait for watcher to start
     await new Promise(r => setTimeout(r, 2000));
 
+    // Make a real change
+    await fs.appendFile(path.join(tmpDir, 'README.md'), '\nUpdate 1');
+
     // Simulate noisy activity
     const noisyInterval = setInterval(async () => {
       try {
@@ -102,9 +105,6 @@ test('CLI Integration', async (t) => {
         await fs.appendFile(path.join(tmpDir, 'autopilot.log'), `[${new Date().toISOString()}] Log entry\n`);
       } catch (e) { /* ignore */ }
     }, 500);
-
-    // Make a real change
-    await fs.appendFile(path.join(tmpDir, 'README.md'), '\nUpdate 1');
 
     // Wait for test mode to finish (it runs for ~5-8s)
     await new Promise((resolve) => {

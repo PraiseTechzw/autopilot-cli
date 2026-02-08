@@ -12,7 +12,7 @@
     "LICENSE",
     "CHANGELOG.md"
   ],
-  "description": "An intelligent CLI tool that automatically commits and pushes your code so you can focus on building.",
+  "description": "An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.",
   "keywords": [
     "git",
     "automation",

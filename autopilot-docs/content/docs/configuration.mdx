@@ -19,24 +19,38 @@ The `.autopilotrc.json` file in your project root controls how Autopilot monitor
 | `ai` | `object` | `{}` | Configuration for AI features (see below). |
 | `team` | `object` | `{}` | Configuration for Team features (see below). |
 
-### AI Configuration
+### AI Configuration & Privacy Disclosure
 
-Enable smart commit messages powered by Google Gemini.
+Autopilot supports optional integration with **Google Gemini** or **xAI Grok** to generate context-aware commit messages.
+
+> **Privacy Disclosure:** AI features are **disabled by default**. They are purely assistive and optional.
+
+#### Data Usage Transparency
+
+If (and only if) you explicitly enable AI and provide your own API key:
+1.  **What is sent**: Autopilot sends the **text diff** of your staged changes to the API provider (Google or xAI) to generate a summary.
+2.  **What is NOT sent**: We do not send your entire codebase, your history, or your file contents (other than the diff).
+3.  **No Training**: We do not store, proxy, or train on your code. The interaction is directly between your local machine and the AI provider.
+4.  **No Ranking Impact**: Using AI does not affect your productivity stats or leaderboard ranking.
+
+#### AI Settings
 
 ```json
 {
   "ai": {
     "enabled": true,
-    "apiKey": "YOUR_GEMINI_API_KEY",
+    "provider": "gemini", 
+    "apiKey": "YOUR_API_KEY",
     "model": "gemini-2.5-flash",
     "interactive": false
   }
 }
 ```
 
-*   **enabled**: Toggle AI features on/off.
-*   **apiKey**: Your Google Gemini API Key.
-*   **model**: The Gemini model to use (default: `gemini-2.5-flash`).
+*   **enabled**: Toggle AI features on/off (default: `false`).
+*   **provider**: Choose between `gemini` (default) or `grok`.
+*   **apiKey**: Your personal API Key.
+*   **model**: Specific model to use.
 *   **interactive**: If `true`, prompts you to review/edit the generated message before committing.
 
 ### Team Configuration

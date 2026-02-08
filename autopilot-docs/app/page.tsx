@@ -25,7 +25,7 @@ export default async function Home() {
       price: '0',
       priceCurrency: 'USD',
     },
-    description: 'Intelligent Git automation with safety rails. Automatic commits & pushes so you stay focused on coding.',
+    description: 'An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.',
     aggregateRating: {
       '@type': 'AggregateRating',
       ratingValue: '5.0',
@@ -60,10 +60,10 @@ export default async function Home() {
         </div>
 
         <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">
-          Autopilot CLI — Git automation with safety rails
+          An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.
         </h1>
         <p className="text-xl md:text-2xl text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          Automatic commits & pushes so you stay focused on coding.
+          Focus on building. We'll handle the git.
         </p>
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">

@@ -5,6 +5,17 @@ description: How Autopilot CLI protects your code and git history.
 
 Automation is powerful, but safety is paramount. Autopilot CLI includes several built-in safety rails to ensure that your automatic commits don't break your repository, overwrite work, or clutter your history with noise.
 
+## Non-Negotiable Guarantees
+
+We prioritize the safety of your code above all else. Autopilot follows strict rules to ensure your work is never lost or corrupted.
+
+-   **Never force-pushes**: Autopilot only performs standard `git push` operations. It will never overwrite remote history.
+-   **Never commits ignored files**: It strictly respects your `.gitignore` and `.autopilotignore` rules.
+-   **Never operates during merge/rebase**: If your repo is in a merge, rebase, or cherry-pick state, Autopilot pauses automatically.
+-   **Never transmits source code without opt-in**: Your code stays local. It is only sent to an AI provider (Gemini/Grok) if you explicitly enable AI features and provide your own API key.
+-   **Pauses when uncertain**: If a git error occurs, a conflict is detected, or the network fails, Autopilot pauses and waits for your intervention.
+-   **Allows all actions to be undone**: The `autopilot undo` command safely reverts the last automated commit without losing your file changes.
+
 ## Why Safety Rails Exist
 
 The goal of Autopilot is to remove the friction of manual commits, not to replace thoughtful engineering practices. Safety rails are designed to:

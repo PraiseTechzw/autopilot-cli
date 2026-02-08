@@ -4,7 +4,7 @@
 
 ![Autopilot Logo](https://img.shields.io/badge/Autopilot-blue?style=for-the-badge&logo=git&logoColor=white)
 
-**Intelligent Git automation that commits and pushes your code, so you can focus on building.**
+**An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.**
 
 [![npm version](https://img.shields.io/npm/v/@traisetech/autopilot?style=flat-square&color=success)](https://www.npmjs.com/package/@traisetech/autopilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
@@ -16,7 +16,7 @@
 
 **Built by [Praise Masunga](https://github.com/PraiseTechzw) (PraiseTechzw)**
 
-[Features](#-features) • [Installation](#-installation) • [Quick Start](#-quick-start) • [Configuration](#-configuration) • [Commands](#-commands)
+[Features](#-features) • [Installation](#-installation) • [How It Works](#-how-autopilot-works) • [Safety & Guarantees](#-safety--guarantees) • [Commands](#-commands)
 
 </div>
 
@@ -24,84 +24,80 @@
 
 ## 📖 Table of Contents
 
-- [Why Autopilot?](#-why-autopilot)
-- [Features](#-features)
+- [How Autopilot Works](#-how-autopilot-works)
+- [Safety & Guarantees](#-safety--guarantees)
+- [Failure & Recovery](#-failure--recovery)
+- [AI & Privacy](#-ai--privacy)
+- [Leaderboard & Metrics](#-leaderboard--metrics)
 - [Installation](#-installation)
 - [Quick Start](#-quick-start)
 - [Commands](#-commands)
 - [Configuration](#-configuration)
-- [Safety Features](#-safety-features)
-- [Troubleshooting](#-troubleshooting)
 - [Contributing](#-contributing)
 - [License](#-license)
 
 ---
 
-## 🎯 Why Autopilot?
+## 🔍 How Autopilot Works
 
-Autopilot is designed for developers who want to stay in the flow. It solves manual Git workflow fatigue by handling the repetitive cycle of staging, committing, and pushing changes, allowing you to focus entirely on writing code.
+Autopilot is a local CLI tool that runs in the background of your terminal. It watches your file system for changes and automates the Git workflow based on your configuration.
 
-<table>
-<tr>
-<td width="50%">
+**No Magic. Just Automation.**
 
-### ❌ Before Autopilot
+1.  **Watch**: It monitors your project directory for file modifications, creations, and deletions.
+2.  **Wait**: It uses a smart debounce timer (default: 20s) to wait until you stop typing.
+3.  **Check**: It verifies the repository status (branch, remote, conflicts) before acting.
+4.  **Commit**: It stages changes and creates a commit. If AI is enabled, it generates a meaningful message; otherwise, it uses a smart template.
+5.  **Push**: It pushes to your remote repository (optional, enabled by default).
 
-```bash
-# Every. Single. Time.
-git add .
-git commit -m "update stuff"
-git push
-
-# Repeat 50+ times a day...
-# Lose focus on coding
-# Forget to commit
-# Inconsistent messages
-```
-
-</td>
-<td width="50%">
-
-### ✅ With Autopilot
-
-```bash
-# One time setup
-autopilot init
-autopilot start
-
-# That's it! 
-# Focus on coding
-# Auto-commits with smart messages
-# Never lose work again
-```
-
-</td>
-</tr>
-</table>
+You can stop, pause, or undo Autopilot at any time.
 
 ---
 
-## ✨ Features
- 
-- **🧠 AI Commit Messages**: Gemini 2.5-powered, context-aware conventional commit messages.
-- **⚡ Watcher Engine**: Real-time file monitoring with smart debouncing using `chokidar`.
-- **🛡️ Safety First**: Blocks commits on protected branches and checks remote status.
-- **🔄 Automated Flow**: Fetches, stages, commits, and pushes (optional) automatically.
-- **👥 Team Mode**: Pull-before-push and conflict abortion with preset workflows.
-- **🖥️ Dashboard**: Real-time terminal dashboard with status and activity feed.
-- **⏮️ Undo System**: Safely rollback the last autopilot commit with one command.
-- **📊 Focus Engine & Insights**: Track active coding time, streaks, peak hours, and commit quality.
-- **⚙️ Zero Config**: Works out of the box, but fully configurable via `.autopilotrc.json`.
-- **🩺 Self-Healing**: Includes a `doctor` command to diagnose and fix issues.
+## 🛡️ Safety & Guarantees
+
+We prioritize the safety of your code above all else. Autopilot follows strict rules to ensure your work is never lost or corrupted.
+
+### Non-Negotiable Guarantees
+
+-   **Never force-pushes**: Autopilot only performs standard `git push` operations. It will never overwrite remote history.
+-   **Never commits ignored files**: It strictly respects your `.gitignore` and `.autopilotignore` rules.
+-   **Never operates during merge/rebase**: If your repo is in a merge, rebase, or cherry-pick state, Autopilot pauses automatically.
+-   **Never transmits source code without opt-in**: Your code stays local. It is only sent to an AI provider (Gemini/Grok) if you explicitly enable AI features and provide your own API key.
+-   **Pauses when uncertain**: If a git error occurs, a conflict is detected, or the network fails, Autopilot pauses and waits for your intervention.
+-   **Allows all actions to be undone**: The `autopilot undo` command safely reverts the last automated commit without losing your file changes.
 
 ---
- 
-## 🆕 What's New in v2.0
- 
-- AI commit generation via Google Gemini (opt-in, with graceful fallback).
-- Team presets (`safe-team`, `solo-speed`, `strict-ci`) for different workflows.
-- Safety net with `autopilot undo`, secret detection, and large-file prevention.
-- Productivity Focus Engine with `autopilot insights` and CSV export.
+
+## ⚠️ Failure & Recovery
+
+What happens when things go wrong? Autopilot is designed to fail safely.
+
+-   **Merge Conflicts**: If a `git pull` results in a conflict, Autopilot aborts the operation and notifies you. It will not attempt to resolve conflicts automatically.
+-   **Network Issues**: If the internet disconnects, Autopilot will queue commits locally and attempt to push when connectivity is restored (if auto-push is enabled).
+-   **Accidental Commits**: If Autopilot commits something you didn't intend, simply run `autopilot undo`. Your files will remain modified in your working directory, but the commit will be removed.
+
+---
+
+## 🤖 AI & Privacy
+
+Autopilot offers **optional** AI integration (Google Gemini or xAI Grok) to generate context-aware commit messages.
+
+-   **Opt-In Only**: AI features are disabled by default. You must enable them and provide your own API key.
+-   **Data Usage**: When enabled, only the `git diff` (text changes) is sent to the AI provider to generate the message.
+-   **Privacy**: Your code is not trained on by Autopilot. We do not store or proxy your code. Interactions are directly between your machine and the AI provider.
+-   **Ranking**: AI usage does not affect your position on the Leaderboard.
+
+---
+
+## 🏆 Leaderboard & Metrics
+
+Autopilot includes a Focus Engine that tracks your local productivity (coding time, commit streaks). You can optionally sync this data to the global Leaderboard.
+
+-   **Participation is Opt-In**: You must explicitly enable syncing with `autopilot config set leaderboard.sync true`.
+-   **Privacy-Safe**: We do not send your email or username directly. IDs are hashed/anonymized.
+-   **No Code Collected**: The leaderboard tracks *metrics* (time, counts), not code. No file contents are ever synced.
+-   **Insight over Competition**: The goal is to help you understand your habits, not to gamify commit spam. Rankings favor consistency and quality.
 
 ---
 
@@ -123,29 +119,29 @@ npx @traisetech/autopilot start
 
 ## 🚀 Quick Start
 
-1. **Navigate to your Git repository:**
-   ```bash
-   cd /path/to/my-project
-   ```
+1.  **Navigate to your Git repository:**
+    ```bash
+    cd /path/to/my-project
+    ```
 
-2. **Initialize Autopilot:**
-   ```bash
-   autopilot init
-   ```
-   Follow the interactive prompts to configure settings (or accept defaults).
+2.  **Initialize Autopilot:**
+    ```bash
+    autopilot init
+    ```
+    Follow the interactive prompts to configure settings (or accept defaults).
 
-3. **Start the watcher:**
-   ```bash
-   autopilot start
-   ```
+3.  **Start the watcher:**
+    ```bash
+    autopilot start
+    ```
 
-   **Autopilot is now running!** It will monitor file changes and automatically commit/push them based on your configuration.
+    **Autopilot is now running!** It will monitor file changes and automatically commit/push them based on your configuration.
 
-4. **View the Dashboard (New):**
-   Open a new terminal and run:
-   ```bash
-   autopilot dashboard
-   ```
+4.  **View the Dashboard:**
+    Open a new terminal and run:
+    ```bash
+    autopilot dashboard
+    ```
 
 ---
 
@@ -159,7 +155,7 @@ npx @traisetech/autopilot start
 | `autopilot status` | Check if Autopilot is running. |
 | `autopilot dashboard` | View real-time status and activity UI. |
 | `autopilot undo` | Revert the last Autopilot commit. |
-| `autopilot pause [reason]` | Temporarily pause automation. |
+| `autopilot pause` | Temporarily pause automation. |
 | `autopilot resume` | Resume automation. |
 | `autopilot insights` | View productivity stats and analytics. |
 | `autopilot doctor` | Diagnose configuration and environment issues. |
@@ -178,7 +174,10 @@ Autopilot uses an `.autopilotrc.json` file in your project root.
   "blockBranches": ["main", "master"],
   "teamMode": true,
   "preventSecrets": true,
-  "maxFileSizeMB": 50
+  "ai": {
+    "enabled": true,
+    "provider": "gemini"
+  }
 }
 ```
 
@@ -186,27 +185,15 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for full details.
 
 ---
 
-## 🛡️ Safety Features
-
-Autopilot includes multiple layers of protection:
-
-1. **Branch Protection**: Prevents running on blocked branches (default: `main`, `master`).
-2. **Secret Detection**: Scans for AWS keys, GitHub tokens, and other secrets before committing.
-3. **File Size Limits**: Prevents committing accidental large files (>50MB).
-4. **Team Mode**: Ensures local changes are rebased on top of remote changes to prevent conflicts.
-5. **Undo**: Allows quick recovery from unwanted auto-commits.
-
----
-
 ## 🤝 Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-1. Fork the repo
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1.  Fork the repo
+2.  Create a feature branch (`git checkout -b feature/amazing-feature`)
+3.  Commit your changes (`git commit -m 'feat: add amazing feature'`)
+4.  Push to the branch (`git push origin feature/amazing-feature`)
+5.  Open a Pull Request
 
 ---
 

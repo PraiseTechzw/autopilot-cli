@@ -4,6 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const os = require('os');
 const { spawnSync } = require('child_process');
+const logger = require('../src/utils/logger');
 
 // Set env var BEFORE requiring modules that use it
 const TMP_ROOT = fs.mkdtempSync(path.join(os.tmpdir(), 'autopilot-e2e-'));
@@ -12,12 +13,13 @@ const REPO_DIR = path.join(TMP_ROOT, 'repo');
 const REMOTE_DIR = path.join(TMP_ROOT, 'remote.git');
 
 process.env.AUTOPILOT_CONFIG_DIR = path.join(HOME_DIR, '.autopilot');
-process.env.AUTOPILOT_TEST_MODE = '1';
+// process.env.AUTOPILOT_TEST_MODE = '1'; // Disable to prevent process.exit()
 
 // Require modules under test
 const Watcher = require('../src/core/watcher');
 const git = require('../src/core/git');
 const gemini = require('../src/core/gemini');
+const eventSystem = require('../src/core/events');
 
 // Mock fetch globally
 global.fetch = async () => {};
@@ -50,7 +52,10 @@ describe('Full System E2E Integration', () => {
     const configDir = process.env.AUTOPILOT_CONFIG_DIR;
     await fs.ensureDir(configDir);
     await fs.writeJson(path.join(configDir, 'config.json'), {
-      autoPush: true, // Enable push for event test
+      autoPush: true, 
+      debounceSeconds: 1, // Fast debounce
+      minSecondsBetweenCommits: 0,
+      commitMessageMode: 'ai', // <--- REQUIRED for AI generation
       ai: {
         enabled: true,
         provider: 'gemini',
@@ -75,39 +80,74 @@ describe('Full System E2E Integration', () => {
 
   afterEach(async () => {
     mock.restoreAll();
-    // await fs.remove(TMP_ROOT); // Keep for debugging if failed
+    try {
+        // Cleanup if needed
+        // await fs.remove(TMP_ROOT); 
+    } catch (e) {}
   });
 
   it('should flow from Global Config -> Watcher -> AI Commit -> Trust Trailers -> Push -> Event', async () => {
     const watcher = new Watcher(REPO_DIR);
+    
+    // Enable debug logging
+    watcher.logVerbose = (msg) => console.log(`[Watcher] ${msg}`);
+    mock.method(logger, 'info', (msg) => console.log(`[Info] ${msg}`));
+    mock.method(logger, 'success', (msg) => console.log(`[Success] ${msg}`));
+    mock.method(logger, 'warn', (msg) => console.log(`[Warn] ${msg}`));
+    mock.method(logger, 'error', (msg) => console.log(`[Error] ${msg}`));
+    mock.method(logger, 'debug', (msg) => console.log(`[Debug] ${msg}`));
 
-    // Override config delays for speed
-    watcher.config = {
-      ...watcher.config,
-      debounceSeconds: 0.1,
-      minSecondsBetweenCommits: 0
-    };
+    // Capture events
+     const emittedEvents = [];
+     mock.method(eventSystem, 'sendToBackend', async (event) => {
+         console.log('[Mock] sendToBackend called');
+         emittedEvents.push(event);
+         return true; // Simulate success
+     });
 
-    // Start Watcher
-    await watcher.start();
+     // Start Watcher
+     await watcher.start();
 
     // Verify Config Loaded
     assert.strictEqual(watcher.config.ai.provider, 'gemini', 'Should load global config');
+    assert.strictEqual(watcher.config.debounceSeconds, 1, 'Should load fast debounce');
 
-    // Make Change
-    await fs.writeFile(path.join(REPO_DIR, 'test.txt'), 'content');
-
-    // Manually trigger processing to wait for it (Watcher is async/event-based)
-    // We wait for watcher to pick it up.
-    
-    // Wait for debounce and processing
+    // Wait for Chokidar to settle
+    console.log('Waiting for watcher to settle...');
     await new Promise(r => setTimeout(r, 2000));
 
-    // Stop watcher to flush anything
+    // Make Change
+    console.log('Writing test file...');
+    // Verify Config Loaded
+     assert.strictEqual(watcher.config.ai.provider, 'gemini', 'Should load global config');
+     assert.strictEqual(watcher.config.debounceSeconds, 1, 'Should load fast debounce');
+
+     // Trigger Change
+     console.log('Writing test file...');
+     await fs.writeFile(path.join(REPO_DIR, 'test.txt'), 'test change');
+
+    // Wait for Event Emission (Push Success)
+    console.log('Waiting for push_success event...');
+    await new Promise((resolve, reject) => {
+        const checkInterval = setInterval(() => {
+            if (emittedEvents.some(e => e.type === 'push_success')) {
+                clearInterval(checkInterval);
+                resolve();
+            }
+        }, 500);
+        
+        // Timeout after 30s
+        setTimeout(() => {
+            clearInterval(checkInterval);
+            reject(new Error('Timed out waiting for push_success event'));
+        }, 30000);
+    });
+
+    // Stop watcher
     await watcher.stop();
 
     // --- VERIFICATION ---
-
+    
     // 1. Check Commit Message (AI)
     const log = spawnSync('git', ['log', '-1', '--pretty=%B'], { cwd: REPO_DIR }).stdout.toString();
     assert.match(log, /feat: e2e test change/, 'Commit message should be AI generated');
@@ -118,11 +158,8 @@ describe('Full System E2E Integration', () => {
     assert.match(log, /Autopilot-Signature:/, 'Should have Autopilot-Signature trailer');
 
     // 3. Check Event Emission
-    const queuePath = path.join(process.env.AUTOPILOT_CONFIG_DIR, 'events-queue.json');
-    assert.ok(await fs.pathExists(queuePath), 'Event queue file should exist');
-    
-    const queue = await fs.readJson(queuePath);
-    const pushEvent = queue.find(e => e.type === 'push_success');
+    assert.ok(emittedEvents.length > 0, 'Should have emitted events');
+    const pushEvent = emittedEvents.find(e => e.type === 'push_success');
     assert.ok(pushEvent, 'Should have a push_success event');
     assert.ok(pushEvent.commitHash, 'Event should have commit hash');
     assert.ok(pushEvent.userId, 'Event should have user ID');

@@ -92,7 +92,20 @@ test('Integration: Watcher detects changes and commits', { timeout: 30000 }, asy
   } finally {
     // Restore process.exit
     process.exit = originalExit;
+
     // Cleanup
-    await fs.remove(TEST_DIR);
+    if (watcher.isWatching) {
+      await watcher.stop();
+    }
+    // Wait a bit for processes to release locks
+    await new Promise(r => setTimeout(r, 1000));
+    try {
+      await fs.remove(TEST_DIR);
+    } catch (e) {
+      // Ignore EBUSY on Windows during cleanup
+      if (e.code !== 'EBUSY') console.error('Cleanup error:', e);
+    }
+    delete process.env.AUTOPILOT_TEST_MODE;
+    delete process.env.AUTOPILOT_TEST_DURATION;
   }
 });
