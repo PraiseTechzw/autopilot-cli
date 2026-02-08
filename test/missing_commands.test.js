@@ -40,7 +40,13 @@ test('Missing Commands Integration', async (t) => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-cli-missing-'));
   
   t.after(async () => {
-    await fs.remove(tmpDir);
+    // Wait a bit for any lingering file handles to close
+    await new Promise(r => setTimeout(r, 500));
+    try {
+      await fs.remove(tmpDir);
+    } catch (err) {
+      console.warn('Warning: Failed to clean up temp dir:', err.message);
+    }
   });
 
   // Setup repo
@@ -168,8 +174,10 @@ test('Missing Commands Integration', async (t) => {
       // Give it time to render
       setTimeout(() => {
         child.kill();
-        resolve();
       }, 3000);
+      
+      // Wait for process to exit to avoid EBUSY on cleanup
+      child.on('close', () => resolve());
     });
 
     // It should not have printed "Failed to launch dashboard"

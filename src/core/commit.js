@@ -6,6 +6,7 @@
 const path = require('path');
 const logger = require('../utils/logger');
 const { generateAICommitMessage } = require('./gemini');
+const { generateGrokCommitMessage } = require('./grok');
 const HistoryManager = require('./history');
 
 /**
@@ -19,13 +20,22 @@ async function generateCommitMessage(files, diffContent, config = {}) {
   let message = '';
   if (!files || files.length === 0) {
     message = 'chore: update changes';
-  } else if (config.commitMessageMode === 'ai' && config.ai?.enabled && config.ai?.apiKey) {
+  } else if (config.commitMessageMode === 'ai' && config.ai?.enabled) {
     // AI Mode
     try {
-      logger.info('Generating AI commit message...');
-      message = await generateAICommitMessage(diffContent, config.ai.apiKey);
+      const provider = config.ai.provider || 'gemini';
+      logger.info(`Generating AI commit message using ${provider}...`);
+      
+      if (provider === 'grok') {
+        if (!config.ai.grokApiKey) throw new Error('Grok API Key not configured');
+        message = await generateGrokCommitMessage(diffContent, config.ai.grokApiKey, config.ai.grokModel);
+      } else {
+        // Default to Gemini
+        if (!config.ai.apiKey) throw new Error('Gemini API Key not configured');
+        message = await generateAICommitMessage(diffContent, config.ai.apiKey, config.ai.model);
+      }
     } catch (error) {
-      logger.warn('AI generation failed, falling back to smart generation.');
+      logger.warn(`AI generation failed (${error.message}), falling back to smart generation.`);
       message = generateSmartCommitMessage(files, diffContent);
     }
   } else {

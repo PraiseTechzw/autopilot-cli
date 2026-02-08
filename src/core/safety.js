@@ -56,6 +56,12 @@ const validateBeforeCommit = async (repoPath, config) => {
     return { ok: true, errors: [] };
   }
 
+  // 0. Merge/Rebase Safety Check (Hard Guarantee)
+  const isMerge = await git.isMergeInProgress(repoPath);
+  if (isMerge) {
+    return { ok: false, errors: ['Repository is in a merge/rebase state. Autopilot paused for safety.'] };
+  }
+
   try {
     // Get staged files
     const statusObj = await git.getPorcelainStatus(repoPath);

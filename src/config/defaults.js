@@ -13,8 +13,11 @@ const DEFAULT_CONFIG = {
   commitMessageMode: 'smart', // smart | simple | ai
   ai: {
     enabled: false,
-    apiKey: '', // Store in env var or secure config
-    model: 'gemini-2.5-flash',
+    provider: 'gemini', // gemini | grok
+    apiKey: '', 
+    grokApiKey: '',
+    model: 'gemini-2.5-flash', // default for gemini
+    grokModel: 'grok-beta', // default for grok
     interactive: true
   },
   // Phase 1: Team Mode

@@ -1,6 +1,7 @@
 const { getGitStats, calculateMetrics } = require('./insights');
 const logger = require('../utils/logger');
 const open = require('open');
+const crypto = require('crypto');
 
 // Default API URL (can be overridden by config)
 const DEFAULT_API_URL = 'http://localhost:3000';
@@ -34,9 +35,15 @@ async function syncLeaderboard(apiUrl, options) {
     const { stdout: username } = await git.runGit(repoPath, ['config', 'user.name']);
     const { stdout: email } = await git.runGit(repoPath, ['config', 'user.email']);
     
+    const userEmail = email.trim() || 'unknown';
+    const userName = username.trim() || 'Anonymous';
+    
+    // Anonymize ID using hash
+    const userId = crypto.createHash('sha256').update(userEmail).digest('hex').substring(0, 12);
+
     const stats = {
-      id: email.trim() || username.trim() || 'unknown_user', // Simple ID generation
-      username: username.trim() || 'Anonymous',
+      id: userId,
+      username: userName, // Display name (can be public)
       score: metrics.quality.score * 100 + metrics.totalCommits * 10, // Example scoring
       commits: metrics.totalCommits,
       focusMinutes: Math.round(metrics.totalAdditions / 10), // Rough proxy if focus engine not linked
@@ -46,7 +53,8 @@ async function syncLeaderboard(apiUrl, options) {
     // If Focus Engine logs exist, use them for more accurate focus time
     // TODO: Read autopilot.log for accurate focus time
 
-    logger.info(`Syncing stats for ${stats.username}...`);
+    logger.info(`Syncing stats for ${stats.username} (ID: ${userId})...`);
+    logger.info('Note: Only metrics are shared. No code or file contents are transmitted.');
     
     const response = await fetch(`${apiUrl}/api/leaderboard/sync`, {
       method: 'POST',

@@ -241,6 +241,42 @@ async function getLatestCommitHash(root) {
   }
 }
 
+const fs = require('fs-extra');
+const path = require('path');
+
+/**
+ * Check if repository is in a merge/rebase/cherry-pick state
+ * @param {string} root - Repository root path
+ * @returns {Promise<boolean>} True if operation in progress
+ */
+async function isMergeInProgress(root) {
+  try {
+    const gitDir = path.join(root, '.git');
+    const files = [
+      'MERGE_HEAD',
+      'REBASE_HEAD',
+      'CHERRY_PICK_HEAD',
+      'REVERT_HEAD',
+      'BISECT_LOG'
+    ];
+    
+    // Check if .git/rebase-merge or .git/rebase-apply exists (directory check)
+    if (await fs.pathExists(path.join(gitDir, 'rebase-merge')) || 
+        await fs.pathExists(path.join(gitDir, 'rebase-apply'))) {
+      return true;
+    }
+
+    for (const file of files) {
+      if (await fs.pathExists(path.join(gitDir, file))) {
+        return true;
+      }
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
 module.exports = {
   getBranch,
   hasChanges,
@@ -255,5 +291,6 @@ module.exports = {
   revert,
   resetSoft,
   commitExists,
-  getLatestCommitHash
+  getLatestCommitHash,
+  isMergeInProgress
 };
