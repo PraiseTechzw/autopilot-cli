@@ -84,16 +84,36 @@ test('CLI Integration', async (t) => {
     // Spawn watcher in TEST MODE (foreground)
     const watcher = spawn(process.execPath, [BIN_PATH, 'start'], {
       cwd: tmpDir,
-      env: { ...process.env, AUTOPILOT_TEST_MODE: '1' },
+      env: { ...process.env, AUTOPILOT_TEST_MODE: '1', AUTOPILOT_TEST_DURATION: '15000' },
       stdio: 'pipe'
     });
 
     let watcherLog = '';
-    watcher.stdout.on('data', d => watcherLog += d.toString());
+    let watcherStarted = false;
+    
+    watcher.stdout.on('data', d => {
+      const output = d.toString();
+      watcherLog += output;
+      if (output.includes('Autopilot is watching')) {
+        watcherStarted = true;
+      }
+    });
     watcher.stderr.on('data', d => watcherLog += d.toString());
 
-    // Wait for watcher to start
-    await new Promise(r => setTimeout(r, 2000));
+    // Wait for watcher to start (max 10s)
+    const startTime = Date.now();
+    while (!watcherStarted && Date.now() - startTime < 10000) {
+      await new Promise(r => setTimeout(r, 100));
+    }
+    
+    if (!watcherStarted) {
+      console.error('Watcher failed to start in time. Log:', watcherLog);
+      watcher.kill();
+      throw new Error('Watcher failed to start');
+    }
+
+    // Wait a bit more for chokidar to be fully ready
+    await new Promise(r => setTimeout(r, 1000));
 
     // Make a real change
     await fs.appendFile(path.join(tmpDir, 'README.md'), '\nUpdate 1');
@@ -106,7 +126,7 @@ test('CLI Integration', async (t) => {
       } catch (e) { /* ignore */ }
     }, 500);
 
-    // Wait for test mode to finish (it runs for ~5-8s)
+    // Wait for test mode to finish (it runs for ~15s)
     await new Promise((resolve) => {
       watcher.on('close', resolve);
     });
@@ -116,6 +136,10 @@ test('CLI Integration', async (t) => {
     // Verify
     const gitLog = await runGit(['log', '--oneline'], tmpDir);
     const commits = gitLog.split('\n');
+    
+    if (commits.length <= 1) {
+      console.error('Watcher Log:', watcherLog);
+    }
     
     assert.ok(commits.length > 1, 'Should have created at least one new commit');
     
