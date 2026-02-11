@@ -38,7 +38,7 @@ function runGit(args, cwd) {
 
 test('Missing Commands Integration', async (t) => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-cli-missing-'));
-  
+
   t.after(async () => {
     // Wait a bit for any lingering file handles to close
     await new Promise(r => setTimeout(r, 500));
@@ -126,43 +126,43 @@ test('Missing Commands Integration', async (t) => {
     // Start a dummy process to simulate autopilot
     // We can't easily start the real `start` command because it blocks or runs in background in a way that's hard to kill cleanly in test without being flaky.
     // Instead, we fake the PID file.
-    
+
     // We'll just test that `stop` handles "not running" correctly first
     const { code, stdout } = await run(['stop'], tmpDir);
     assert.strictEqual(code, 0);
     assert.match(stdout, /Autopilot is not running/);
-    
+
     // Now fake a PID
     // We use the current process PID just to have a valid PID, but we won't actually kill it because `stop` uses process.kill(pid, 'SIGTERM')
     // Wait, if we use current process PID, `stop` will kill the test runner! Bad idea.
     // We should spawn a sleep process.
-    
+
     const sleep = spawn('node', ['-e', 'setTimeout(() => {}, 10000)'], { detached: true });
     const pid = sleep.pid;
-    
+
     await fs.writeFile(path.join(tmpDir, '.autopilot.pid'), pid.toString());
-    
+
     const stopResult = await run(['stop'], tmpDir);
     assert.strictEqual(stopResult.code, 0);
     assert.match(stopResult.stdout, /Autopilot stopped successfully/);
-    
+
     // Check if PID file is gone
     const pidExists = await fs.pathExists(path.join(tmpDir, '.autopilot.pid'));
     assert.strictEqual(pidExists, false);
-    
+
     // Cleanup sleep process if it's still alive (it should be killed by stop)
     try {
-        process.kill(pid, 0); // Check if exists
-        process.kill(pid); // Kill if still exists
+      process.kill(pid, 0); // Check if exists
+      process.kill(pid); // Kill if still exists
     } catch (e) {
-        // Expected if it was killed
+      // Expected if it was killed
     }
   });
 
   await t.test('dashboard command', async () => {
     const child = spawn(process.execPath, [BIN_PATH, 'dashboard'], {
       cwd: tmpDir,
-      env: { ...process.env, FORCE_COLOR: '1' },
+      env: { ...process.env, FORCE_COLOR: '1', AUTOPILOT_TEST_MODE: '1' },
       stdio: 'pipe'
     });
 
@@ -175,21 +175,21 @@ test('Missing Commands Integration', async (t) => {
       setTimeout(() => {
         child.kill();
       }, 3000);
-      
+
       // Wait for process to exit to avoid EBUSY on cleanup
       child.on('close', () => resolve());
     });
 
     // It should not have printed "Failed to launch dashboard"
     assert.doesNotMatch(output, /Failed to launch dashboard/);
-    
+
     // If we are in a CI/Test environment without TTY, ink might not output anything.
     // We mainly want to ensure it didn't crash with the import error we fixed.
     if (output.length === 0) {
-        // Log warning but don't fail if we know it didn't crash with the specific error
-        console.warn('Warning: Dashboard produced no output (likely due to non-TTY environment).');
+      // Log warning but don't fail if we know it didn't crash with the specific error
+      console.warn('Warning: Dashboard produced no output (likely due to non-TTY environment).');
     } else {
-        assert.match(output, /Autopilot|Loading|Status/);
+      assert.match(output, /Autopilot|Loading|Status/);
     }
   });
 

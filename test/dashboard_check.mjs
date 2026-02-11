@@ -9,7 +9,8 @@ console.log('Running dashboard check...');
 
 const child = spawn('node', [binPath, 'dashboard'], {
   stdio: 'pipe',
-  timeout: 5000
+  timeout: 5000,
+  env: { ...process.env, AUTOPILOT_TEST_MODE: '1' }
 });
 
 let output = '';

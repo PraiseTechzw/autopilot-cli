@@ -18,7 +18,7 @@ const logger = {
    * @param {string} message - Message to log
    */
   info: (message) => {
-    console.log(`ℹ️  ${message}`);
+    console.log(`${logger.colors.cyan('ℹ️')}  ${message}`);
   },
 
   /**
@@ -27,7 +27,7 @@ const logger = {
    */
   debug: (message) => {
     if (process.env.DEBUG) {
-      console.log(`🔍 ${message}`);
+      console.log(`${logger.colors.blue('🔍')} ${message}`);
     }
   },
 
@@ -36,7 +36,7 @@ const logger = {
    * @param {string} message - Message to log
    */
   success: (message) => {
-    console.log(`✅ ${message}`);
+    console.log(`${logger.colors.green('✅')} ${message}`);
   },
 
   /**
@@ -44,7 +44,7 @@ const logger = {
    * @param {string} message - Message to log
    */
   warn: (message) => {
-    console.warn(`⚠️  ${message}`);
+    console.warn(`${logger.colors.yellow('⚠️')}  ${message}`);
   },
 
   /**
@@ -52,7 +52,7 @@ const logger = {
    * @param {string} message - Message to log
    */
   error: (message) => {
-    console.error(`❌ ${message}`);
+    console.error(`${logger.colors.red('❌')} ${message}`);
   },
 
   /**
@@ -60,8 +60,8 @@ const logger = {
    * @param {string} title - Section title
    */
   section: (title) => {
-    console.log(`\n${title}`);
-    console.log('─'.repeat(50));
+    console.log(`\n${logger.colors.bold(logger.colors.cyan(title))}`);
+    console.log(logger.colors.cyan('─'.repeat(50)));
   },
 };
 
