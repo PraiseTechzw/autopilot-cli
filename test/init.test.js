@@ -82,15 +82,14 @@ describe('Init Command AI Configuration', () => {
     delete global.capturedConfig;
   });
 
-  it('should configure Gemini correctly', async () => {
+  it('should configure Gemini correctly (custom)', async () => {
     // Answers:
     // 1. Team mode? N
-    // 2. Enable AI? y
+    // 2. Custom AI? y
     // 3. Provider? gemini
     // 4. API Key? test-gemini-key
     // 5. Interactive? y
     answers = ['N', 'y', 'gemini', 'test-gemini-key', 'y'];
-    console.error('DEBUG: answers set to:', answers);
     
     await initRepo();
     
@@ -102,10 +101,10 @@ describe('Init Command AI Configuration', () => {
     assert.strictEqual(config.ai.interactive, true);
   });
 
-  it('should configure Grok correctly', async () => {
+  it('should configure Grok correctly (custom)', async () => {
     // Answers:
     // 1. Team mode? N
-    // 2. Enable AI? y
+    // 2. Custom AI? y
     // 3. Provider? grok
     // 4. API Key? test-grok-key
     // 5. Interactive? n
@@ -121,4 +120,22 @@ describe('Init Command AI Configuration', () => {
     assert.strictEqual(config.ai.interactive, false);
     assert.strictEqual(config.ai.model, 'grok-beta');
   });
+
+  it('should use Zero-Config AI by default', async () => {
+    // Answers:
+    // 1. Team mode? N
+    // 2. Custom AI? N
+    answers = ['N', 'N'];
+    
+    await initRepo();
+    
+    const config = global.capturedConfig;
+    assert.ok(config);
+    assert.strictEqual(config.ai.enabled, true);
+    assert.strictEqual(config.ai.provider, 'grok');
+    assert.strictEqual(config.ai.apiKey, '');
+    assert.strictEqual(config.ai.grokApiKey, '');
+    assert.strictEqual(config.ai.interactive, false); // Default from defaults.js
+  });
+
 });

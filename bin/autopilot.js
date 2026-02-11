@@ -13,6 +13,7 @@ const { leaderboard } = require('../src/commands/leaderboard');
 const doctor = require('../src/commands/doctor');
 const presetCommand = require('../src/commands/preset');
 const configCommand = require('../src/commands/config');
+const interactiveCommand = require('../src/commands/interactive');
 const pkg = require('../package.json');
 const logger = require('../src/utils/logger');
 const { checkForUpdate } = require('../src/utils/update-check');
@@ -30,7 +31,8 @@ const commands = {
   leaderboard: leaderboard,
   doctor: doctor,
   preset: presetCommand,
-  config: configCommand
+  config: configCommand,
+  interactive: interactiveCommand
 };
 
 // Runtime assertion to prevent wiring errors
@@ -121,6 +123,12 @@ program
   .description('Manage configuration (list, get, set)')
   .option('-g, --global', 'Use global configuration')
   .action(configCommand);
+
+program
+  .command('interactive [on|off]')
+  .description('Toggle AI Safety Mode (on = prompt, off = automated)')
+  .option('-g, --global', 'Set the preference globally')
+  .action(interactiveCommand);
 
 program
   .command('doctor')
