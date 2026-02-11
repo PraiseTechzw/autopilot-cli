@@ -128,20 +128,21 @@ describe('AI Features Integration', () => {
       assert.strictEqual(msg, '[autopilot] feat: grok message');
     });
 
-    it('should default to Gemini if provider is missing', async () => {
+    it('should default to Grok if provider is missing', async () => {
       const config = {
         commitMessageMode: 'ai',
         ai: {
           enabled: true,
-          apiKey: 'gemini-key'
+          // no provider specified
         }
       };
 
-      mock.method(gemini, 'generateAICommitMessage', async () => 'feat: default gemini');
+      mock.method(grok, 'generateGrokCommitMessage', async () => 'feat: default grok');
 
       const msg = await commit.generateCommitMessage([{ status: 'M', file: 'test.js' }], 'diff', config);
-      assert.strictEqual(msg, '[autopilot] feat: default gemini');
+      assert.strictEqual(msg, '[autopilot] feat: default grok');
     });
+
 
     it('should fallback to smart commit if AI fails', async () => {
       const config = {

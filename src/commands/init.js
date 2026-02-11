@@ -137,19 +137,21 @@ async function initRepo() {
     const teamMode = await askQuestion('Enable team mode? (pull before push) [y/N]: ');
     const useTeamMode = teamMode.toLowerCase() === 'y';
 
-    // Phase 3: AI Configuration
-    const enableAI = await askQuestion('Enable AI commit messages? [y/N]: ');
-    let useAI = enableAI.toLowerCase() === 'y';
+    // Phase 3: AI Configuration (Zero-Config)
+    logger.info('\n🤖 AI Commit Messages are ENABLED by default (Zero-Config).');
+    const customAI = await askQuestion('Would you like to use your own AI API keys instead? [y/N]: ');
     
+    let useAI = true;
     let apiKey = '';
     let grokApiKey = '';
-    let provider = 'gemini';
-    let interactive = false;
+    let provider = 'grok';
+    let interactive = DEFAULT_CONFIG.ai.interactive;
+
     
-    if (useAI) {
+    if (customAI.toLowerCase() === 'y') {
       // Select Provider
-      const providerAns = await askQuestion('Select AI Provider (gemini/grok) [gemini]: ');
-      provider = providerAns.toLowerCase() === 'grok' ? 'grok' : 'gemini';
+      const providerAns = await askQuestion('Select AI Provider (gemini/grok) [grok]: ');
+      provider = providerAns.toLowerCase() === 'gemini' ? 'gemini' : 'grok';
       
       while (true) {
         const keyPrompt = provider === 'grok' 
@@ -159,16 +161,15 @@ async function initRepo() {
         const keyInput = await askQuestion(keyPrompt);
         
         if (!keyInput) {
-           logger.warn('API Key cannot be empty if AI is enabled.');
-           const retry = await askQuestion('Try again? (n to disable AI) [Y/n]: ');
+           logger.warn('Custom API Key cannot be empty. Falling back to System AI.');
+           const retry = await askQuestion('Try again with custom key? (n to use System AI) [Y/n]: ');
            if (retry.toLowerCase() === 'n') {
-             useAI = false;
              break;
            }
            continue;
         }
 
-        logger.info(`Verifying ${provider} API Key...`);
+        logger.info(`Verifying custom ${provider} API Key...`);
         let result;
         if (provider === 'grok') {
           result = await grok.validateGrokApiKey(keyInput);
@@ -177,33 +178,32 @@ async function initRepo() {
         }
         
         if (result.valid) {
-          logger.success('API Key verified successfully! ✨');
+          logger.success('Custom API Key verified successfully! ✨');
           if (provider === 'grok') grokApiKey = keyInput;
           else apiKey = keyInput;
           break;
         } else {
           logger.warn(`API Key validation failed: ${result.error}`);
-          const retry = await askQuestion('Try again? (n to disable AI, p to proceed anyway) [Y/n/p]: ');
+          const retry = await askQuestion('Try again? (n to use System AI, p to proceed anyway) [Y/n/p]: ');
           const choice = retry.toLowerCase();
           
           if (choice === 'n') {
-            useAI = false;
             break;
           } else if (choice === 'p') {
-            logger.warn('Proceeding with potentially invalid API key.');
+            logger.warn('Proceeding with custom API key.');
             if (provider === 'grok') grokApiKey = keyInput;
             else apiKey = keyInput;
             break;
           }
-          // Default is retry (loop)
         }
       }
 
-      if (useAI) {
-        const interactiveAns = await askQuestion('Review AI messages before committing? [y/N]: ');
-        interactive = interactiveAns.toLowerCase() === 'y';
-      }
+      const interactiveAns = await askQuestion('Review AI messages before committing? [y/N]: ');
+      interactive = interactiveAns.toLowerCase() === 'y';
+    } else {
+      logger.info('Using System AI (Zero-Config mode). ✨');
     }
+
 
     const overrides = {
       teamMode: useTeamMode,
