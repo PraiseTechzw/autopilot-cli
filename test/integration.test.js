@@ -31,7 +31,7 @@ test('Integration: Watcher detects changes and commits', { timeout: 30000 }, asy
 
   // Set environment for Test Mode
   process.env.AUTOPILOT_TEST_MODE = '1';
-  process.env.AUTOPILOT_TEST_DURATION = '5000'; // 5 seconds
+  process.env.AUTOPILOT_TEST_DURATION = '10000'; // 10 seconds
   
   // Start Watcher
   const watcher = new Watcher(TEST_DIR);
@@ -75,7 +75,7 @@ test('Integration: Watcher detects changes and commits', { timeout: 30000 }, asy
 
     // Wait for the test duration (plus a buffer) for the watcher to process and "exit"
     console.log('Waiting for watcher to process...');
-    await new Promise(r => setTimeout(r, 6000)); // 5000 duration + 1000 buffer
+    await new Promise(r => setTimeout(r, 11000)); // 10000 duration + 1000 buffer
 
     // Verify
     const { stdout: log } = await execa('git', ['log', '--oneline'], { cwd: TEST_DIR });
