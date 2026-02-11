@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/components/SidebarProvider";
 import { Topbar } from "@/components/Topbar";
 import { Footer } from "@/components/Footer";
 import { VersionBadge } from "@/components/VersionBadge";
+import { MobileMenu } from "@/components/MobileMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -112,6 +113,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="autopilot-theme">
           <SidebarProvider>
             <Topbar versionBadge={<VersionBadge />} />
+            <MobileMenu />
             <div className="flex-1 flex flex-col">
               {children}
             </div>
