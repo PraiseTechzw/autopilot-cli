@@ -135,7 +135,7 @@ describe('Init Command AI Configuration', () => {
     assert.strictEqual(config.ai.provider, 'grok');
     assert.strictEqual(config.ai.apiKey, '');
     assert.strictEqual(config.ai.grokApiKey, '');
-    assert.strictEqual(config.ai.interactive, false); // Default from defaults.js
+    assert.strictEqual(config.ai.interactive, true); // Default is now true (Safety Mode)
   });
 
 });
