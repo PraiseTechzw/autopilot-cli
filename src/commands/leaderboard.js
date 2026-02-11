@@ -2,7 +2,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const { getGitStats, calculateMetrics } = require('./insights');
 const logger = require('../utils/logger');
-const open = require('open');
 const crypto = require('crypto');
 
 // Default API URL (can be overridden by config)
@@ -16,7 +15,7 @@ async function calculateFocusTime(repoPath) {
     const content = await fs.readFile(logPath, 'utf8');
     const lines = content.split('\n').filter(l => l.trim());
     let totalMs = 0;
-    
+
     for (const line of lines) {
       try {
         const entry = JSON.parse(line);
@@ -27,7 +26,7 @@ async function calculateFocusTime(repoPath) {
         // ignore bad lines
       }
     }
-    
+
     return Math.round(totalMs / 60000); // minutes
   } catch (error) {
     logger.warn(`Failed to parse autopilot.log: ${error.message}`);
@@ -59,15 +58,15 @@ async function syncLeaderboard(apiUrl, options) {
     }
 
     const metrics = calculateMetrics(commits);
-    
+
     // Get user info (git config)
     const git = require('../core/git');
     const { stdout: username } = await git.runGit(repoPath, ['config', 'user.name']);
     const { stdout: email } = await git.runGit(repoPath, ['config', 'user.email']);
-    
+
     const userEmail = email.trim() || 'unknown';
     const userName = username.trim() || 'Anonymous';
-    
+
     // Anonymize ID using hash
     const userId = crypto.createHash('sha256').update(userEmail).digest('hex').substring(0, 12);
 
@@ -87,7 +86,7 @@ async function syncLeaderboard(apiUrl, options) {
 
     logger.info(`Syncing stats for ${stats.username} (ID: ${userId})...`);
     logger.info('Note: Only metrics are shared. No code or file contents are transmitted.');
-    
+
     const response = await fetch(`${apiUrl}/api/leaderboard/sync`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

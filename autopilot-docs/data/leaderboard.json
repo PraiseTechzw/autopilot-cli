@@ -1,20 +1,11 @@
 [
   {
-    "id": "user_1",
-    "username": "AlexChen",
-    "score": 9850,
-    "commits": 142,
-    "focusMinutes": 2535,
-    "streak": 12,
-    "lastActive": "2024-03-10T14:30:00Z"
-  },
-  {
-    "id": "user_2",
-    "username": "SarahDev",
-    "score": 9420,
-    "commits": 128,
-    "focusMinutes": 2320,
-    "streak": 8,
-    "lastActive": "2024-03-10T12:15:00Z"
+    "id": "47c15b2d27ee",
+    "username": "Praise Masunga",
+    "score": 9310,
+    "commits": 1,
+    "focusMinutes": 51,
+    "streak": 1,
+    "lastActive": "2026-02-11T07:47:54.567Z"
   }
 ]
