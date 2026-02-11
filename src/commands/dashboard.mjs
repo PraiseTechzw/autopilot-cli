@@ -19,7 +19,7 @@ const e = React.createElement;
 const Dashboard = () => {
   const { exit } = useApp();
   const root = process.cwd();
-  
+
   const [status, setStatus] = useState('loading');
   const [pid, setPid] = useState(null);
   const [lastCommit, setLastCommit] = useState(null);
@@ -34,18 +34,18 @@ const Dashboard = () => {
         // 1. Check process status
         const currentPid = await getRunningPid(root);
         setPid(currentPid);
-        
+
         // 2. Check Paused State
         const stateManager = new StateManager(root);
         if (stateManager.isPaused()) {
-           setStatus('paused');
-           setPausedState(stateManager.getState());
+          setStatus('paused');
+          setPausedState(stateManager.getState());
         } else if (currentPid) {
-           setStatus('running');
-           setPausedState(null);
+          setStatus('running');
+          setPausedState(null);
         } else {
-           setStatus('stopped');
-           setPausedState(null);
+          setStatus('stopped');
+          setPausedState(null);
         }
 
         // 3. Last Commit
@@ -56,7 +56,7 @@ const Dashboard = () => {
         // 4. Pending Files
         const statusObj = await git.getPorcelainStatus(root);
         if (statusObj.ok) {
-           setPendingFiles(statusObj.files);
+          setPendingFiles(statusObj.files);
         }
 
         // 5. Today Stats (Simple count from history)
@@ -126,10 +126,10 @@ const Dashboard = () => {
     e(Box, { flexDirection: "column", marginBottom: 1 },
       e(Text, { underline: true }, `Pending Changes (${pendingFiles.length})`),
       e(Box, { flexDirection: "column" },
-        pendingFiles.length === 0 ? 
+        pendingFiles.length === 0 ?
           e(Text, { color: "gray" }, "No pending changes") :
-          pendingFiles.slice(0, 5).map((f) => 
-            e(Text, { key: f.file, color: "yellow" }, ` ${f.status} ${f.file}`)
+          pendingFiles.slice(0, 5).map((f, idx) =>
+            e(Text, { key: `${f.file}-${idx}`, color: "yellow" }, ` ${f.status} ${f.file}`)
           )
       ),
       pendingFiles.length > 5 && e(Text, { color: "gray" }, ` ...and ${pendingFiles.length - 5} more`)
@@ -143,5 +143,9 @@ const Dashboard = () => {
 };
 
 export default function runDashboard() {
+  if (!process.stdin.isTTY && !process.env.AUTOPILOT_TEST_MODE) {
+    console.error('Error: Dashboard requires an interactive terminal (TTY).');
+    process.exit(1);
+  }
   render(e(Dashboard));
 }

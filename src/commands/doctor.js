@@ -13,7 +13,7 @@ const git = require('../core/git');
 const doctor = async () => {
   const repoPath = process.cwd();
   let issues = 0;
-  
+
   logger.section('Autopilot Doctor');
   logger.info('Diagnosing environment...');
 
@@ -50,7 +50,17 @@ const doctor = async () => {
 
     // Check remote type
     if (remoteUrl.startsWith('http')) {
-      logger.warn('Remote uses HTTPS. Ensure credential helper is configured for non-interactive push.');
+      let hasHelper = false;
+      try {
+        const { stdout: helper } = await execa('git', ['config', '--get', 'credential.helper'], { cwd: repoPath });
+        if (helper.trim()) hasHelper = true;
+      } catch (e) { /* ignore */ }
+
+      if (hasHelper) {
+        logger.success('Remote uses HTTPS with credential helper configured.');
+      } else {
+        logger.warn('Remote uses HTTPS. Ensure credential helper is configured for non-interactive push.');
+      }
     } else if (remoteUrl.startsWith('git@') || remoteUrl.startsWith('ssh://')) {
       logger.success('Remote uses SSH (recommended).');
     } else {
@@ -102,8 +112,8 @@ const doctor = async () => {
         logger.success('Branch is up to date with remote.');
       }
     } else {
-       // Could be no upstream configured, which is fine for local-only initially
-       logger.info('Could not check remote status (upstream might not be set).');
+      // Could be no upstream configured, which is fine for local-only initially
+      logger.info('Could not check remote status (upstream might not be set).');
     }
   } catch (error) {
     logger.info('Skipping remote status check.');

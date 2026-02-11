@@ -6,86 +6,52 @@ const { createObjectCsvWriter } = require('csv-writer');
 
 async function getGitStats(repoPath) {
   try {
-    // Get commit log with stats
-    // We use custom delimiters to safely parse multi-line bodies and stats
     const { stdout } = await git.runGit(repoPath, [
       'log',
-      '--pretty=format:====COMMIT====%n%H|%an|%ad|%s|%b%n====BODY_END====',
+      '--pretty=format:===C===%H|%an|%ad|%s|%b===E===',
       '--date=iso',
       '--numstat'
     ]);
 
+    if (!stdout) return [];
+
     const commits = [];
-    const rawCommits = stdout.split('====COMMIT====');
+    const rawCommits = stdout.split('===C===').filter(Boolean);
 
     for (const raw of rawCommits) {
-      if (!raw.trim()) continue;
+      const [metadataPlusBody, ...statsParts] = raw.split('===E===');
+      if (!metadataPlusBody) continue;
 
-      const [metadataPart, statsPart] = raw.split('====BODY_END====');
-      if (!metadataPart) continue;
+      const [hash, author, dateStr, subject, ...bodyParts] = metadataPlusBody.trim().split('|');
+      const body = bodyParts.join('|'); // Rejoin in case body had pipes
 
-      const lines = metadataPart.trim().split('\n');
-      const header = lines[0]; // hash|author|date|subject|body_start...
-      // The body might continue on next lines if %b has newlines.
-      // Actually, my format puts %b starting on the first line.
-      // But let's be safer: split header by | first 4 times only.
-      
-      // header format: hash|author|date|subject|rest...
-      // But wait, if body has newlines, "lines" array has them.
-      
-      // Let's reconstruct the full message body
-      const fullMetadata = metadataPart.trim();
-      const firstPipe = fullMetadata.indexOf('|');
-      const secondPipe = fullMetadata.indexOf('|', firstPipe + 1);
-      const thirdPipe = fullMetadata.indexOf('|', secondPipe + 1);
-      const fourthPipe = fullMetadata.indexOf('|', thirdPipe + 1);
-      
-      if (firstPipe === -1 || fourthPipe === -1) continue;
-
-      const hash = fullMetadata.substring(0, firstPipe);
-      const author = fullMetadata.substring(firstPipe + 1, secondPipe);
-      const dateStr = fullMetadata.substring(secondPipe + 1, thirdPipe);
-      const subject = fullMetadata.substring(thirdPipe + 1, fourthPipe);
-      const body = fullMetadata.substring(fourthPipe + 1);
-
-      // TRUST VERIFICATION
-      // Check for Autopilot trailers
-      if (!body.includes('Autopilot-Commit: true')) {
-        continue; // Skip non-autopilot commits
-      }
-
-      // TODO: Verify Signature (Optional but recommended for strict mode)
-      // const signature = extractTrailer(body, 'Autopilot-Signature');
-      // if (!verifySignature(signature, ...)) continue;
+      // Trust Verification: Only process autopilot commits
+      if (!body.includes('Autopilot-Commit: true')) continue;
 
       const commit = {
         hash,
         author,
         date: new Date(dateStr),
-        message: subject + '\n' + body,
+        message: `${subject}\n${body}`.trim(),
         files: [],
         additions: 0,
         deletions: 0
       };
 
-      // Parse Stats
-      if (statsPart) {
-        const statLines = statsPart.trim().split('\n');
-        for (const statLine of statLines) {
-          if (!statLine.trim()) continue;
-          const parts = statLine.split(/\s+/);
-          if (parts.length >= 3) {
-            const additions = parseInt(parts[0]) || 0;
-            const deletions = parseInt(parts[1]) || 0;
-            const file = parts.slice(2).join(' '); // handle spaces in filenames
-            
+      const statsText = statsParts.join('===E===').trim();
+      if (statsText) {
+        const statLines = statsText.split('\n');
+        for (const line of statLines) {
+          const [add, del, file] = line.trim().split(/\s+/);
+          if (file) {
+            const additions = parseInt(add) || 0;
+            const deletions = parseInt(del) || 0;
             commit.files.push({ file, additions, deletions });
             commit.additions += additions;
             commit.deletions += deletions;
           }
         }
       }
-
       commits.push(commit);
     }
 
@@ -130,7 +96,7 @@ function calculateMetrics(commits) {
     // Time analysis
     const dateStr = c.date.toISOString().split('T')[0];
     const hour = c.date.getHours();
-    
+
     stats.commitsByDay[dateStr] = (stats.commitsByDay[dateStr] || 0) + 1;
     stats.commitsByHour[hour] = (stats.commitsByHour[hour] || 0) + 1;
     dates.add(dateStr);
@@ -145,7 +111,7 @@ function calculateMetrics(commits) {
   // Calculate Averages
   stats.totalFilesCount = stats.totalFilesChanged.size;
   stats.quality.avgLength = commits.length ? Math.round(totalMessageLength / commits.length) : 0;
-  
+
   // Calculate Score (0-100)
   // 40% Conventional, 30% Message Length (>30 chars), 30% Consistency
   const convScore = commits.length ? (stats.quality.conventional / commits.length) * 40 : 0;
@@ -165,7 +131,7 @@ function calculateMetrics(commits) {
       currentStreak = 1;
     } else {
       const diffTime = Math.abs(d - lastDate);
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       if (diffDays === 1) {
         currentStreak++;
       } else {
@@ -176,12 +142,12 @@ function calculateMetrics(commits) {
     lastDate = d;
   });
   stats.streak.max = Math.max(maxStreak, currentStreak);
-  
+
   // Check if streak is active (last commit today or yesterday)
   const today = new Date().toISOString().split('T')[0];
   const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
   const lastCommitDate = sortedDates[sortedDates.length - 1];
-  
+
   if (lastCommitDate === today || lastCommitDate === yesterday) {
     stats.streak.current = currentStreak;
   } else {
@@ -217,10 +183,10 @@ async function insights(options) {
     console.log(`Lines Added:      ${metrics.totalAdditions}`);
     console.log(`Lines Deleted:    ${metrics.totalDeletions}`);
     console.log(`Current Streak:   ${metrics.streak.current} days (Max: ${metrics.streak.max})`);
-    
+
     // Find most productive hour
     const productiveHour = Object.entries(metrics.commitsByHour)
-      .sort(([,a], [,b]) => b - a)[0];
+      .sort(([, a], [, b]) => b - a)[0];
     console.log(`Peak Productivity: ${productiveHour ? productiveHour[0] + ':00' : 'N/A'}`);
 
     console.log('');
@@ -241,12 +207,12 @@ async function insights(options) {
       const csvWriter = createObjectCsvWriter({
         path: csvPath,
         header: [
-          {id: 'hash', title: 'Hash'},
-          {id: 'date', title: 'Date'},
-          {id: 'author', title: 'Author'},
-          {id: 'message', title: 'Message'},
-          {id: 'additions', title: 'Additions'},
-          {id: 'deletions', title: 'Deletions'}
+          { id: 'hash', title: 'Hash' },
+          { id: 'date', title: 'Date' },
+          { id: 'author', title: 'Author' },
+          { id: 'message', title: 'Message' },
+          { id: 'additions', title: 'Additions' },
+          { id: 'deletions', title: 'Deletions' }
         ]
       });
 

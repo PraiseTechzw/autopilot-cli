@@ -42,13 +42,14 @@ async function getPorcelainStatus(root) {
   try {
     const { stdout } = await execa('git', ['status', '--porcelain'], { cwd: root });
     const raw = stdout.trim();
-    
+
     if (!raw) {
       return { ok: true, files: [], raw: '' };
     }
 
     const files = raw
       .split(/\r?\n/)
+      .filter(line => line.trim().length > 0)
       .map(line => {
         const status = line.slice(0, 2).trim();
         const file = line.slice(3).trim();
@@ -134,7 +135,7 @@ async function isRemoteAhead(root) {
 
     const { stdout } = await execa('git', ['rev-list', '--left-right', '--count', `${branch}...origin/${branch}`], { cwd: root });
     const [aheadCount, behindCount] = stdout.trim().split(/\s+/).map(Number);
-    
+
     return {
       ok: true,
       ahead: aheadCount > 0,
@@ -259,10 +260,10 @@ async function isMergeInProgress(root) {
       'REVERT_HEAD',
       'BISECT_LOG'
     ];
-    
+
     // Check if .git/rebase-merge or .git/rebase-apply exists (directory check)
-    if (await fs.pathExists(path.join(gitDir, 'rebase-merge')) || 
-        await fs.pathExists(path.join(gitDir, 'rebase-apply'))) {
+    if (await fs.pathExists(path.join(gitDir, 'rebase-merge')) ||
+      await fs.pathExists(path.join(gitDir, 'rebase-apply'))) {
       return true;
     }
 

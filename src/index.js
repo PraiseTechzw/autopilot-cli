@@ -8,7 +8,6 @@ const { doctor } = require('./commands/doctor');
 const { insights } = require('./commands/insights');
 const pauseCommand = require('./commands/pause');
 const resumeCommand = require('./commands/resume');
-const runDashboard = require('./commands/dashboard');
 const { leaderboard } = require('./commands/leaderboard');
 const pkg = require('../package.json');
 
@@ -65,7 +64,14 @@ function run() {
   program
     .command('dashboard')
     .description('View real-time Autopilot dashboard')
-    .action(runDashboard);
+    .action(async () => {
+      try {
+        const { default: runDashboard } = await import('./commands/dashboard.mjs');
+        runDashboard();
+      } catch (error) {
+        console.error('Failed to launch dashboard:', error);
+      }
+    });
 
   program
     .command('doctor')
