@@ -42,6 +42,7 @@ async function leaderboard(options) {
     await syncLeaderboard(apiUrl, options);
   } else {
     logger.info(`Opening leaderboard at ${apiUrl}/leaderboard...`);
+    const { default: open } = await import('open');
     await open(`${apiUrl}/leaderboard`);
   }
 }
