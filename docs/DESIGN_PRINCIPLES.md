@@ -40,19 +40,75 @@ All automation is **reversible** via `autopilot undo`.
 - **AI (Gemini / Grok)** is an assistant, never an authority.
 - AI output must be reviewable, overridable, and optional.
 
+## Privacy & Local-First Design
+
+**Privacy Guarantees:**
+- Your source code **never** leaves your machine
+- No code diffs are transmitted externally
+- No file contents are sent to remote servers
+- AI commit message generation happens with metadata only (file paths, line counts, not actual code)
+
+**Local-First Architecture:**
+- Works 100% offline (except for git push operations)
+- No authentication to external services required
+- All data stored locally in your project
+- Configuration is local and version-controllable
+
 ## Leaderboard & Metrics
 
 - Metrics are derived **only** from local Git activity created by Autopilot.
 - **No raw code, diffs, or file contents are ever transmitted.**
 - Leaderboard data is:
-  - opt-in
+  - opt-in (disabled by default)
   - anonymized or pseudonymous
   - explainable (users know exactly what is counted)
+  - aggregate only (commit counts, focus time, streak days)
 
-## Philosophy
+**What gets synced (if opted in):**
+- ✅ Commit counts
+- ✅ Focus time duration
+- ✅ Streak days
+- ✅ Anonymized username/identifier
 
-- Autopilot exists to protect developer flow, not replace developer judgment.
-- **When in doubt: pause, explain, wait.**
+**What never gets synced:**
+- ❌ Source code
+- ❌ File names or paths
+- ❌ Commit messages
+- ❌ Repository names
+- ❌ File diffs or changes
+
+## User Experience Philosophy
+
+**When in Doubt: Pause, Explain, Wait**
+
+- Ambiguous situations should trigger clear, actionable error messages
+- Users should always understand what Autopilot is doing and why
+- Status messages should be informative without being verbose
+- Configuration should have sensible defaults but be fully customizable
+
+**Trust Through Transparency:**
+- Every action Autopilot takes should be logged
+- Users should be able to audit what happened and when
+- The system should explain its decisions in plain language
+- Documentation should be honest about limitations
+
+## Development Guidelines
+
+**For Contributors:**
+- Any feature must pass the "trust test" - would you trust this with your production code?
+- Prefer explicit over implicit behavior
+- Add clear error messages for every failure case
+- Document why, not just what
+- Test edge cases extensively, especially around git state
+
+**For AI Integration:**
+- AI should enhance, not replace, developer judgment
+- All AI suggestions must be reviewable before commit
+- Provide escape hatches for AI-generated content
+- Log AI usage for transparency
+- Allow disabling AI features entirely
 
 ---
-*Any feature (including Grok or leaderboards) must pass this test.*
+
+*Any feature (including Grok or leaderboards) must pass this test: Does it maintain developer trust, safety, and control?*
+
