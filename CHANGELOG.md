@@ -3,6 +3,35 @@
 All notable changes to this project will be documented in this file.
 This project follows [Semantic Versioning](https://semver.org).
 
+## [2.1.1] - 2026-02-11
+
+### Added
+- **Global Leaderboard Sync**:
+  - New `autopilot leaderboard --sync` command to share productivity metrics with the global community.
+  - Implemented secure, anonymized data transmission (metrics only, no code).
+- **Dynamic Leaderboard Dashboard**:
+  - Completely redesigned `autopilot-docs` leaderboard with real-time analytics.
+  - Real-time aggregation of global commits, focus hours, and active streaks.
+  - Premium glassmorphism UI with live ranking updates.
+
+### Improved
+- **CLI Aesthetics**:
+  - Integrated full ANSI color support for the `logger` utility for more professional output.
+  - Improved visual hierarchy with bold section headers and color-coded status icons.
+- **Diagnostics**:
+  - Enhanced `doctor` command to intelligently check for `credential.helper` validation on HTTPS remotes.
+- **Insights Portability**:
+  - Refined Git log parsing to be more robust across different Git versions and configurations.
+
+### Fixed
+- **Dashboard Stability**:
+  - Fixed "Duplicate Key" warning in the interactive React Ink dashboard.
+  - Added TTY-detection to prevent crashes in non-interactive environments (CI/CD, background).
+  - Fixed ESM/CommonJS compatibility issues using dynamic `import()` for the dashboard.
+- **Test Integrity**:
+  - Implemented `AUTOPILOT_TEST_MODE` bypass for automated dashboard verification.
+  - Fixed cross-test contamination and EBUSY errors on Windows platforms.
+
 ## [2.1.0] - 2026-02-08
 
 ### Added
