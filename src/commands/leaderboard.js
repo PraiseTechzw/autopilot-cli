@@ -106,4 +106,4 @@ async function syncLeaderboard(apiUrl, options) {
   }
 }
 
-module.exports = { leaderboard };
+module.exports = { leaderboard, syncLeaderboard };
