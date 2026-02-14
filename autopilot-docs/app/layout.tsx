@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/components/SidebarProvider";
 import { Topbar } from "@/components/Topbar";
 import { Footer } from "@/components/Footer";
 import { VersionBadge } from "@/components/VersionBadge";
+import { MobileMenu } from "@/components/MobileMenu";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     description: 'Stop worrying about commits. Autopilot CLI watches your changes and syncs them automatically with safety rails.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.svg',
         width: 1200,
         height: 630,
         alt: 'Autopilot CLI Banner',
@@ -57,7 +58,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Autopilot CLI',
     description: 'Intelligent Git automation with safety rails. Focus on code, not commits.',
-    images: ['/og-image.png'],
+    images: ['/og-image.svg'],
     creator: '@PraiseTechzw',
   },
   icons: {
@@ -65,7 +66,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
     apple: '/favicon.ico', // Ideally we should have a real apple-touch-icon
   },
-  manifest: '/manifest.json',
+  manifest: '/manifest.webmanifest',
   robots: {
     index: true,
     follow: true,
@@ -112,6 +113,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="system" storageKey="autopilot-theme">
           <SidebarProvider>
             <Topbar versionBadge={<VersionBadge />} />
+            <MobileMenu />
             <div className="flex-1 flex flex-col">
               {children}
             </div>

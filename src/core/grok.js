@@ -76,6 +76,32 @@ Rules:
 5. Use types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert.
 6. Return ONLY the commit message, no explanations or markdown code blocks.`;
 
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    const response = await fetch(BASE_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: `Diff:\n${truncatedDiff}` }
+        ],
+        temperature: 0.2,
+        stream: false
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(`Grok API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+    }
   const response = await fetch(baseUrl, {
     method: 'POST',
     headers: {
@@ -122,6 +148,9 @@ async function validateGrokApiKey(apiKey) {
   const model = isGroq ? DEFAULT_GROQ_MODEL : DEFAULT_GROK_MODEL;
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const response = await fetch(BASE_API_URL, {
     const response = await fetch(baseUrl, {
       method: 'POST',
       headers: {
@@ -132,8 +161,10 @@ async function validateGrokApiKey(apiKey) {
         model: model,
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 1
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     if (response.ok) return { valid: true };
     const errorData = await response.json().catch(() => ({}));

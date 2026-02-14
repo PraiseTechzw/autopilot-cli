@@ -1,10 +1,10 @@
 const { Command } = require('commander');
-const { initRepo } = require('./commands/init');
-const { startWatcher } = require('./commands/start');
-const { stopWatcher } = require('./commands/stop');
-const { statusWatcher } = require('./commands/status');
+const initRepo = require('./commands/init');
+const startWatcher = require('./commands/start');
+const stopWatcher = require('./commands/stop');
+const statusWatcher = require('./commands/status');
 const undoCommand = require('./commands/undo');
-const { doctor } = require('./commands/doctor');
+const doctor = require('./commands/doctor');
 const { insights } = require('./commands/insights');
 const pauseCommand = require('./commands/pause');
 const resumeCommand = require('./commands/resume');

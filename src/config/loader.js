@@ -33,6 +33,13 @@ const loadConfig = async (repoPath) => {
     logger.warn(`Error loading local config: ${error.message}`);
   }
 
+  // Backward compatibility: map deprecated keys
+  try {
+    if (config.blockBranches && !config.blockedBranches) {
+      config.blockedBranches = config.blockBranches;
+    }
+  } catch (_) {}
+
   return config;
 };
 

@@ -7,7 +7,7 @@ const DEFAULT_CONFIG = {
   debounceSeconds: 20,
   minSecondsBetweenCommits: 180,
   autoPush: true,
-  blockBranches: ['main', 'master'],
+  blockedBranches: ['main', 'master'],
   requireChecks: false,
   checks: [],
   commitMessageMode: 'ai', // Default to AI for zero-config

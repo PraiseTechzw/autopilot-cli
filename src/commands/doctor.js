@@ -126,6 +126,34 @@ const doctor = async () => {
   } else {
     logger.warn(`Diagnosis complete. Found ${issues} potential issue(s).`);
   }
+
+  // 7. AI Connectivity (if enabled)
+  try {
+    const { loadConfig } = require('../config/loader');
+    const config = await loadConfig(repoPath);
+    if (config?.ai?.enabled) {
+      logger.section('AI Connectivity');
+      if (config.ai.provider === 'grok') {
+        const { validateGrokApiKey } = require('../core/grok');
+        const result = await validateGrokApiKey(config.ai.grokApiKey);
+        if (result.valid) logger.success('Grok API reachable and key looks valid.');
+        else {
+          logger.warn(`Grok API check failed: ${result.error}`);
+          issues++;
+        }
+      } else {
+        const { validateApiKey } = require('../core/gemini');
+        const result = await validateApiKey(config.ai.apiKey);
+        if (result.valid) logger.success('Gemini API reachable and key looks valid.');
+        else {
+          logger.warn(`Gemini API check failed: ${result.error}`);
+          issues++;
+        }
+      }
+    }
+  } catch (error) {
+    // ignore AI check failures
+  }
 };
 
 module.exports = doctor;

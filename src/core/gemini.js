@@ -42,6 +42,8 @@ ${truncatedDiff}
 
   try {
     const url = `${BASE_API_URL}${model}:generateContent?key=${apiKey}`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -57,8 +59,10 @@ ${truncatedDiff}
           temperature: 0.2,
           maxOutputTokens: 256,
         }
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -94,14 +98,18 @@ async function validateApiKey(apiKey, model = DEFAULT_MODEL) {
   try {
     const url = `${BASE_API_URL}${model}:generateContent?key=${apiKey}`;
     // Simple test call with empty prompt
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: "Hi" }] }],
         generationConfig: { maxOutputTokens: 1 }
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
     
     if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

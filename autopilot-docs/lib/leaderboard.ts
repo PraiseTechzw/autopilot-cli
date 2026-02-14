@@ -1,7 +1,4 @@
-import fs from 'fs/promises';
-import path from 'path';
-
-const DB_PATH = path.join(process.cwd(), 'data', 'leaderboard.json');
+import { getServerClient } from './supabase';
 
 export interface UserStats {
   id: string;
@@ -14,30 +11,49 @@ export interface UserStats {
 }
 
 export async function getLeaderboard(): Promise<UserStats[]> {
-  try {
-    const data = await fs.readFile(DB_PATH, 'utf-8');
-    const users: UserStats[] = JSON.parse(data);
-    return users.sort((a, b) => b.score - a.score);
-  } catch (error) {
-    // If file doesn't exist or is invalid, return empty array
-    return [];
-  }
+  const supabase = getServerClient();
+  const { data, error } = await supabase
+    .from('leaderboard')
+    .select('id, username, score, commits, focus_minutes, streak, last_active')
+    .order('score', { ascending: false })
+    .limit(100);
+  if (error || !data) return [];
+  // Normalize to camelCase for the frontend
+  const rows = data as Array<{
+    id: string;
+    username: string;
+    score: number;
+    commits: number;
+    focus_minutes: number;
+    streak: number;
+    last_active: string;
+  }>;
+  return rows.map((u) => ({
+    id: u.id,
+    username: u.username,
+    score: Number(u.score) || 0,
+    commits: Number(u.commits) || 0,
+    focusMinutes: Number(u.focus_minutes) || 0,
+    streak: Number(u.streak) || 0,
+    lastActive: u.last_active,
+  }));
 }
 
 export async function updateUserStats(stats: UserStats): Promise<UserStats[]> {
-  let users = await getLeaderboard();
-  const index = users.findIndex(u => u.id === stats.id);
-  
-  if (index >= 0) {
-    users[index] = { ...users[index], ...stats };
-  } else {
-    users.push(stats);
-  }
-  
-  // Sort and limit to top 100 to keep file size manageable
-  users.sort((a, b) => b.score - a.score);
-  users = users.slice(0, 100);
-
-  await fs.writeFile(DB_PATH, JSON.stringify(users, null, 2));
-  return users;
+  const supabase = getServerClient();
+  // Convert to snake_case for storage
+  const row = {
+    id: stats.id,
+    username: stats.username,
+    score: stats.score,
+    commits: stats.commits,
+    focus_minutes: stats.focusMinutes,
+    streak: stats.streak,
+    last_active: stats.lastActive,
+  };
+  const { error } = await supabase
+    .from('leaderboard')
+    .upsert(row, { onConflict: 'id' });
+  if (error) throw error;
+  return await getLeaderboard();
 }

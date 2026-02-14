@@ -88,17 +88,22 @@ class EventSystem {
    * In production, this would POST to an API
    */
   async sendToBackend(event) {
-    // Simulate network delay
-    // await new Promise(resolve => setTimeout(resolve, 100));
-    
-    // For now, we just log that we would have sent it
-    // logger.debug(`[Telemetry] Event emitted: ${event.type}`);
-    
-    // In a real implementation:
-    // const response = await fetch('https://api.autopilot.com/events', { ... });
-    // if (!response.ok) throw new Error('Network error');
-    
-    return true; 
+    const apiBase = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
+    const url = `${apiBase}/api/events`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3000);
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(event),
+        signal: controller.signal
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return true;
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 }
 
