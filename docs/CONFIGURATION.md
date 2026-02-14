@@ -49,7 +49,7 @@ This document reflects the current `.autopilotrc.json` options.
 - **Default:** true
 - **Description:** Push to `origin/<branch>` after commit.
 
-### `blockBranches`
+### `blockedBranches`
 - **Type:** string[]
 - **Default:** `["main", "master"]`
 - **Description:** Branches where auto-commit is disabled.
@@ -65,24 +65,27 @@ This document reflects the current `.autopilotrc.json` options.
 - **Description:** Shell commands executed sequentially when `requireChecks` is true.
 
 ### `commitMessageMode`
-- **Type:** `"smart" | "simple"`
+- **Type:** `"smart" | "simple" | "ai"`
 - **Default:** `"smart"`
-- **Description:** Smart uses file-based conventional commit messages; simple uses `chore: update changes`.
+- **Description:** 
+  - smart: file/diff-based conventional messages
+  - simple: `chore: update changes`
+  - ai: uses configured AI provider (Gemini or Grok)
 
 ### `teamMode`
 - **Type:** boolean
 - **Default:** `false`
 - **Description:** Enables pull-before-push and stricter conflict handling. Recommended for collaborative environments.
 
-### `maxFileSizeMB`
-- **Type:** number
-- **Default:** `50`
-- **Description:** Prevents committing files larger than this size (in MB).
-
-### `preventSecrets`
+### `preCommitChecks.fileSize`
 - **Type:** boolean
 - **Default:** `true`
-- **Description:** Scans staged files for common secret patterns (AWS keys, GitHub tokens) before committing.
+- **Description:** Prevent commits containing files larger than 50MB.
+
+### `preCommitChecks.secrets`
+- **Type:** boolean
+- **Default:** `true`
+- **Description:** Secret scan for common key/token patterns before committing.
 
 ---
 

@@ -9,8 +9,14 @@ export async function POST(request: Request) {
     }
     const supabase = getServerClient();
     const enriched = {
-      ...body,
-      receivedAt: new Date().toISOString(),
+      type: body.type,
+      user_id: body.userId ?? null,
+      commit_hash: body.commitHash ?? null,
+      timestamp: body.timestamp ?? null,
+      version: body.version ?? null,
+      queued_at: body.queuedAt ?? null,
+      retry_count: body.retryCount ?? 0,
+      received_at: new Date().toISOString(),
     };
     const { error } = await supabase.from('events').insert(enriched);
     if (error) {

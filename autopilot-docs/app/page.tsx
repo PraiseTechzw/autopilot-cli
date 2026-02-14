@@ -188,7 +188,7 @@ export default async function Home() {
             <Step
               number="2"
               title="Start Watching"
-              description="Start the background daemon. Autopilot will now monitor your files and sync changes automatically."
+              description="Start the foreground watcher. Autopilot will now monitor your files and sync changes automatically."
               command="autopilot start"
               icon={<Play className="h-5 w-5" />}
               reverse

@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
     apple: '/favicon.ico', // Ideally we should have a real apple-touch-icon
   },
-  manifest: '/manifest.json',
+  manifest: '/manifest.webmanifest',
   robots: {
     index: true,
     follow: true,

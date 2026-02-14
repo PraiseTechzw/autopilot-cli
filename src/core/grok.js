@@ -35,6 +35,8 @@ Rules:
 6. Return ONLY the commit message, no explanations or markdown code blocks.`;
 
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
     const response = await fetch(BASE_API_URL, {
       method: 'POST',
       headers: {
@@ -49,8 +51,10 @@ Rules:
         ],
         temperature: 0.2,
         stream: false
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
@@ -83,6 +87,8 @@ Rules:
  */
 async function validateGrokApiKey(apiKey) {
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
     const response = await fetch(BASE_API_URL, {
       method: 'POST',
       headers: {
@@ -93,8 +99,10 @@ async function validateGrokApiKey(apiKey) {
         model: DEFAULT_MODEL,
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 1
-      })
+      }),
+      signal: controller.signal
     });
+    clearTimeout(timeout);
 
     if (response.ok) return { valid: true };
     return { valid: false, error: `Status: ${response.status}` };

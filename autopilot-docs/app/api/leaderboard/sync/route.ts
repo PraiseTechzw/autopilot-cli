@@ -22,9 +22,18 @@ export async function POST(request: Request) {
     };
 
     const supabase = getServerClient();
+    const row = {
+      id: stats.id,
+      username: stats.username,
+      score: stats.score,
+      commits: stats.commits,
+      focus_minutes: stats.focusMinutes,
+      streak: stats.streak,
+      last_active: stats.lastActive,
+    };
     const { error: upsertError } = await supabase
       .from('leaderboard')
-      .upsert(stats, { onConflict: 'id' });
+      .upsert(row, { onConflict: 'id' });
     if (upsertError) {
       return NextResponse.json({ error: 'Failed to sync leaderboard' }, { status: 500 });
     }

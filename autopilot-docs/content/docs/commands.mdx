@@ -36,7 +36,7 @@ autopilot init --ai
 
 ## `autopilot start`
 
-Starts the background file watcher daemon.
+Starts the foreground file watcher.
 
 **Syntax:**
 ```bash
@@ -44,15 +44,16 @@ autopilot start
 ```
 
 **What it does:**
-*   Spawns a detached background process.
-*   Begins monitoring the current directory (and subdirectories) for file changes using `chokidar`.
-*   Respects `.gitignore` and `.autopilotrc.json` ignore rules.
+*   Runs a foreground watcher process in your terminal.
+*   Monitors the current directory (and subdirectories) for file changes using `chokidar`.
+*   Respects `.gitignore` and `.autopilotignore` rules.
 *   Automatically commits and pushes changes after the debounce period.
 
 **Common Output:**
 ```text
-🚀 Autopilot watcher started in background (PID: 12345)
-Logs: .autopilot/autopilot.log
+🚀 Starting Autopilot watcher…
+Logs: ./autopilot.log
+Press Ctrl+C to stop, or run "autopilot stop" in another terminal.
 ```
 
 ---
