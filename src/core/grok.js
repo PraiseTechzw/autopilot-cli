@@ -1,26 +1,68 @@
-/**
- * xAI Grok Integration for Autopilot
- * Generates commit messages using the Grok API
- */
-
 const logger = require('../utils/logger');
+const keys = require('./keys');
 
-const BASE_API_URL = 'https://api.x.ai/v1/chat/completions';
-const DEFAULT_MODEL = 'grok-beta'; // or current stable model
+const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
+
+const DEFAULT_GROK_MODEL = 'grok-beta';
+const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 /**
- * Generate a commit message using Grok API
+ * Generate a commit message using Grok (or Groq) API with automatic failover
  * @param {string} diff - The git diff content
- * @param {string} apiKey - xAI API Key
- * @param {string} [model] - Grok Model ID
+ * @param {string} [customApiKey] - Optional user-provided API Key
+ * @param {string} [model] - Model ID
  * @returns {Promise<string>} Generated commit message
  */
-async function generateGrokCommitMessage(diff, apiKey, model = DEFAULT_MODEL) {
+async function generateGrokCommitMessage(diff, customApiKey, model) {
   if (!diff || !diff.trim()) {
     return 'chore: update changes';
   }
 
-  // Truncate diff to avoid token limits (safe limit)
+  // If a custom key is provided, use it directly
+  if (customApiKey) {
+    return await executeRequest(diff, customApiKey, model);
+  }
+
+  // System Key Logic with Failover
+  let attempts = 0;
+  const maxAttempts = keys.keyCount;
+
+  while (attempts < maxAttempts) {
+    const currentKey = keys.getSystemKey();
+    if (!currentKey || currentKey.includes('placeholder')) {
+      throw new Error('No valid system AI keys configured.');
+    }
+
+    try {
+      return await executeRequest(diff, currentKey, model);
+    } catch (error) {
+      const isRateLimit = error.message.includes('429');
+      const isInvalid = error.message.includes('401') || error.message.includes('403');
+
+      if (isRateLimit || isInvalid) {
+        keys.markKeyAsFailed(currentKey);
+        attempts++;
+        logger.info(`Attempt ${attempts}/${maxAttempts} failed. Trying next key...`);
+        continue;
+      }
+      
+      throw error;
+    }
+  }
+
+  throw new Error('All internal AI keys exhausted or rate-limited.');
+}
+
+/**
+ * Internal execution of the API request
+ */
+async function executeRequest(diff, apiKey, model) {
+  const isGroq = apiKey.startsWith('gsk_');
+  const baseUrl = isGroq ? GROQ_API_URL : GROK_API_URL;
+  const defaultModel = isGroq ? DEFAULT_GROQ_MODEL : DEFAULT_GROK_MODEL;
+  const targetModel = model || defaultModel;
+
   const truncatedDiff = diff.length > 30000 ? diff.slice(0, 30000) + '\n...(truncated)' : diff;
 
   const systemPrompt = `You are an expert software engineer.
@@ -60,43 +102,63 @@ Rules:
       const errorData = await response.json().catch(() => ({}));
       throw new Error(`Grok API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
     }
+  const response = await fetch(baseUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: targetModel,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: `Diff:\n${truncatedDiff}` }
+      ],
+      temperature: 0.2,
+      stream: false
+    })
+  });
 
-    const data = await response.json();
-    
-    if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
-      throw new Error('No response content from Grok');
-    }
-
-    let message = data.choices[0].message.content.trim();
-    
-    // Cleanup markdown if present
-    message = message.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '').trim();
-
-    return message;
-
-  } catch (error) {
-    logger.error(`Grok Generation failed: ${error.message}`);
-    throw error;
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const msg = errorData.error?.message || response.statusText;
+    throw new Error(`${isGroq ? 'Groq' : 'Grok'} API Error: ${response.status} ${msg}`);
   }
+
+  const data = await response.json();
+  
+  if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
+    throw new Error(`No response content from ${isGroq ? 'Groq' : 'Grok'}`);
+  }
+
+  let message = data.choices[0].message.content.trim();
+  
+  // Cleanup markdown if present
+  message = message.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '').trim();
+
+  return message;
 }
 
 /**
- * Validate Grok API Key
- * @param {string} apiKey 
- * @returns {Promise<{valid: boolean, error?: string}>}
+ * Validate API Key
  */
 async function validateGrokApiKey(apiKey) {
+  const isGroq = apiKey.startsWith('gsk_');
+  const baseUrl = isGroq ? GROQ_API_URL : GROK_API_URL;
+  const model = isGroq ? DEFAULT_GROQ_MODEL : DEFAULT_GROK_MODEL;
+
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 4000);
     const response = await fetch(BASE_API_URL, {
+    const response = await fetch(baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: DEFAULT_MODEL,
+        model: model,
         messages: [{ role: 'user', content: 'test' }],
         max_tokens: 1
       }),
@@ -105,13 +167,16 @@ async function validateGrokApiKey(apiKey) {
     clearTimeout(timeout);
 
     if (response.ok) return { valid: true };
-    return { valid: false, error: `Status: ${response.status}` };
+    const errorData = await response.json().catch(() => ({}));
+    return { valid: false, error: errorData.error?.message || `Status: ${response.status}` };
   } catch (error) {
     return { valid: false, error: error.message };
   }
 }
 
+
 module.exports = {
   generateGrokCommitMessage,
   validateGrokApiKey
 };
+

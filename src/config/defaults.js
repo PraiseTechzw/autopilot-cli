@@ -10,16 +10,17 @@ const DEFAULT_CONFIG = {
   blockedBranches: ['main', 'master'],
   requireChecks: false,
   checks: [],
-  commitMessageMode: 'smart', // smart | simple | ai
+  commitMessageMode: 'ai', // Default to AI for zero-config
   ai: {
-    enabled: false,
-    provider: 'gemini', // gemini | grok
+    enabled: true, // Enabled by default
+    provider: 'grok', // Grok is the default for our system keys
     apiKey: '', 
     grokApiKey: '',
-    model: 'gemini-2.5-flash', // default for gemini
-    grokModel: 'grok-beta', // default for grok
-    interactive: true
+    model: 'grok-beta',
+    grokModel: 'grok-beta',
+    interactive: true // Prompt user to review AI messages by default
   },
+
   // Phase 1: Team Mode
   teamMode: false,
   pullBeforePush: true,
