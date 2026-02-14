@@ -18,20 +18,30 @@ const HistoryManager = require('./history');
  */
 async function generateCommitMessage(files, diffContent, config = {}) {
   let message = '';
+  
+  // Default to smart mode if not explicitly set (preserves unit tests)
+  // Real usage will usually have a config object with defaults from defaults.js
+  const mode = config.commitMessageMode || 'smart';
+  const aiEnabled = config.ai?.enabled !== false; 
+
+
   if (!files || files.length === 0) {
     message = 'chore: update changes';
-  } else if (config.commitMessageMode === 'ai' && config.ai?.enabled) {
+  } else if (mode === 'simple') {
+    message = 'chore: auto-commit changes';
+  } else if (mode === 'ai' && aiEnabled) {
     // AI Mode
     try {
-      const provider = config.ai.provider || 'gemini';
+      // Default to grok as it supports our internal key pool strategy
+      const provider = config.ai?.provider || 'grok';
       logger.info(`Generating AI commit message using ${provider}...`);
       
       if (provider === 'grok') {
-        if (!config.ai.grokApiKey) throw new Error('Grok API Key not configured');
-        message = await grok.generateGrokCommitMessage(diffContent, config.ai.grokApiKey, config.ai.grokModel);
+        // use custom key if provided, otherwise the internal pool in grok.js will handle it
+        message = await grok.generateGrokCommitMessage(diffContent, config.ai?.grokApiKey, config.ai?.grokModel);
       } else {
-        // Default to Gemini
-        if (!config.ai.apiKey) throw new Error('Gemini API Key not configured');
+        // Gemini fallback (requires user key)
+        if (!config.ai?.apiKey) throw new Error('Gemini API Key not configured');
         message = await gemini.generateAICommitMessage(diffContent, config.ai.apiKey, config.ai.model);
       }
     } catch (error) {
@@ -39,9 +49,11 @@ async function generateCommitMessage(files, diffContent, config = {}) {
       message = generateSmartCommitMessage(files, diffContent);
     }
   } else {
-    // Smart Mode (Default)
+    // Smart Mode (Fallback)
     message = generateSmartCommitMessage(files, diffContent);
   }
+
+
 
   // Prepend [autopilot] tag for traceability (Phase 1 req)
   const finalMessage = `[autopilot] ${message}`;

@@ -55,28 +55,32 @@ describe('Full System E2E Integration', () => {
       autoPush: true, 
       debounceSeconds: 1, // Fast debounce
       minSecondsBetweenCommits: 0,
+<<<<<<< HEAD
       commitMessageMode: 'ai', // <--- REQUIRED for AI generation
       blockedBranches: [], // ensure e2e runs on 'master'
+=======
+      commitMessageMode: 'ai',
+>>>>>>> 3b494c48f6884625d6cdb6eece61e2a80f56ba2f
       ai: {
         enabled: true,
-        provider: 'gemini',
-        apiKey: 'test-gemini-key'
+        provider: 'grok' // New default
       }
     });
 
-    // Mock AI Generation
+    // Mock AI Generation (Grok/Groq OpenAI style)
     mock.method(global, 'fetch', async (url) => {
       return {
         ok: true,
         json: async () => ({
-          candidates: [{
-            content: {
-              parts: [{ text: 'feat: e2e test change' }]
+          choices: [{
+            message: {
+              content: 'feat: e2e test change'
             }
           }]
         })
       };
     });
+
   });
 
   afterEach(async () => {
@@ -110,7 +114,7 @@ describe('Full System E2E Integration', () => {
      await watcher.start();
 
     // Verify Config Loaded
-    assert.strictEqual(watcher.config.ai.provider, 'gemini', 'Should load global config');
+    assert.strictEqual(watcher.config.ai.provider, 'grok', 'Should load global config');
     assert.strictEqual(watcher.config.debounceSeconds, 1, 'Should load fast debounce');
 
     // Wait for Chokidar to settle
@@ -120,8 +124,9 @@ describe('Full System E2E Integration', () => {
     // Make Change
     console.log('Writing test file...');
     // Verify Config Loaded
-     assert.strictEqual(watcher.config.ai.provider, 'gemini', 'Should load global config');
+     assert.strictEqual(watcher.config.ai.provider, 'grok', 'Should load global config');
      assert.strictEqual(watcher.config.debounceSeconds, 1, 'Should load fast debounce');
+
 
      // Trigger Change
      console.log('Writing test file...');
