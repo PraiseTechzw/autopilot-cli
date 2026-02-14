@@ -14,7 +14,7 @@
   },
   {
     "title": "Fixed",
-    "route": "/docs/changelog#fixed-1",
+    "route": "/docs/changelog#fixed",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -63,7 +63,7 @@
   },
   {
     "title": "Fixed",
-    "route": "/docs/changelog#fixed",
+    "route": "/docs/changelog#fixed-1",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -194,6 +194,27 @@
     "level": 2
   },
   {
+    "title": "`autopilot leaderboard`",
+    "route": "/docs/commands#autopilot-leaderboard",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "Sync your latest stats",
+    "route": "/docs/commands#sync-your-latest-stats",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 1
+  },
+  {
+    "title": "View rankings",
+    "route": "/docs/commands#view-rankings",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 1
+  },
+  {
     "title": "Configuration",
     "description": "Customize Autopilot CLI behavior using configuration files.",
     "route": "/docs/configuration",
@@ -207,8 +228,8 @@
     "level": 2
   },
   {
-    "title": "AI Configuration",
-    "route": "/docs/configuration#ai-configuration",
+    "title": "AI Configuration & Privacy Disclosure",
+    "route": "/docs/configuration#ai-configuration--privacy-disclosure",
     "type": "heading",
     "parentTitle": "Configuration",
     "level": 3
@@ -354,7 +375,7 @@
   },
   {
     "title": "Introduction",
-    "description": "Intelligent Git automation that commits and pushes your code, so you can focus on building.",
+    "description": "An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.",
     "route": "/docs",
     "type": "page"
   },
@@ -602,6 +623,20 @@
     "level": 3
   },
   {
+    "title": "Global Leaderboard (Opt-In)",
+    "route": "/docs/productivity#global-leaderboard-opt-in",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 2
+  },
+  {
+    "title": "Privacy & Trust Rules",
+    "route": "/docs/productivity#privacy--trust-rules",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
     "title": "Dashboard Visualization",
     "route": "/docs/productivity#dashboard-visualization",
     "type": "heading",
@@ -682,6 +717,13 @@
     "description": "How Autopilot CLI protects your code and git history.",
     "route": "/docs/safety",
     "type": "page"
+  },
+  {
+    "title": "Non-Negotiable Guarantees",
+    "route": "/docs/safety#non-negotiable-guarantees",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
   },
   {
     "title": "Why Safety Rails Exist",

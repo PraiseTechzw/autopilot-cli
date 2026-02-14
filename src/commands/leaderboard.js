@@ -4,8 +4,8 @@ const { getGitStats, calculateMetrics } = require('./insights');
 const logger = require('../utils/logger');
 const crypto = require('crypto');
 
-// Default API URL (can be overridden by config)
-const DEFAULT_API_URL = 'http://localhost:3000';
+// Default API URL (can be overridden by env)
+const DEFAULT_API_URL = 'https://autopilot-cli.vercel.app';
 
 async function calculateFocusTime(repoPath) {
   const logPath = path.join(repoPath, 'autopilot.log');
