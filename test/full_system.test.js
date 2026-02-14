@@ -56,6 +56,7 @@ describe('Full System E2E Integration', () => {
       debounceSeconds: 1, // Fast debounce
       minSecondsBetweenCommits: 0,
       commitMessageMode: 'ai', // <--- REQUIRED for AI generation
+      blockedBranches: [], // ensure e2e runs on 'master'
       ai: {
         enabled: true,
         provider: 'gemini',

@@ -68,7 +68,8 @@ test('CLI Integration', async (t) => {
     await fs.writeJson(path.join(tmpDir, '.autopilotrc.json'), {
       debounceSeconds: 1,
       minSecondsBetweenCommits: 0,
-      autoPush: false
+      autoPush: false,
+      blockedBranches: [] // allow commits on default branch
     });
 
     // Create initial commit
