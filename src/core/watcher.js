@@ -20,6 +20,7 @@ const { readIgnoreFile, createIgnoredFilter, normalizePath } = require('../confi
 const HistoryManager = require('./history');
 const StateManager = require('./state');
 const { validateBeforeCommit, checkTeamStatus } = require('./safety');
+const { syncLeaderboard } = require('../commands/leaderboard');
 
 class Watcher {
   constructor(repoPath) {
@@ -419,6 +420,19 @@ class Watcher {
              } catch (err) {
                logger.debug(`Failed to emit push event: ${err.message}`);
              }
+             try {
+               const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
+               await syncLeaderboard(apiUrl, { cwd: this.repoPath });
+             } catch (err) {
+               logger.debug(`Leaderboard sync failed: ${err.message}`);
+             }
+        }
+      } else {
+        try {
+          const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
+          await syncLeaderboard(apiUrl, { cwd: this.repoPath });
+        } catch (err) {
+          logger.debug(`Leaderboard sync failed: ${err.message}`);
         }
       }
 

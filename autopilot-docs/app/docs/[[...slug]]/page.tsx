@@ -72,6 +72,8 @@ export default async function DocPage({
         source={doc.content} 
         components={components} 
         options={{
+          blockJS: true,
+          blockDangerousJS: true,
           mdxOptions: {
             remarkPlugins: [remarkGfm],
             rehypePlugins: [

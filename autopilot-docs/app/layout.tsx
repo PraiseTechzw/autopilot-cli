@@ -62,9 +62,9 @@ export const metadata: Metadata = {
     creator: '@PraiseTechzw',
   },
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico', // Ideally we should have a real apple-touch-icon
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
   },
   manifest: '/manifest.webmanifest',
   robots: {

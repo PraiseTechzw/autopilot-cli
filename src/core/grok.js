@@ -1,6 +1,14 @@
 const logger = require('../utils/logger');
 const keys = require('./keys');
 
+// Resolve fetch at call-time so test mocks can override it
+function getFetch() {
+  if (typeof globalThis.fetch === 'function') {
+    return globalThis.fetch;
+  }
+  return (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+}
+
 const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
@@ -15,13 +23,11 @@ const DEFAULT_GROQ_MODEL = 'llama-3.3-70b-versatile';
  * @returns {Promise<string>} Generated commit message
  */
 async function generateGrokCommitMessage(diff, customApiKey, model) {
-  if (!diff || !diff.trim()) {
-    return 'chore: update changes';
-  }
+  if (!diff || !diff.trim()) return 'chore: update changes';
 
   // If a custom key is provided, use it directly
   if (customApiKey) {
-    return await executeRequest(diff, customApiKey, model);
+    return executeRequest(diff, customApiKey, model);
   }
 
   // System Key Logic with Failover
@@ -30,6 +36,7 @@ async function generateGrokCommitMessage(diff, customApiKey, model) {
 
   while (attempts < maxAttempts) {
     const currentKey = keys.getSystemKey();
+
     if (!currentKey || currentKey.includes('placeholder')) {
       throw new Error('No valid system AI keys configured.');
     }
@@ -37,8 +44,9 @@ async function generateGrokCommitMessage(diff, customApiKey, model) {
     try {
       return await executeRequest(diff, currentKey, model);
     } catch (error) {
-      const isRateLimit = error.message.includes('429');
-      const isInvalid = error.message.includes('401') || error.message.includes('403');
+      const msg = String(error?.message || error);
+      const isRateLimit = msg.includes(' 429') || msg.includes('429');
+      const isInvalid = msg.includes(' 401') || msg.includes('401') || msg.includes(' 403') || msg.includes('403');
 
       if (isRateLimit || isInvalid) {
         keys.markKeyAsFailed(currentKey);
@@ -46,7 +54,7 @@ async function generateGrokCommitMessage(diff, customApiKey, model) {
         logger.info(`Attempt ${attempts}/${maxAttempts} failed. Trying next key...`);
         continue;
       }
-      
+
       throw error;
     }
   }
@@ -63,7 +71,8 @@ async function executeRequest(diff, apiKey, model) {
   const defaultModel = isGroq ? DEFAULT_GROQ_MODEL : DEFAULT_GROK_MODEL;
   const targetModel = model || defaultModel;
 
-  const truncatedDiff = diff.length > 30000 ? diff.slice(0, 30000) + '\n...(truncated)' : diff;
+  const truncatedDiff =
+    diff.length > 30000 ? diff.slice(0, 30000) + '\n...(truncated)' : diff;
 
   const systemPrompt = `You are an expert software engineer.
 Generate a concise, standardized commit message following the Conventional Commits specification based on the provided git diff.
@@ -76,67 +85,79 @@ Rules:
 5. Use types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert.
 6. Return ONLY the commit message, no explanations or markdown code blocks.`;
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 5000);
-    const response = await fetch(BASE_API_URL, {
+    const response = await getFetch()(baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: model,
+        model: targetModel,
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `Diff:\n${truncatedDiff}` }
+          { role: 'user', content: `Diff:\n${truncatedDiff}` },
         ],
         temperature: 0.2,
-        stream: false
+        stream: false,
       }),
-      signal: controller.signal
+      signal: controller.signal,
     });
-    clearTimeout(timeout);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(`Grok API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorData)}`);
+      let msg = response.statusText;
+      let parsed = null;
+
+      // Prefer JSON if available
+      try {
+        if (typeof response.json === 'function') {
+          parsed = await response.json().catch(() => null);
+        }
+      } catch {}
+
+      if (parsed && typeof parsed === 'object') {
+        msg = parsed?.error?.message || msg;
+      } else {
+        // Fallback to text only if supported
+        let text = '';
+        if (typeof response.text === 'function') {
+          text = await response.text().catch(() => '');
+          try {
+            const errorData = text ? JSON.parse(text) : {};
+            msg = errorData?.error?.message || msg;
+          } catch {
+            if (text) msg = text.slice(0, 500);
+          }
+        }
+      }
+
+      throw new Error(`${isGroq ? 'Groq' : 'Grok'} API Error: ${response.status} ${msg}`);
     }
-  const response = await fetch(baseUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: targetModel,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: `Diff:\n${truncatedDiff}` }
-      ],
-      temperature: 0.2,
-      stream: false
-    })
-  });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const msg = errorData.error?.message || response.statusText;
-    throw new Error(`${isGroq ? 'Groq' : 'Grok'} API Error: ${response.status} ${msg}`);
+    const data = await response.json();
+
+    const content = data?.choices?.[0]?.message?.content;
+    if (!content) {
+      throw new Error(`No response content from ${isGroq ? 'Groq' : 'Grok'}`);
+    }
+
+    // Strip markdown fences if the model ignores instructions
+    return String(content)
+      .trim()
+      .replace(/^```[a-z]*\n?/i, '')
+      .replace(/\n?```$/i, '')
+      .trim();
+  } catch (error) {
+    if (error?.name === 'AbortError') {
+      throw new Error(`${isGroq ? 'Groq' : 'Grok'} API Error: request timed out`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  const data = await response.json();
-  
-  if (!data.choices || data.choices.length === 0 || !data.choices[0].message) {
-    throw new Error(`No response content from ${isGroq ? 'Groq' : 'Grok'}`);
-  }
-
-  let message = data.choices[0].message.content.trim();
-  
-  // Cleanup markdown if present
-  message = message.replace(/^```[a-z]*\n?/, '').replace(/\n?```$/, '').trim();
-
-  return message;
 }
 
 /**
@@ -147,36 +168,38 @@ async function validateGrokApiKey(apiKey) {
   const baseUrl = isGroq ? GROQ_API_URL : GROK_API_URL;
   const model = isGroq ? DEFAULT_GROQ_MODEL : DEFAULT_GROK_MODEL;
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 4000);
+
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const response = await fetch(BASE_API_URL, {
-    const response = await fetch(baseUrl, {
+    const response = await getFetch()(baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: model,
+        model,
         messages: [{ role: 'user', content: 'test' }],
-        max_tokens: 1
+        max_tokens: 1,
+        stream: false,
       }),
-      signal: controller.signal
+      signal: controller.signal,
     });
-    clearTimeout(timeout);
 
     if (response.ok) return { valid: true };
-    const errorData = await response.json().catch(() => ({}));
-    return { valid: false, error: errorData.error?.message || `Status: ${response.status}` };
+
+    // Always report status code for deterministic tests
+    return { valid: false, error: `Status: ${response.status}` };
   } catch (error) {
-    return { valid: false, error: error.message };
+    if (error?.name === 'AbortError') return { valid: false, error: 'Request timed out' };
+    return { valid: false, error: String(error?.message || error) };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
-
 module.exports = {
   generateGrokCommitMessage,
-  validateGrokApiKey
+  validateGrokApiKey,
 };
-

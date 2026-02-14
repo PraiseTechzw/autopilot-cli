@@ -55,7 +55,8 @@ describe('Full System E2E Integration', () => {
       autoPush: true, 
       debounceSeconds: 1, // Fast debounce
       minSecondsBetweenCommits: 0,
-      commitMessageMode: 'ai',
+      commitMessageMode: 'ai', // REQUIRED for AI generation
+      blockedBranches: [], // ensure e2e runs on 'master'
       ai: {
         enabled: true,
         provider: 'grok' // New default
