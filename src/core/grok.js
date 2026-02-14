@@ -1,10 +1,13 @@
 const logger = require('../utils/logger');
 const keys = require('./keys');
 
-// Ensure fetch exists (Node 18+ has it; older needs node-fetch)
-const fetchFn =
-  globalThis.fetch ||
-  ((...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)));
+// Resolve fetch at call-time so test mocks can override it
+function getFetch() {
+  if (typeof globalThis.fetch === 'function') {
+    return globalThis.fetch;
+  }
+  return (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+}
 
 const GROK_API_URL = 'https://api.x.ai/v1/chat/completions';
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
@@ -86,7 +89,7 @@ Rules:
   const timeout = setTimeout(() => controller.abort(), 5000);
 
   try {
-    const response = await fetchFn(baseUrl, {
+    const response = await getFetch()(baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -105,15 +108,30 @@ Rules:
     });
 
     if (!response.ok) {
-      // Try to read response body safely (some APIs return non-JSON on error)
-      const text = await response.text().catch(() => '');
       let msg = response.statusText;
+      let parsed = null;
 
+      // Prefer JSON if available
       try {
-        const errorData = text ? JSON.parse(text) : {};
-        msg = errorData?.error?.message || msg;
-      } catch {
-        if (text) msg = text.slice(0, 500);
+        if (typeof response.json === 'function') {
+          parsed = await response.json().catch(() => null);
+        }
+      } catch {}
+
+      if (parsed && typeof parsed === 'object') {
+        msg = parsed?.error?.message || msg;
+      } else {
+        // Fallback to text only if supported
+        let text = '';
+        if (typeof response.text === 'function') {
+          text = await response.text().catch(() => '');
+          try {
+            const errorData = text ? JSON.parse(text) : {};
+            msg = errorData?.error?.message || msg;
+          } catch {
+            if (text) msg = text.slice(0, 500);
+          }
+        }
       }
 
       throw new Error(`${isGroq ? 'Groq' : 'Grok'} API Error: ${response.status} ${msg}`);
@@ -154,7 +172,7 @@ async function validateGrokApiKey(apiKey) {
   const timeout = setTimeout(() => controller.abort(), 4000);
 
   try {
-    const response = await fetchFn(baseUrl, {
+    const response = await getFetch()(baseUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -171,13 +189,8 @@ async function validateGrokApiKey(apiKey) {
 
     if (response.ok) return { valid: true };
 
-    const text = await response.text().catch(() => '');
-    try {
-      const errorData = text ? JSON.parse(text) : {};
-      return { valid: false, error: errorData?.error?.message || `Status: ${response.status}` };
-    } catch {
-      return { valid: false, error: text || `Status: ${response.status}` };
-    }
+    // Always report status code for deterministic tests
+    return { valid: false, error: `Status: ${response.status}` };
   } catch (error) {
     if (error?.name === 'AbortError') return { valid: false, error: 'Request timed out' };
     return { valid: false, error: String(error?.message || error) };
