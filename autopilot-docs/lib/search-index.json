@@ -6,6 +6,41 @@
     "type": "page"
   },
   {
+    "title": "[2.2.0] - 2026-02-14",
+    "route": "/docs/changelog#220---2026-02-14",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Added",
+    "route": "/docs/changelog#added",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Improved",
+    "route": "/docs/changelog#improved",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Docs/Website",
+    "route": "/docs/changelog#docswebsite",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Tests",
+    "route": "/docs/changelog#tests",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
     "title": "[2.0.1] - 2026-02-05",
     "route": "/docs/changelog#201---2026-02-05",
     "type": "heading",
@@ -28,14 +63,14 @@
   },
   {
     "title": "Added",
-    "route": "/docs/changelog#added",
+    "route": "/docs/changelog#added-1",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
   },
   {
     "title": "Docs/Website",
-    "route": "/docs/changelog#docswebsite",
+    "route": "/docs/changelog#docswebsite-1",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
