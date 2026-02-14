@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     description: 'Stop worrying about commits. Autopilot CLI watches your changes and syncs them automatically with safety rails.',
     images: [
       {
-        url: '/og-image.png',
+        url: '/og-image.svg',
         width: 1200,
         height: 630,
         alt: 'Autopilot CLI Banner',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Autopilot CLI',
     description: 'Intelligent Git automation with safety rails. Focus on code, not commits.',
-    images: ['/og-image.png'],
+    images: ['/og-image.svg'],
     creator: '@PraiseTechzw',
   },
   icons: {
