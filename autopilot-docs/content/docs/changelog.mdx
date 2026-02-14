@@ -3,6 +3,28 @@ title: Changelog
 description: Latest updates and improvements to Autopilot CLI.
 ---
 
+## [2.2.0] - 2026-02-14
+
+### Added
+- **Automatic Leaderboard Sync**:
+  - Watcher auto-syncs stats after commit or push using site API.
+- **Durable Backend Storage**:
+  - Leaderboard and events stored in Supabase with normalized schema.
+- **Events API**:
+  - Ingests `push_success` from CLI and stores telemetry.
+
+### Improved
+- **Config Consistency**: Standardized `blockedBranches` and loader back-compat.
+- **AI Provider Hardening**: Added request timeouts; doctor validates keys.
+- **Programmatic Imports**: Fixed command imports wiring in CLI.
+
+### Docs/Website
+- **Metadata & Assets**: Added OG image and proper favicon; corrected manifest path.
+- **Foreground Watcher**: Updated wording on homepage and commands.
+
+### Tests
+- **Grok Parity**: Added Grok tests mirroring Gemini coverage.
+
 Stay up to date with the latest changes to Autopilot CLI. For a full history of releases, visit our [GitHub Releases](https://github.com/PraiseTechzw/autopilot-cli/releases) page.
 
 ## [2.0.1] - 2026-02-05

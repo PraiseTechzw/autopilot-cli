@@ -1,5 +1,36 @@
 # Changelog
 
+## [2.2.0] - 2026-02-14
+
+### Added
+- **Automatic Leaderboard Sync**:
+  - Watcher auto-syncs stats after commit or push.
+  - Uses site API with anonymized ID and metrics only.
+- **Durable Backend Storage**:
+  - Website API backed by Supabase for persistent leaderboard and event telemetry.
+- **Events API**:
+  - CLI emits `push_success` events with commit hash and identity.
+  - Website ingests and stores normalized payloads.
+
+### Improved
+- **Config Consistency**:
+  - Standardized `blockedBranches` with backward-compat mapping.
+- **AI Network Resilience**:
+  - Added request timeouts to Gemini/Grok; doctor validates connectivity.
+- **Programmatic Imports**:
+  - Fixed command imports wiring in `src/index.js`.
+
+### Docs/Website
+- **OG Image & Favicon**:
+  - Added `public/og-image.svg` and `public/favicon.svg`.
+  - Corrected manifest path to `/manifest.webmanifest`.
+- **Foreground Watcher Wording**:
+  - Updated homepage and commands to reflect foreground behavior.
+
+### Tests
+- **Grok Test Coverage**:
+  - Added parity tests mirroring Gemini scenarios.
+
 All notable changes to this project will be documented in this file.
 This project follows [Semantic Versioning](https://semver.org).
 
