@@ -1,5 +1,27 @@
 # Changelog
 
+## [2.3.0] - 2026-02-18
+
+### Added
+- **Production-Ready Leaderboard**:
+  - Implemented secure Row-Level Security (RLS) policies for anonymized stat synchronization.
+  - Enhanced API response to include real-time global ranking.
+- **Searchable Documentation**:
+  - Added full-text search capability to the documentation portal using a pre-built static index.
+
+### Improved
+- **Error Diagnostics**:
+  - CLI now provides detailed feedback for server-side errors during sync (no more generic 500 errors).
+  - Synchronous environment validation for Supabase credentials on the server.
+- **AI Reliability**:
+  - Improved Grok API error parsing for rate limits and invalid tokens.
+  - Optimized fetch timeouts for better responsiveness in low-bandwidth environments.
+
+### Fixed
+- **CLI Stability**:
+  - Fixed sync failures caused by rigid database permission checks.
+  - Resolved potential crashes when parsing malformed `autopilot.log` entries.
+
 ## [2.2.0] - 2026-02-14
 
 ### Added
