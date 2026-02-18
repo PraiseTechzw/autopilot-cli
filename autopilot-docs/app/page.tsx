@@ -168,6 +168,66 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      +
+      +      {/* Commands Reference */}
+      +      <section className="py-24 px-4 bg-background">
+        +        <div className="container mx-auto max-w-6xl">
+          +          <div className="text-center mb-16">
+            +            <h2 className="text-3xl md:text-4xl font-bold mb-4">Command Reference</h2>
+            +            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              +              Master every aspect of the Autopilot CLI with this comprehensive command list.
+              +            </p>
+            +          </div>
+          +
+          +          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            +            <CommandCard
++              command="autopilot init"
+            +              description="Setup safety rails and configuration for your repository."
+            +              group="Setup"
++            />
+            +            <CommandCard
++              command="autopilot start"
+            +              description="Start the intelligent foreground watcher."
+            +              group="Core"
++            />
+            +            <CommandCard
++              command="autopilot dashboard"
+            +              description="Open the real-time TUI dashboard."
+            +              group="Visibility"
++            />
+            +            <CommandCard
++              command="autopilot insights"
+            +              description="View productivity metrics and quality scores."
+            +              group="Analytics"
++            />
+            +            <CommandCard
++              command="autopilot leaderboard"
+            +              description="Sync and view your global ranking."
+            +              group="Social"
++            />
+            +            <CommandCard
++              command="autopilot undo"
+            +              description="Safely revert the last automated commit."
+            +              group="Safety"
++            />
+            +            <CommandCard
++              command="autopilot doctor"
+            +              description="Diagnose environment and setup issues."
+            +              group="Maintenance"
++            />
+            +            <CommandCard
++              command="autopilot guide"
+            +              description="Interactive walk-through of the tool."
+            +              group="Education"
++            />
+            +            <CommandCard
++              command="autopilot config"
+            +              description="Manage local and global configurations."
+            +              group="Advanced"
++            />
+            +          </div>
+          +        </div>
+        +      </section>
 
       {/* Features */}
       <FeatureShowcase />
@@ -243,4 +303,26 @@ function PrincipleCard({ icon: Icon, title, description, color, bg }: { icon: an
     </div>
   );
 }
+
+function CommandCard({ command, description, group }: { command: string, description: string, group: string }) {
+  return (
+    <div className="group p-6 bg-card rounded-2xl border border-border hover:border-link/30 hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+      <div>
+        <div className="flex justify-between items-start mb-4">
+          <span className="px-2 py-1 rounded-md bg-secondary text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+            {group}
+          </span>
+          <div className="h-2 w-2 rounded-full bg-link group-hover:animate-pulse" />
+        </div>
+        <div className="font-mono text-sm bg-black/5 dark:bg-white/5 p-3 rounded-lg mb-4 border border-border group-hover:bg-link/5 transition-colors">
+          <span className="text-link">$</span> {command}
+        </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {description}
+        </p>
+      </div>
+    </div>
+  );
+}
+
 

@@ -14,6 +14,7 @@ const doctor = require('../src/commands/doctor');
 const presetCommand = require('../src/commands/preset');
 const configCommand = require('../src/commands/config');
 const interactiveCommand = require('../src/commands/interactive');
+const guideCommand = require('../src/commands/guide');
 const pkg = require('../package.json');
 const logger = require('../src/utils/logger');
 const { checkForUpdate } = require('../src/utils/update-check');
@@ -32,7 +33,8 @@ const commands = {
   doctor: doctor,
   preset: presetCommand,
   config: configCommand,
-  interactive: interactiveCommand
+  interactive: interactiveCommand,
+  guide: guideCommand
 };
 
 // Runtime assertion to prevent wiring errors
@@ -129,6 +131,11 @@ program
   .description('Toggle AI Safety Mode (on = prompt, off = automated)')
   .option('-g, --global', 'Set the preference globally')
   .action(interactiveCommand);
+
+program
+  .command('guide')
+  .description('Interactive guide to using Autopilot')
+  .action(guideCommand);
 
 program
   .command('doctor')
