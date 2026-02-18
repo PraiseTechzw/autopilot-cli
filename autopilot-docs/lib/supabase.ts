@@ -13,9 +13,15 @@ export function getAnonClient(): SupabaseClient {
 
 export function getServerClient(): SupabaseClient {
   if (cachedServiceClient) return cachedServiceClient;
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+  if (!serviceKey) {
+    console.warn('⚠️ SUPABASE_SERVICE_ROLE_KEY is missing. Falling back to ANON_KEY. Some operations may fail due to RLS.');
+  }
+
   const key = serviceKey || anonKey;
   cachedServiceClient = createClient(url, key);
   return cachedServiceClient;
