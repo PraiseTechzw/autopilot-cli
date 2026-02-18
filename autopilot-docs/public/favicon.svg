@@ -1,16 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
   <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#3B82F6"/>
-      <stop offset="50%" stop-color="#6366F1"/>
-      <stop offset="100%" stop-color="#A855F7"/>
+    <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8B5CF6;stop-opacity:1" />
     </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#0B1220"/>
-  <rect width="64" height="64" rx="14" fill="url(#g)" opacity="0.22"/>
-  <g transform="translate(12,12)">
-    <path d="M20 0c1.1 0 2 .9 2 2v8h6a2 2 0 0 1 0 4h-6v8a2 2 0 0 1-4 0v-8h-6a2 2 0 0 1 0-4h6V2c0-1.1.9-2 2-2z" fill="#FFFFFF"/>
-    <circle cx="28" cy="28" r="8" fill="none" stroke="#FFFFFF" stroke-width="2"/>
-    <path d="M28 22v6l4 2" stroke="#FFFFFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+  
+  <!-- Modern Rounded Square Background -->
+  <rect width="128" height="128" rx="32" fill="#0F172A" />
+  
+  <!-- Abstract "A" / Wing Shape -->
+  <path d="M34 94 L64 34 L94 94 M49 74 L79 74" 
+        stroke="url(#brandGradient)" 
+        stroke-width="8" 
+        fill="none" 
+        stroke-linecap="round" 
+        stroke-linejoin="round"
+        opacity="0.3" />
+        
+  <!-- Primary Icon: Futuristic Paper Plane / Git Branch Hybrid -->
+  <g transform="translate(64, 64) scale(1.2)">
+    <!-- Trail -->
+    <path d="M-25,15 Q-10,0 10,-10" 
+          stroke="url(#brandGradient)" 
+          stroke-width="4" 
+          fill="none" 
+          stroke-linecap="round" 
+          stroke-dasharray="1,6" />
+          
+    <!-- Main Wing Body -->
+    <path d="M-20,-10 L25,0 L-10,10 L-15,25 L-5,10 L-20,10 Z" 
+          fill="url(#brandGradient)" 
+          filter="url(#glow)" />
+          
+    <!-- Git Node Representation -->
+    <circle cx="25" cy="0" r="4" fill="#FFFFFF" />
   </g>
+  
+  <!-- Subtle UI Accents -->
+  <rect x="25" y="25" width="10" height="2" rx="1" fill="#FFFFFF" opacity="0.4" />
+  <rect x="25" y="32" width="20" height="2" rx="1" fill="#FFFFFF" opacity="0.2" />
 </svg>

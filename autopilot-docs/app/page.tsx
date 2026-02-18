@@ -272,6 +272,79 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Developer First Experience */}
+      <section className="py-24 px-4 bg-muted/10 border-t border-border">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold mb-8 leading-tight">
+                Built for the <br />
+                <span className="text-link">Modern Developer.</span>
+              </h2>
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+                Autopilot is a companion, not a replacement. We handle the mundane gift-wrapping of your code so you can stay in the zone.
+              </p>
+
+              <div className="space-y-6">
+                {[
+                  { title: "Flow Preservation", desc: "No more breaking context to write 'fix' or 'wip' commits." },
+                  { title: "Standard Enforcement", desc: "Automatically adheres to conventional commit standards." },
+                  { title: "Conflict Intelligence", desc: "Senses git conflicts before they happen and yields control." }
+                ].map((item, idx) => (
+                  <div key={idx} className="flex gap-4">
+                    <div className="h-6 w-6 rounded-full bg-link/10 flex items-center justify-center text-link shrink-0">
+                      <span className="text-xs font-bold">{idx + 1}</span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-foreground">{item.title}</h4>
+                      <p className="text-sm text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+              <div className="relative bg-black rounded-2xl p-8 border border-white/10 shadow-2xl overflow-hidden">
+                <div className="flex gap-1.5 mb-6">
+                  <div className="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+                </div>
+
+                <div className="font-mono space-y-3">
+                  <div className="flex gap-2 text-blue-400">
+                    <span className="opacity-50">1</span>
+                    <span>$ autopilot start</span>
+                  </div>
+                  <div className="flex gap-2 text-gray-400">
+                    <span className="opacity-50">2</span>
+                    <span className="text-green-500">✓ Detected 4 file changes</span>
+                  </div>
+                  <div className="flex gap-2 text-gray-400">
+                    <span className="opacity-50">3</span>
+                    <span className="text-yellow-500">⚠ Debounce active (2.4s remaining)</span>
+                  </div>
+                  <div className="flex gap-2 text-gray-400 border-l-2 border-link/30 pl-3 ml-2">
+                    <span className="opacity-50">4</span>
+                    <span className="text-blue-300 italic">// AI generating commit message...</span>
+                  </div>
+                  <div className="flex gap-2 text-gray-400">
+                    <span className="opacity-50">5</span>
+                    <span className="text-white">feat: add focus-mode state management</span>
+                  </div>
+                  <div className="flex gap-2 text-gray-400">
+                    <span className="opacity-50">6</span>
+                    <span className="text-green-500">✅ Pushed to feat/v2-enhancements</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer is handled by layout */}
     </div>
   );

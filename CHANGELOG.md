@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.4.0] - 2026-02-18
+
+### Added
+- **Intelligent Guide System**: New `autopilot guide` command for interactive onboarding and documentation.
+- **Enhanced Visual Identity**: Modernized branding and professional documentation aesthetics.
+- **Premium Command Reference**: Redesigned website command library with grouped categories and interactive cards.
+
+### Improved
+- **Developer Experience**: Added explicit guide callouts in the documentation hero section.
+- **Onboarding Flow**: Simplified the initial setup path for new users.
+
 ## [2.3.0] - 2026-02-18
 
 ### Added
