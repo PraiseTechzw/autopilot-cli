@@ -5,7 +5,7 @@ import { UserStats } from '@/lib/leaderboard';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    
+
     // Basic validation
     if (!body.id || !body.username) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -34,8 +34,14 @@ export async function POST(request: Request) {
     const { error: upsertError } = await supabase
       .from('leaderboard')
       .upsert(row, { onConflict: 'id' });
+
     if (upsertError) {
-      return NextResponse.json({ error: 'Failed to sync leaderboard' }, { status: 500 });
+      console.error('Supabase upsert error:', upsertError);
+      return NextResponse.json({
+        error: 'Failed to sync leaderboard',
+        details: upsertError.message,
+        hint: 'Check if RLS policies allow upsert or if SUPABASE_SERVICE_ROLE_KEY is missing.'
+      }, { status: 500 });
     }
 
     const { data: all, error: fetchError } = await supabase
@@ -43,13 +49,16 @@ export async function POST(request: Request) {
       .select('id,score')
       .order('score', { ascending: false })
       .limit(100);
+
     if (fetchError || !all) {
-      return NextResponse.json({ success: true });
+      console.warn('Leaderboard fetch error or empty:', fetchError);
+      return NextResponse.json({ success: true, rank: null });
     }
+
     const rank = (all.findIndex(u => u.id === stats.id) + 1) || null;
     return NextResponse.json({ success: true, rank });
   } catch (error) {
-    console.error('Failed to sync leaderboard:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error('Failed to sync leaderboard (Catch):', error);
+    return NextResponse.json({ error: 'Internal server error', details: error instanceof Error ? error.message : String(error) }, { status: 500 });
   }
 }

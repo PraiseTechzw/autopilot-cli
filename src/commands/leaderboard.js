@@ -94,7 +94,14 @@ async function syncLeaderboard(apiUrl, options) {
     });
 
     if (!response.ok) {
-      throw new Error(`Server responded with ${response.status}`);
+      let errorDetail = '';
+      try {
+        const errJson = await response.json();
+        errorDetail = errJson.details || errJson.error || '';
+      } catch (e) {
+        // Not a JSON error
+      }
+      throw new Error(`Server responded with ${response.status}${errorDetail ? ': ' + errorDetail : ''}`);
     }
 
     const data = await response.json();
