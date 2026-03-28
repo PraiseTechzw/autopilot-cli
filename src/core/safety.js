@@ -203,8 +203,23 @@ const checkTeamStatus = async (repoPath, config) => {
   return { ok: true, action: 'continue' };
 };
 
+/**
+ * Check if the current branch is protected
+ * @param {string} branchName 
+ * @param {object} config 
+ * @returns {boolean}
+ */
+const isProtectedBranch = (branchName, config) => {
+  const defaultProtected = ["main", "master", "production", "prod", "release"];
+  const userProtected = config.protectedBranches || [];
+  const protectedBranches = [...new Set([...defaultProtected, ...userProtected])];
+  
+  return protectedBranches.includes(branchName);
+};
+
 module.exports = {
   validateConfig,
   validateBeforeCommit,
-  checkTeamStatus
+  checkTeamStatus,
+  isProtectedBranch
 };

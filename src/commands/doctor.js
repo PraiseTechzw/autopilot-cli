@@ -1,159 +1,133 @@
 /**
- * Command: doctor
- * Diagnoses potential issues with the repository and environment
+ * Autopilot doctor command - Environmental health checks
+ * Built by Praise Masunga (PraiseTechzw)
  */
 
+const execa = require('execa');
 const fs = require('fs-extra');
 const path = require('path');
-const process = require('process');
-const execa = require('execa');
-const logger = require('../utils/logger');
+const { validateConfig } = require('../core/configValidator');
 const git = require('../core/git');
+const safety = require('../core/safety');
 
-const doctor = async () => {
-  const repoPath = process.cwd();
+async function doctor() {
+  const root = process.cwd();
+  console.log('\n  Autopilot doctor');
+  console.log('  ─────────────────────────────');
+
   let issues = 0;
 
-  logger.section('Autopilot Doctor');
-  logger.info('Diagnosing environment...');
+  // 1. Node version >= 18
+  const nodeVersion = process.version;
+  const major = parseInt(nodeVersion.slice(1).split('.')[0]);
+  if (major >= 18) {
+    console.log(`  [PASS] Node.js version: ${nodeVersion} (>=18 required)`);
+  } else {
+    console.log(`  [FAIL] Node.js version: ${nodeVersion} (>=18 required)`);
+    issues++;
+  }
 
-  // 1. Check Git installation
+  // 2. Git installed
   try {
     const { stdout } = await execa('git', ['--version']);
-    logger.success(`Git installed: ${stdout.trim()}`);
-  } catch (error) {
-    logger.error('Git is not installed or not in PATH.');
+    console.log(`  [PASS] Git installed: ${stdout.trim()}`);
+  } catch (err) {
+    console.log(`  [FAIL] Git not found`);
     issues++;
   }
 
-  // 2. Check valid repository
+  // 3. Inside git repo
   try {
-    const { stdout } = await execa('git', ['rev-parse', '--is-inside-work-tree'], { cwd: repoPath });
-    if (stdout.trim() === 'true') {
-      logger.success('Valid Git repository detected');
-    } else {
-      logger.error('Not inside a Git repository.');
-      issues++;
-      return; // Stop further checks if not a repo
-    }
-  } catch (error) {
-    logger.error('Not inside a Git repository.');
-    issues++;
-    return;
-  }
-
-  // 3. Check remote origin
-  try {
-    const { stdout } = await execa('git', ['remote', 'get-url', 'origin'], { cwd: repoPath });
-    const remoteUrl = stdout.trim();
-    logger.success(`Remote 'origin' found: ${remoteUrl}`);
-
-    // Check remote type
-    if (remoteUrl.startsWith('http')) {
-      let hasHelper = false;
-      try {
-        const { stdout: helper } = await execa('git', ['config', '--get', 'credential.helper'], { cwd: repoPath });
-        if (helper.trim()) hasHelper = true;
-      } catch (e) { /* ignore */ }
-
-      if (hasHelper) {
-        logger.success('Remote uses HTTPS with credential helper configured.');
-      } else {
-        logger.warn('Remote uses HTTPS. Ensure credential helper is configured for non-interactive push.');
-      }
-    } else if (remoteUrl.startsWith('git@') || remoteUrl.startsWith('ssh://')) {
-      logger.success('Remote uses SSH (recommended).');
-    } else {
-      logger.info('Remote uses unknown protocol.');
-    }
-  } catch (error) {
-    logger.warn('No remote \'origin\' configured. Auto-push will fail.');
+    await execa('git', ['rev-parse', '--is-inside-work-tree']);
+    console.log(`  [PASS] Inside a git repo: yes`);
+  } catch (err) {
+    console.log(`  [FAIL] Inside a git repo: no`);
     issues++;
   }
 
-  // 4. Check branch name
-  const branch = await git.getBranch(repoPath);
-  if (branch) {
-    logger.info(`Current branch: ${branch}`);
-    if (branch === 'main' || branch === 'master') {
-      logger.warn('You are on the main/master branch. It is recommended to work on feature branches.');
-      issues++;
-    }
+  // 4. .autopilotrc.json exists and valid
+  const configPath = path.join(root, '.autopilotrc.json');
+  let config = null;
+  if (!fs.existsSync(configPath)) {
+    console.log(`  [FAIL] .autopilotrc.json not found`);
+    issues++;
   } else {
-    logger.error('Could not detect current branch.');
-    issues++;
-  }
-
-  // 5. Check .env in .gitignore
-  const envPath = path.join(repoPath, '.env');
-  if (await fs.pathExists(envPath)) {
     try {
-      // Check if ignored by git
-      await execa('git', ['check-ignore', '.env'], { cwd: repoPath });
-      logger.success('.env is properly ignored.');
-    } catch (error) {
-      // Exit code 1 means not ignored
-      logger.warn('SECURITY WARNING: .env file exists but is NOT ignored by git!');
-      logger.info('Add .env to your .gitignore file immediately.');
+      config = fs.readJsonSync(configPath);
+      const validation = validateConfig(config);
+      if (validation.valid) {
+        console.log(`  [PASS] .autopilotrc.json found and valid`);
+      } else {
+        console.log(`  [FAIL] .autopilotrc.json has errors: ${validation.errors[0]}`);
+        issues++;
+      }
+    } catch (err) {
+      console.log(`  [FAIL] .autopilotrc.json is not valid JSON`);
       issues++;
     }
   }
 
-  // 6. Check remote status (ahead/behind)
-  try {
-    const remoteStatus = await git.isRemoteAhead(repoPath);
-    if (remoteStatus.ok) {
-      if (remoteStatus.behind) {
-        logger.warn('Your branch is behind remote. You should pull changes before starting autopilot.');
-        issues++;
-      } else if (remoteStatus.ahead) {
-        logger.info('Your branch is ahead of remote. Autopilot will push these changes.');
-      } else {
-        logger.success('Branch is up to date with remote.');
-      }
+  // 5. AI API key present
+  const geminiKey = config?.aiApiKey || process.env.GEMINI_API_KEY;
+  const grokKey = config?.aiApiKey || process.env.GROK_API_KEY; // Actually need to know which one to check
+  const hasKey = (config?.aiProvider === 'gemini' && geminiKey) || 
+                 (config?.aiProvider === 'grok' && grokKey) ||
+                 (config?.aiProvider === 'none');
+  
+  if (config) {
+    if (config.aiProvider === 'none') {
+      console.log(`  [PASS] Rule-based commit messages enabled (No AI provider)`);
+    } else if (!hasKey) {
+      console.log(`  [FAIL] AI API key missing for provider: ${config.aiProvider}`);
+      issues++;
     } else {
-      // Could be no upstream configured, which is fine for local-only initially
-      logger.info('Could not check remote status (upstream might not be set).');
+      console.log(`  [PASS] AI API key present for provider: ${config.aiProvider}`);
     }
-  } catch (error) {
-    logger.info('Skipping remote status check.');
   }
 
-  // Summary
-  console.log(''); // newline
-  if (issues === 0) {
-    logger.success('Diagnosis complete. No issues found. You are ready to fly! ✈️');
-  } else {
-    logger.warn(`Diagnosis complete. Found ${issues} potential issue(s).`);
-  }
-
-  // 7. AI Connectivity (if enabled)
+  // 6. Remote origin reachable (5s timeout)
   try {
-    const { loadConfig } = require('../config/loader');
-    const config = await loadConfig(repoPath);
-    if (config?.ai?.enabled) {
-      logger.section('AI Connectivity');
-      if (config.ai.provider === 'grok') {
-        const { validateGrokApiKey } = require('../core/grok');
-        const result = await validateGrokApiKey(config.ai.grokApiKey);
-        if (result.valid) logger.success('Grok API reachable and key looks valid.');
-        else {
-          logger.warn(`Grok API check failed: ${result.error}`);
-          issues++;
-        }
+    await execa('git', ['ls-remote', 'origin'], { timeout: 5000 });
+    const { stdout: remoteUrl } = await execa('git', ['remote', 'get-url', 'origin']);
+    console.log(`  [PASS] Remote origin reachable: ${remoteUrl.trim()}`);
+  } catch (err) {
+    console.log(`  [FAIL] Remote origin not reachable (check network or auth)`);
+    issues++;
+  }
+
+  // 7. Current branch vs protected branches
+  try {
+    const branch = await git.getBranch(root);
+    if (branch && config) {
+      const isProtected = safety.isProtectedBranch(branch, config);
+      if (isProtected) {
+        console.log(`  [FAIL] Current branch "${branch}" is protected — pushes will be blocked`);
+        issues++;
       } else {
-        const { validateApiKey } = require('../core/gemini');
-        const result = await validateApiKey(config.ai.apiKey);
-        if (result.valid) logger.success('Gemini API reachable and key looks valid.');
-        else {
-          logger.warn(`Gemini API check failed: ${result.error}`);
-          issues++;
-        }
+        console.log(`  [PASS] Current branch "${branch}" is not protected`);
       }
     }
-  } catch (error) {
-    // ignore AI check failures
+  } catch (err) {}
+
+  // 8. Retry queue status
+  const queuePath = path.join(root, '.autopilot-queue.json');
+  if (fs.existsSync(queuePath)) {
+    try {
+       const queue = fs.readJsonSync(queuePath);
+       console.log(`  [INFO] Retry queue: ${queue.length} pending jobs`);
+    } catch (err) {
+       console.log(`  [WARN] Could not read .autopilot-queue.json`);
+    }
+  } else {
+     console.log(`  [PASS] Retry queue: 0 pending jobs`);
   }
-};
+
+  console.log('  ─────────────────────────────');
+  if (issues > 0) {
+    console.log(`  ${issues} issues found. Run "autopilot init" to reconfigure.`);
+  } else {
+    console.log('  Everything looks good! Autopilot is ready to fly.');
+  }
+}
 
 module.exports = doctor;

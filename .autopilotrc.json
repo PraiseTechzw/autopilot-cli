@@ -1,12 +1,11 @@
 {
-  "debounceSeconds": 20,
-  "minSecondsBetweenCommits": 180,
-  "autoPush": true,
-  "blockBranches": [
-    "main",
-    "master"
-  ],
-  "requireChecks": false,
-  "checks": [],
-  "commitMessageMode": "smart"
+  "watchPath": ".",
+  "debounceMs": 20000,
+  "aiProvider": "none",
+  "aiApiKey": "",
+  "protectedBranches": ["main", "master", "production"],
+  "allowPushToProtected": false,
+  "notificationsEnabled": true,
+  "maxRetryAttempts": 5,
+  "ignorePaths": [".git", "node_modules", ".autopilot-state.json", ".autopilot-queue.json"]
 }

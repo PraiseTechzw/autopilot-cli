@@ -9,6 +9,8 @@ const gemini = require('./gemini');
 const grok = require('./grok');
 const HistoryManager = require('./history');
 
+const { generateRuleBasedMessage } = require('./commitMessageGenerator');
+
 /**
  * Generate a conventional commit message based on diff analysis
  * @param {Array<{status: string, file: string}>} files - Array of changed file objects
@@ -19,57 +21,42 @@ const HistoryManager = require('./history');
 async function generateCommitMessage(files, diffContent, config = {}) {
   let message = '';
   
-  // Default to smart mode if not explicitly set (preserves unit tests)
-  // Real usage will usually have a config object with defaults from defaults.js
   const mode = config.commitMessageMode || 'smart';
-  const aiEnabled = config.ai?.enabled !== false; 
-
+  const aiProvider = config.aiProvider || config.ai?.provider || 'none';
+  const aiApiKey = config.aiApiKey || config.ai?.apiKey;
 
   if (!files || files.length === 0) {
-    message = 'chore: update changes';
+    message = 'update: minor changes';
   } else if (mode === 'simple') {
-    message = 'chore: auto-commit changes';
-  } else if (mode === 'ai' && aiEnabled) {
+    message = 'update: auto-commit changes';
+  } else if (aiProvider !== 'none' && aiApiKey) {
     // AI Mode
     try {
-      // Default to grok as it supports our internal key pool strategy
-      const provider = config.ai?.provider || 'grok';
-      logger.info(`Generating AI commit message using ${provider}...`);
+      logger.info(`Generating AI commit message using ${aiProvider}...`);
       
-      if (provider === 'grok') {
-        // use custom key if provided, otherwise the internal pool in grok.js will handle it
-        message = await grok.generateGrokCommitMessage(diffContent, config.ai?.grokApiKey, config.ai?.grokModel);
+      if (aiProvider === 'grok') {
+        message = await grok.generateGrokCommitMessage(diffContent, aiApiKey, config.ai?.grokModel);
       } else {
-        // Gemini fallback (requires user key)
-        if (!config.ai?.apiKey) throw new Error('Gemini API Key not configured');
-        message = await gemini.generateAICommitMessage(diffContent, config.ai.apiKey, config.ai.model);
+        message = await gemini.generateAICommitMessage(diffContent, aiApiKey, config.ai?.model);
+      }
+
+      if (!message || message.length < 3) {
+        throw new Error('AI returned empty or invalid message');
       }
     } catch (error) {
-      logger.warn(`AI generation failed (${error.message}), falling back to smart generation.`);
-      message = generateSmartCommitMessage(files, diffContent);
+      logger.warn(`AI generation failed (${error.message}), falling back to rule-based generation.`);
+      message = generateRuleBasedMessage(files);
     }
   } else {
-    // Smart Mode (Fallback)
-    message = generateSmartCommitMessage(files, diffContent);
+    // Rule-based Fallback
+    message = generateRuleBasedMessage(files);
   }
 
-
-
-  // Prepend [autopilot] tag for traceability (Phase 1 req)
-  const finalMessage = `[autopilot] ${message}`;
+  // Ensure message is trimmed and not too long (git convention 72 chars for first line)
+  // But we might have a body, so we only trim the first line if needed, 
+  // though generateRuleBasedMessage already handles it.
   
-  // Record history
-  try {
-    const root = process.cwd();
-    const historyManager = new HistoryManager(root);
-    // We don't have the hash yet, but we will update it or store it after commit
-    // Actually, we should probably return just the message here and let the caller (watcher) handle history.
-    // However, the prompt says "Tag all commits with [autopilot] prefix".
-  } catch (err) {
-    // ignore history errors here
-  }
-
-  return finalMessage;
+  return message;
 }
 
 /**

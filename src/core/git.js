@@ -151,17 +151,44 @@ async function isRemoteAhead(root) {
  * Push changes to remote
  * @param {string} root - Repository root path
  * @param {string} [branch] - Branch to push (optional, defaults to current)
- * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string, conflict?: boolean}>} Result object
  */
 async function push(root, branch) {
   try {
     const targetBranch = branch || await getBranch(root);
     if (!targetBranch) throw new Error('Could not determine branch to push');
 
+    // 1. Fetch updates
+    await fetch(root);
+
+    // 2. Check if behind
+    const { stdout: behindCountStr } = await execa('git', ['rev-list', 'HEAD..origin/' + targetBranch, '--count'], { cwd: root }).catch(() => ({ stdout: '0' }));
+    const behindCount = parseInt(behindCountStr.trim(), 10);
+
+    if (behindCount > 0) {
+      // 3. Try rebase
+      try {
+        await execa('git', ['pull', '--rebase', 'origin', targetBranch], { cwd: root });
+      } catch (err) {
+        if (err.stdout?.includes('CONFLICT') || err.stderr?.includes('CONFLICT')) {
+          return { ok: false, stdout: '', stderr: 'Rebase conflict detected — manual intervention required', conflict: true };
+        }
+        throw err;
+      }
+    }
+
+    // 4. Push
     const { stdout, stderr } = await execa('git', ['push', 'origin', targetBranch], { cwd: root });
     return { ok: true, stdout, stderr };
   } catch (error) {
-    return { ok: false, stdout: '', stderr: error.message };
+    const stderr = error.stderr || error.message || '';
+    if (stderr.includes('CONFLICT')) {
+      return { ok: false, stdout: '', stderr: 'Rebase conflict detected — manual intervention required', conflict: true };
+    }
+    if (error.exitCode === 128 && stderr.includes('rejected')) {
+      return { ok: false, stdout: '', stderr: 'Push rejected: remote has diverged. Try manual rebase.', conflict: true };
+    }
+    return { ok: false, stdout: '', stderr };
   }
 }
 

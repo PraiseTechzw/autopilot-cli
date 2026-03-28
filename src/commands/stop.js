@@ -3,6 +3,8 @@
  * Stops the running Autopilot instance
  */
 
+const fs = require('fs');
+const path = require('path');
 const process = require('process');
 const logger = require('../utils/logger');
 const { getRunningPid, removePid } = require('../utils/process');
@@ -28,8 +30,14 @@ const stop = async () => {
       
       logger.success('Autopilot stopped successfully.');
       
-      // Cleanup PID file
+      // Cleanup files
       await removePid(repoPath);
+      
+      const statePath = path.join(repoPath, '.autopilot-state.json');
+      const logPath = path.join(repoPath, '.autopilot.log');
+      
+      if (fs.existsSync(statePath)) fs.unlinkSync(statePath);
+      if (fs.existsSync(logPath)) fs.unlinkSync(logPath);
       
     } catch (error) {
       if (error.code === 'ESRCH') {

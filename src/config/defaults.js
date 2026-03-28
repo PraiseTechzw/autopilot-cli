@@ -4,29 +4,26 @@
  */
 
 const DEFAULT_CONFIG = {
-  debounceSeconds: 20,
+  watchPath: '.',
+  debounceMs: 20000,
+  aiProvider: 'none',
+  aiApiKey: '',
+  protectedBranches: ['main', 'master', 'production', 'prod', 'release'],
+  allowPushToProtected: false,
+  notificationsEnabled: true,
+  maxRetryAttempts: 5,
+  ignorePaths: ['.git', 'node_modules', '.autopilot-state.json', '.autopilot-queue.json'],
+  
+  // Legacy/Internal
   minSecondsBetweenCommits: 180,
   autoPush: true,
-  blockedBranches: ['main', 'master'],
   requireChecks: false,
   checks: [],
-  commitMessageMode: 'ai', // Default to AI for zero-config
-  ai: {
-    enabled: true, // Enabled by default
-    provider: 'grok', // Grok is the default for our system keys
-    apiKey: '', 
-    grokApiKey: '',
-    model: 'grok-beta',
-    grokModel: 'grok-beta',
-    interactive: true // Prompt user to review AI messages by default
-  },
-
-  // Phase 1: Team Mode
+  commitMessageMode: 'ai',
   teamMode: false,
   pullBeforePush: true,
   conflictStrategy: 'abort',
   maxUnpushedCommits: 5,
-  // Phase 1: Pre-commit checks
   preCommitChecks: {
     secrets: true,
     fileSize: true,

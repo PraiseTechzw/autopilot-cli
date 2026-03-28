@@ -1,7 +1,9 @@
-/**
- * Simple logger utility for consistent CLI output
- * Built by Praise Masunga (PraiseTechzw)
- */
+const fs = require('fs');
+const path = require('path');
+
+const LOG_FILE = '.autopilot.log';
+const MAX_LOG_SIZE = 500 * 1024; // 500KB
+const KEEP_LINES = 200;
 
 const logger = {
   colors: {
@@ -13,56 +15,63 @@ const logger = {
     bold: (text) => `\x1b[1m${text}\x1b[0m`
   },
 
-  /**
-   * Log informational message
-   * @param {string} message - Message to log
-   */
-  info: (message) => {
-    console.log(`${logger.colors.cyan('ℹ️')}  ${message}`);
+  _writeToFile: (message) => {
+    try {
+      const logPath = path.join(process.cwd(), LOG_FILE);
+      const timestamp = new Date().toISOString();
+      const line = `[${timestamp}] ${message}\n`;
+      
+      // Check size and rotate if needed
+      if (fs.existsSync(logPath)) {
+        const stats = fs.statSync(logPath);
+        if (stats.size > MAX_LOG_SIZE) {
+          const content = fs.readFileSync(logPath, 'utf8');
+          const lines = content.split('\n');
+          const keptLines = lines.slice(-KEEP_LINES).join('\n');
+          fs.writeFileSync(logPath, keptLines + '\n');
+        }
+      }
+      
+      fs.appendFileSync(logPath, line);
+    } catch (err) {
+      // Silent fail for logging errors
+    }
   },
 
-  /**
-   * Log debug message (only visible if DEBUG env var is set)
-   * @param {string} message - Message to log
-   */
+  info: (message) => {
+    console.log(`${logger.colors.cyan('ℹ️')}  ${message}`);
+    logger._writeToFile(`INFO: ${message}`);
+  },
+
   debug: (message) => {
     if (process.env.DEBUG) {
       console.log(`${logger.colors.blue('🔍')} ${message}`);
     }
+    logger._writeToFile(`DEBUG: ${message}`);
   },
 
-  /**
-   * Log success message
-   * @param {string} message - Message to log
-   */
   success: (message) => {
     console.log(`${logger.colors.green('✅')} ${message}`);
+    logger._writeToFile(`SUCCESS: ${message}`);
   },
 
-  /**
-   * Log warning message
-   * @param {string} message - Message to log
-   */
   warn: (message) => {
     console.warn(`${logger.colors.yellow('⚠️')}  ${message}`);
+    logger._writeToFile(`WARN: ${message}`);
   },
 
-  /**
-   * Log error message
-   * @param {string} message - Message to log
-   */
   error: (message) => {
     console.error(`${logger.colors.red('❌')} ${message}`);
+    logger._writeToFile(`ERROR: ${message}`);
   },
 
-  /**
-   * Log section header
-   * @param {string} title - Section title
-   */
   section: (title) => {
+    const sep = '─'.repeat(50);
     console.log(`\n${logger.colors.bold(logger.colors.cyan(title))}`);
-    console.log(logger.colors.cyan('─'.repeat(50)));
+    console.log(logger.colors.cyan(sep));
+    logger._writeToFile(`SECTION: ${title}`);
   },
 };
 
 module.exports = logger;
+

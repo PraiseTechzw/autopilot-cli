@@ -1,0 +1,13 @@
+﻿
+  Autopilot doctor
+  ─────────────────────────────
+  [PASS] Node.js version: v25.3.0 (>=18 required)
+  [PASS] Git installed: git version 2.52.0.windows.1
+  [PASS] Inside a git repo: yes
+  [PASS] .autopilotrc.json found and valid
+  [PASS] Rule-based commit messages enabled (No AI provider)
+  [PASS] Remote origin reachable: https://github.com/PraiseTechzw/autopilot-cli.git
+  [FAIL] Current branch "main" is protected — pushes will be blocked
+  [PASS] Retry queue: 0 pending jobs
+  ─────────────────────────────
+  1 issues found. Run "autopilot init" to reconfigure.

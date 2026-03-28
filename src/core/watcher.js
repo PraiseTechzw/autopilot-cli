@@ -19,8 +19,11 @@ const { loadConfig } = require('../config/loader');
 const { readIgnoreFile, createIgnoredFilter, normalizePath } = require('../config/ignore');
 const HistoryManager = require('./history');
 const StateManager = require('./state');
-const { validateBeforeCommit, checkTeamStatus } = require('./safety');
+const { validateBeforeCommit, checkTeamStatus, isProtectedBranch } = require('./safety');
 const { syncLeaderboard } = require('../commands/leaderboard');
+const { validateConfig } = require('./configValidator');
+const { notify } = require('./notifier');
+const RetryQueue = require('./retryQueue');
 
 class Watcher {
   constructor(repoPath) {
@@ -33,12 +36,14 @@ class Watcher {
     this.maxWaitTimer = null;
     this.firstChangeTime = null;
     this.lastCommitAt = 0;
-    this.logFilePath = path.join(repoPath, 'autopilot.log');
+    this.logFilePath = path.join(repoPath, '.autopilot.log');
     this.ignorePatterns = [];
     this.ignoredFilter = null;
     this.focusEngine = new FocusEngine(repoPath);
     this.historyManager = new HistoryManager(repoPath);
     this.stateManager = new StateManager(repoPath);
+    this.retryQueue = new RetryQueue(repoPath, git.push.bind(git));
+    this.statePath = path.join(repoPath, '.autopilot-state.json');
   }
 
   logVerbose(message) {
@@ -72,6 +77,14 @@ class Watcher {
       
       // Load configuration
       await this.reloadConfig();
+      
+      // Validate configuration
+      const validation = validateConfig(this.config);
+      if (!validation.valid) {
+        logger.error(`Config error: ${validation.errors[0]}. Fix your .autopilotrc.json and try again.`);
+        process.exit(1);
+      }
+
       await this.reloadIgnore();
 
       // Initial safety check
@@ -111,6 +124,11 @@ class Watcher {
       logger.success(`Autopilot is watching ${this.repoPath}`);
       logger.info(`Logs: ${this.logFilePath}`);
       
+      // Heartbeat to update status file (for uptime/queue length)
+      this.heartbeatTimer = setInterval(() => {
+        this.updateStatusFile();
+      }, 5000);
+      
       // Test Mode Support
       if (process.env.AUTOPILOT_TEST_MODE) {
         logger.warn('TEST MODE: Running in foreground for test duration...');
@@ -143,6 +161,11 @@ class Watcher {
       if (this.maxWaitTimer) {
         clearTimeout(this.maxWaitTimer);
         this.maxWaitTimer = null;
+      }
+      
+      if (this.heartbeatTimer) {
+        clearInterval(this.heartbeatTimer);
+        this.heartbeatTimer = null;
       }
 
       if (this.watcher) {
@@ -180,7 +203,7 @@ class Watcher {
     }
 
     // Additional strict check for critical files just in case
-    if (relativePath.includes('.git/') || relativePath.endsWith('autopilot.log')) {
+    if (relativePath.includes('.git/') || relativePath.endsWith('.autopilot.log') || relativePath.endsWith('.autopilot-state.json')) {
         return;
     }
 
@@ -196,7 +219,7 @@ class Watcher {
    * Schedule processing with debounce
    */
   scheduleProcess() {
-    const debounceMs = (this.config?.debounceSeconds || 5) * 1000;
+    const debounceMs = this.config?.debounceMs || 20000;
     const maxWaitMs = (this.config?.maxWaitSeconds || 60) * 1000; // Default 60s max wait
     
     // Reset debounce timer
@@ -302,6 +325,9 @@ class Watcher {
         return;
       }
 
+      // Update state: processing
+      await this.updateStatusFile({ status: 'committing' });
+
       // 3. Safety: Branch check
       const branch = await git.getBranch(this.repoPath);
       if (this.config?.blockedBranches?.includes(branch)) {
@@ -311,9 +337,14 @@ class Watcher {
 
       // 4. Safety: Team Mode & Remote check
       logger.debug('Checking team/remote status...');
+      // Note: checkTeamStatus in safety.js also does pull --rebase if configured.
+      // But our updated git.push also handles it. We'll rely on git.push for the main logic
+      // but keep checkTeamStatus for initial safety.
       const teamStatus = await checkTeamStatus(this.repoPath, this.config);
       if (!teamStatus.ok) {
         logger.warn('Skip commit: Team check failed (Remote ahead or conflict).');
+        await this.updateStatusFile({ conflicts: 'Detected during team check' });
+        notify('conflict', { branch }, this.config.notificationsEnabled);
         return;
       }
 
@@ -341,24 +372,12 @@ class Watcher {
       // Add all changes
       await git.addAll(this.repoPath);
       
-      // Generate message
       const changedFiles = statusObj.files;
-      let message = 'chore: auto-commit changes';
+      let message = 'update: auto-commit changes';
 
-      if (this.config?.commitMessageMode !== 'simple') {
-        const diff = await git.getDiff(this.repoPath, true); // Staged diff
-        message = await generateCommitMessage(changedFiles, diff, this.config);
-      }
-
-      // Interactive Review (Skip in test mode if not mocked)
-      if (this.config?.ai?.interactive && !process.env.AUTOPILOT_TEST_MODE) {
-        const approval = await this.askApproval(message);
-        if (!approval.approved) {
-          logger.warn('Commit skipped by user.');
-          return;
-        }
-        message = approval.message;
-      }
+      // Always use AI if enabled, otherwise fallback to rule-based (handled in generateCommitMessage)
+      const diff = await git.getDiff(this.repoPath, true); // Staged diff
+      message = await generateCommitMessage(changedFiles, diff, this.config);
 
       // Add Trust/Attribution Trailers
       message = await addTrailers(message);
@@ -369,10 +388,10 @@ class Watcher {
         this.lastCommitAt = Date.now();
         this.focusEngine.onCommit();
         
-        // Phase 1: Record History
+        const hash = await git.getLatestCommitHash(this.repoPath);
+        
+        // Record history
         try {
-          // We need the hash of the commit we just made
-          const hash = await git.getLatestCommitHash(this.repoPath);
           if (hash) {
             this.historyManager.addCommit({
               hash,
@@ -384,6 +403,12 @@ class Watcher {
           logger.error(`Failed to record history: ${err.message}`);
         }
         
+        await this.updateStatusFile({
+          lastCommitHash: hash,
+          lastCommitMessage: message,
+          lastCommitAt: Date.now()
+        });
+
         logger.success('Commit complete');
       } else {
         logger.error(`Commit failed: ${commitResult.stderr}`);
@@ -393,53 +418,135 @@ class Watcher {
       // 7. Auto-push
       if (this.config?.autoPush) {
         logger.info('Pushing to remote...');
-        const pushResult = await git.push(this.repoPath);
+        
+        // Protected branch check
+        if (isProtectedBranch(branch, this.config) && !this.config.allowPushToProtected) {
+          logger.warn(`Autopilot paused — direct push to ${branch} is blocked. Set allowPushToProtected: true in .autopilotrc.json to override.`);
+          await this.updateStatusFile({ status: 'watching', branch: `${branch} (PROTECTED)` });
+          return;
+        }
+
+        await this.updateStatusFile({ status: 'pushing' });
+        const pushResult = await git.push(this.repoPath, branch);
+        
         if (!pushResult.ok) {
-             logger.warn(`Push failed: ${pushResult.stderr}`);
-             
-             // Safety: Pause on critical push failures (Auth, Permissions, or Persistent errors)
-             // This aligns with "Failure Behavior: If a push fails -> pause watcher"
-             logger.error('Push failed! Pausing Autopilot to prevent issues.');
-             this.stateManager.pause(`Push failed: ${pushResult.stderr.split('\n')[0]}`);
-             logger.info('Run "autopilot resume" to restart after fixing the issue.');
+          if (pushResult.conflict) {
+             logger.error('Rebase conflict detected — manual intervention required');
+             this.stateManager.pause(`Conflict in ${branch}`);
+             await this.updateStatusFile({ status: 'paused', conflicts: `Conflict in ${branch}` });
+             notify('conflict', { branch }, this.config.notificationsEnabled);
+             return;
+          }
+
+          logger.warn(`Push failed: ${pushResult.stderr}. Queuing for retry.`);
+          const latestHash = await git.getLatestCommitHash(this.repoPath);
+          this.retryQueue.add({
+            commitHash: latestHash,
+            branch: branch,
+            maxAttempts: this.config.maxRetryAttempts || 5
+          });
+          
+          await this.updateStatusFile({ 
+            status: 'watching', 
+            lastPushStatus: 'queued',
+            queueLength: this.retryQueue.queue.length 
+          });
+          notify('push_failed', {}, this.config.notificationsEnabled);
         } else {
-             logger.success('Push complete');
-             
-             // Emit Event for Leaderboard/Telemetry
-             try {
-               const identity = await getIdentity();
-               const latestHash = await git.getLatestCommitHash(this.repoPath);
-               
-               await eventSystem.emit({
-                 type: 'push_success',
-                 userId: identity.id,
-                 commitHash: latestHash,
-                 timestamp: Date.now(),
-                 version: version
-               });
-             } catch (err) {
-               logger.debug(`Failed to emit push event: ${err.message}`);
-             }
-             try {
-               const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
-               await syncLeaderboard(apiUrl, { cwd: this.repoPath });
-             } catch (err) {
-               logger.debug(`Leaderboard sync failed: ${err.message}`);
-             }
+          logger.success('Push complete');
+          const latestHash = await git.getLatestCommitHash(this.repoPath);
+          
+          await this.updateStatusFile({ 
+            status: 'watching', 
+            lastPushHash: latestHash,
+            lastPushStatus: 'succeeded',
+            lastPushAt: Date.now()
+          });
+          notify('push_success', { commitMessage: message }, this.config.notificationsEnabled);
+
+          // Emit Event for Leaderboard/Telemetry
+          try {
+            const identity = await getIdentity();
+            await eventSystem.emit({
+              type: 'push_success',
+              userId: identity.id,
+              commitHash: latestHash,
+              timestamp: Date.now(),
+              version: version
+            });
+          } catch (err) {
+            logger.debug(`Failed to emit push event: ${err.message}`);
+          }
         }
-      } else {
-        try {
-          const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
-          await syncLeaderboard(apiUrl, { cwd: this.repoPath });
-        } catch (err) {
-          logger.debug(`Leaderboard sync failed: ${err.message}`);
-        }
+      }
+      
+      // Cleanup
+      await this.updateStatusFile({ status: 'watching' });
+      
+      // Sync leaderboard
+      try {
+        const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
+        await syncLeaderboard(apiUrl, { cwd: this.repoPath });
+      } catch (err) {
+        logger.debug(`Leaderboard sync failed: ${err.message}`);
       }
 
     } catch (error) {
       logger.error(`Process error: ${error.message}`);
     } finally {
       this.isProcessing = false;
+    }
+  }
+  /**
+   * Update the external status file for the status command
+   */
+  async updateStatusFile(updates = {}) {
+    try {
+      let state = {};
+      if (fs.existsSync(this.statePath)) {
+        state = fs.readJsonSync(this.statePath);
+      }
+
+      if (!this.startedAt) this.startedAt = Date.now();
+
+      const branch = await git.getBranch(this.repoPath);
+      const uptime = Math.floor((Date.now() - this.startedAt) / 1000);
+      
+      const newState = {
+        pid: process.pid,
+        startedAt: new Date(this.startedAt).toISOString(),
+        branch: branch,
+        isProtected: isProtectedBranch(branch, this.config),
+        status: updates.status || state.status || 'watching',
+        lastCommit: updates.lastCommit || state.lastCommit || null,
+        lastPush: updates.lastPush || state.lastPush || null,
+        queueLength: this.retryQueue ? this.retryQueue.queue.length : 0,
+        conflicts: !!(updates.conflicts || state.conflicts),
+        watchPath: this.repoPath,
+        uptime: uptime
+      };
+
+      // Handle special updates like lastCommitHash/Message to the new structure
+      if (updates.lastCommitHash) {
+        newState.lastCommit = {
+          hash: updates.lastCommitHash,
+          message: updates.lastCommitMessage,
+          timestamp: new Date(updates.lastCommitAt || Date.now()).toISOString()
+        };
+      }
+
+      if (updates.lastPushStatus) {
+        newState.lastPush = {
+          hash: updates.lastPushHash || (newState.lastCommit ? newState.lastCommit.hash : null),
+          success: updates.lastPushStatus === 'succeeded',
+          timestamp: new Date(updates.lastPushAt || Date.now()).toISOString()
+        };
+      }
+
+      fs.writeJsonSync(this.statePath, newState, { spaces: 2 });
+    } catch (err) {
+      // Don't fail the watcher if status file write fails
+      logger.debug(`Failed to update status file: ${err.message}`);
     }
   }
 }
