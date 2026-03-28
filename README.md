@@ -145,6 +145,19 @@ npx @traisetech/autopilot start
 
 ---
 
+## 🎨 VS Code Extension (Recommended)
+
+Prefer a GUI? Use our official **Autopilot VS Code Extension**:
+
+-   **Live Sidebar**: Monitor status, branch, and queue at a glance.
+-   **Integrated Logs**: View color-coded process output directly in your editor.
+-   **Quick Actions**: Start, stop, pause, and undo with a single click from the status bar.
+-   **Settings UI**: Form-based configuration of your `.autopilotrc.json`.
+
+**[Install from the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=praisetechzw.autopilot-vscode)**
+
+---
+
 ## 🛠️ Commands
 
 | Command | Description |
