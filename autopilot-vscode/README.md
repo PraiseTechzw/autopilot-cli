@@ -2,7 +2,6 @@
 
 > Intelligent git automation — a GUI shell over the [autopilot-cli](https://github.com/PraiseTechzw/autopilot-cli).
 
-![Status bar](media/icon.svg)
 
 ## Features
 
@@ -30,7 +29,7 @@ npm install -g autopilot-cli
 ## Commands
 
 | Command | Description |
-|---------|-------------|
+| :--- | :--- |
 | `Autopilot: Start` | Start the autopilot watcher |
 | `Autopilot: Stop` | Stop the autopilot watcher |
 | `Autopilot: Pause` | Pause watching temporarily |
@@ -45,7 +44,7 @@ npm install -g autopilot-cli
 ## Extension Settings
 
 | Setting | Default | Description |
-|---------|---------|-------------|
+| :--- | :--- | :--- |
 | `autopilot.cliPath` | `autopilot` | Path to CLI binary if not in PATH |
 | `autopilot.pollInterval` | `2000` | ms between state file polls |
 | `autopilot.showNotifications` | `true` | Enable toast notifications |
@@ -54,14 +53,19 @@ npm install -g autopilot-cli
 
 This extension is a **pure GUI shell** — it never re-implements git logic.
 
+```mermaid
+graph LR
+    A[CLI process] --> |Writes| B[.autopilot-state.json]
+    B --> |Polled| C[VS Code Extension]
+    A --> |Writes| D[.autopilot.log]
+    D --> |Polled| C
+    C --> |SIGTERM| A
 ```
-CLI process (autopilot start)     VS Code Extension
-    │                                    │
-    ├─ writes .autopilot-state.json ───► StateReader polls every 2s
-    ├─ writes .autopilot.log ─────────► LogPanel streams
-    │                                    │
-    └─ listens for SIGTERM ◄──────────── cliRunner.stop()
+
+```javascript
+// Example architecture
 ```
+
 
 ## License
 

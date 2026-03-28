@@ -1,8 +1,35 @@
 # Changelog
 
+
+## [2.5.0] - 2026-03-28
+
+### Added (v2.5.0)
+
+- **VS Code Extension Engine**:
+  - Implemented `.autopilot-state.json` for real-time state synchronization (PID, status, uptime, branch, etc.).
+  - Added `.autopilot.log` with automatic rotation (500KB cap) for fast, incremental streaming in extension UI.
+  - Implemented 5s heartbeat in watcher to keep remote UIs perfectly synchronized.
+- **Improved Process Lifecycle**:
+  - `autopilot stop` now performs deep cleanup of state, log, and PID files.
+  - Enforced `.autopilot-state.json` and `.autopilot.log` as reserved system files, auto-ignored by the watcher.
+
+### Improved (v2.5.0)
+
+- **Logger Engine**: Pipe all CLI output to `.autopilot.log` by default.
+- **Persistence**: Re-aligned `startedAt` timestamps to ISO strings for cross-tool compatibility.
+
+## [2.4.0] - 2026-03-10
+
+### Added (v2.4.0)
+
+- **Focus Engine Upgrades**: Improved detection of deep work sessions and productivity streaks.
+- **Enhanced AI Logic**: More accurate conventional commit categorization for mixed changes.
+
 ## [2.3.0] - 2026-02-18
 
-### Added
+### Added (v2.3.0)
+
+
 - **Production-Ready Leaderboard**:
   - Implemented secure Row-Level Security (RLS) policies for anonymized stat synchronization.
   - Enhanced API response to include real-time global ranking.
