@@ -1,9 +1,11 @@
 const fs = require('fs');
 const path = require('path');
 
-const LOG_FILE = '.autopilot.log';
+const LOG_FILENAME = '.autopilot.log';
 const MAX_LOG_SIZE = 500 * 1024; // 500KB
 const KEEP_LINES = 200;
+
+let targetPath = null;
 
 const logger = {
   colors: {
@@ -15,14 +17,21 @@ const logger = {
     bold: (text) => `\x1b[1m${text}\x1b[0m`
   },
 
+  setTargetPath: (dir) => {
+    targetPath = dir;
+  },
+
   _writeToFile: (message) => {
+    if (!targetPath) return; // Only log to file if target path is set
+    
     try {
-      const logPath = path.join(process.cwd(), LOG_FILE);
+      const logPath = path.join(targetPath, LOG_FILENAME);
       const timestamp = new Date().toISOString();
       const line = `[${timestamp}] ${message}\n`;
       
-      // Check size and rotate if needed
-      if (fs.existsSync(logPath)) {
+      // Check size for rotation - only occasionally to avoid heavy I/O
+      // We'll trust append for speed and only rotate if we happen to check
+      if (Math.random() < 0.05 && fs.existsSync(logPath)) {
         const stats = fs.statSync(logPath);
         if (stats.size > MAX_LOG_SIZE) {
           const content = fs.readFileSync(logPath, 'utf8');
@@ -34,7 +43,7 @@ const logger = {
       
       fs.appendFileSync(logPath, line);
     } catch (err) {
-      // Silent fail for logging errors
+      // Silent fail
     }
   },
 

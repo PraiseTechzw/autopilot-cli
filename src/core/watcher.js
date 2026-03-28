@@ -44,6 +44,7 @@ class Watcher {
     this.stateManager = new StateManager(repoPath);
     this.retryQueue = new RetryQueue(repoPath, git.push.bind(git));
     this.statePath = path.join(repoPath, '.autopilot-state.json');
+    this.startedAt = Date.now();
   }
 
   logVerbose(message) {
@@ -71,6 +72,7 @@ class Watcher {
 
       // Initialize environment
       await fs.ensureFile(this.logFilePath);
+      logger.setTargetPath(this.repoPath);
       await savePid(this.repoPath);
       
       logger.info('Starting Autopilot watcher...');
@@ -178,6 +180,11 @@ class Watcher {
       }
 
       await removePid(this.repoPath);
+      
+      // Cleanup files
+      if (fs.existsSync(this.statePath)) fs.unlinkSync(this.statePath);
+      if (fs.existsSync(this.logFilePath)) fs.unlinkSync(this.logFilePath);
+      
       this.isWatching = false;
       logger.info('Watcher stopped');
     } catch (error) {
