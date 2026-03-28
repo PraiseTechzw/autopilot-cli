@@ -52,11 +52,10 @@ async function generateCommitMessage(files, diffContent, config = {}) {
     message = generateRuleBasedMessage(files);
   }
 
-  // Ensure message is trimmed and not too long (git convention 72 chars for first line)
-  // But we might have a body, so we only trim the first line if needed, 
-  // though generateRuleBasedMessage already handles it.
+  // Ensure message is trimmed and has prefix
+  const finalMessage = `[autopilot] ${message.trim()}`;
   
-  return message;
+  return finalMessage;
 }
 
 /**

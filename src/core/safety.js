@@ -91,9 +91,8 @@ const validateBeforeCommit = async (repoPath, config) => {
       for (const file of stagedFiles) {
         try {
           const filePath = path.join(repoPath, file.file);
-          if (fs.existsSync(filePath)) {
-            // Read first 1MB only for performance
-            // Use stream or buffer
+          const stats = await fs.stat(filePath);
+          if (stats.isFile()) {
             const buffer = Buffer.alloc(1024 * 1024);
             const fd = await fs.open(filePath, 'r');
             const { bytesRead } = await fs.read(fd, buffer, 0, buffer.length, 0);

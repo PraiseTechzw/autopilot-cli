@@ -206,15 +206,16 @@ async function initRepo() {
 
 
     const overrides = {
-      watchPath: ".",
-      debounceMs: 20000,
-      aiProvider: (customAI.toLowerCase() === 'y') ? provider : "none",
-      aiApiKey: apiKey || grokApiKey || "",
-      protectedBranches: ["main", "master", "production"],
-      allowPushToProtected: false,
-      notificationsEnabled: true,
-      maxRetryAttempts: 5,
-      ignorePaths: [".git", "node_modules", ".autopilot-state.json", ".autopilot-queue.json"]
+      ai: {
+        enabled: true,
+        provider: (customAI.toLowerCase() === 'y') ? provider : "grok",
+        apiKey: apiKey || "",
+        grokApiKey: grokApiKey || "",
+        interactive: interactive,
+        model: provider === 'grok' ? "grok-beta" : "gemini-1.5-flash"
+      },
+      teamMode: useTeamMode,
+      ignorePaths: [".git", "node_modules", ".autopilot-state.json", ".autopilot.log"]
     };
 
     const created = await createConfigFile(repoPath, overrides);
