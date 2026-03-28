@@ -70,7 +70,7 @@ test('Missing Commands Integration', async (t) => {
     assert.match(p1.stdout, /Autopilot paused/);
 
     // Verify state file
-    const state = await fs.readJson(path.join(tmpDir, '.autopilot', 'state.json'));
+    const state = await fs.readJson(path.join(tmpDir, '.autopilot-state.json'));
     assert.strictEqual(state.status, 'paused');
     assert.strictEqual(state.reason, 'Taking a break');
 
@@ -80,7 +80,7 @@ test('Missing Commands Integration', async (t) => {
     assert.match(p2.stdout, /Autopilot resumed/);
 
     // Verify state file
-    const state2 = await fs.readJson(path.join(tmpDir, '.autopilot', 'state.json'));
+    const state2 = await fs.readJson(path.join(tmpDir, '.autopilot-state.json'));
     assert.strictEqual(state2.status, 'running');
   });
 

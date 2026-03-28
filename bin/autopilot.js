@@ -149,5 +149,5 @@ program
 
 (async () => {
   await checkForUpdate();
-  program.parse(process.argv);
+  await program.parseAsync(process.argv);
 })();

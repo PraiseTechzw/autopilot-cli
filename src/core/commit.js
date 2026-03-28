@@ -22,14 +22,14 @@ async function generateCommitMessage(files, diffContent, config = {}) {
   let message = '';
   
   const mode = config.commitMessageMode || 'smart';
-  const aiProvider = config.aiProvider || config.ai?.provider || 'none';
-  const aiApiKey = config.aiApiKey || config.ai?.apiKey;
+  const aiProvider = config.ai?.provider || config.aiProvider || 'grok';
+  const aiApiKey = config.ai?.apiKey || config.ai?.grokApiKey || config.aiApiKey;
 
   if (!files || files.length === 0) {
     message = 'update: minor changes';
   } else if (mode === 'simple') {
-    message = 'update: auto-commit changes';
-  } else if (aiProvider !== 'none' && aiApiKey) {
+    message = 'chore: auto-commit changes';
+  } else if (aiProvider !== 'none' && (aiApiKey || aiProvider === 'grok' || config.ai?.enabled)) {
     // AI Mode
     try {
       logger.info(`Generating AI commit message using ${aiProvider}...`);
@@ -48,8 +48,8 @@ async function generateCommitMessage(files, diffContent, config = {}) {
       message = generateRuleBasedMessage(files);
     }
   } else {
-    // Rule-based Fallback
-    message = generateRuleBasedMessage(files);
+    // Smart Rule-based Fallback (Senior-level)
+    message = generateSmartCommitMessage(files, diffContent);
   }
 
   // Ensure message is trimmed and has prefix

@@ -18,7 +18,7 @@ async function status() {
   console.log('  ─────────────────────────────');
 
   if (!fs.existsSync(statePath)) {
-    console.log('  State:          Not running');
+    console.error('Status: Not Running');
     console.log('  ─────────────────────────────');
     return;
   }

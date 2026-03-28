@@ -215,7 +215,6 @@ async function initRepo() {
         model: provider === 'grok' ? "grok-beta" : "gemini-1.5-flash"
       },
       teamMode: useTeamMode,
-      ignorePaths: [".git", "node_modules", ".autopilot-state.json", ".autopilot.log"]
     };
 
     const created = await createConfigFile(repoPath, overrides);

@@ -3,18 +3,16 @@ const path = require('path');
 const logger = require('../utils/logger');
 const { getAutopilotHome } = require('../utils/paths');
 
-const STATE_FILE = 'state.json';
+const STATE_FILE = '.autopilot-state.json';
 
 class StateManager {
   constructor(repoPath) {
     this.repoPath = repoPath;
-    this.stateDir = path.join(repoPath, '.autopilot');
-    this.stateFile = path.join(this.stateDir, STATE_FILE);
+    this.stateFile = path.join(repoPath, STATE_FILE);
     this.init();
   }
 
   init() {
-    fs.ensureDirSync(this.stateDir);
     if (!fs.existsSync(this.stateFile)) {
       this.reset();
     }

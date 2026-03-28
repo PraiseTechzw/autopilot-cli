@@ -6,13 +6,21 @@
 const DEFAULT_CONFIG = {
   watchPath: '.',
   debounceMs: 20000,
-  aiProvider: 'none',
+  aiProvider: 'grok',
   aiApiKey: '',
+  ai: {
+    enabled: true,
+    provider: 'grok',
+    apiKey: '',
+    grokApiKey: '',
+    interactive: true,
+    model: 'grok-beta'
+  },
   protectedBranches: ['main', 'master', 'production', 'prod', 'release'],
   allowPushToProtected: false,
   notificationsEnabled: true,
   maxRetryAttempts: 5,
-  ignorePaths: ['.git', 'node_modules', '.autopilot-state.json', '.autopilot-queue.json'],
+  ignorePaths: ['.git', 'node_modules', '.autopilot/', '.autopilot-state.json', '.autopilot.log', '.autopilot-queue.json'],
   
   // Legacy/Internal
   minSecondsBetweenCommits: 180,

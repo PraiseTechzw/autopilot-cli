@@ -53,10 +53,11 @@ describe('Full System E2E Integration', () => {
     await fs.ensureDir(configDir);
     await fs.writeJson(path.join(configDir, 'config.json'), {
       autoPush: true, 
+      allowPushToProtected: true, // REQUIRED for 'master' push in e2e
       debounceSeconds: 1, // Fast debounce
       minSecondsBetweenCommits: 0,
       commitMessageMode: 'ai', // REQUIRED for AI generation
-      blockedBranches: [], // ensure e2e runs on 'master'
+      protectedBranches: [], // override defaults for test
       ai: {
         enabled: true,
         provider: 'grok' // New default

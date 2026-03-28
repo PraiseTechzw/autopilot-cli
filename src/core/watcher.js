@@ -183,7 +183,11 @@ class Watcher {
       
       // Cleanup files
       if (fs.existsSync(this.statePath)) fs.unlinkSync(this.statePath);
-      if (fs.existsSync(this.logFilePath)) fs.unlinkSync(this.logFilePath);
+      if (fs.existsSync(this.logFilePath)) {
+          // Tell logger to stop writing to this file before deleting it
+          logger.setTargetPath(null);
+          fs.unlinkSync(this.logFilePath);
+      }
       
       this.isWatching = false;
       logger.info('Watcher stopped');
@@ -210,7 +214,7 @@ class Watcher {
     }
 
     // Additional strict check for critical files just in case
-    if (relativePath.includes('.git/') || relativePath.endsWith('.autopilot.log') || relativePath.endsWith('.autopilot-state.json')) {
+    if (relativePath.includes('.git/') || relativePath.includes('.autopilot/') || relativePath.endsWith('.autopilot.log') || relativePath.endsWith('.autopilot-state.json')) {
         return;
     }
 
@@ -226,7 +230,7 @@ class Watcher {
    * Schedule processing with debounce
    */
   scheduleProcess() {
-    const debounceMs = this.config?.debounceMs || 20000;
+    const debounceMs = this.config?.debounceMs || (this.config?.debounceSeconds ? this.config.debounceSeconds * 1000 : 20000);
     const maxWaitMs = (this.config?.maxWaitSeconds || 60) * 1000; // Default 60s max wait
     
     // Reset debounce timer
