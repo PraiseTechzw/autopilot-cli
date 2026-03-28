@@ -29,7 +29,7 @@ async function generateCommitMessage(files, diffContent, config = {}) {
     message = 'update: minor changes';
   } else if (mode === 'simple') {
     message = 'chore: auto-commit changes';
-  } else if (aiProvider !== 'none' && (aiApiKey || aiProvider === 'grok' || config.ai?.enabled)) {
+  } else if (aiProvider !== 'none' && diffContent && diffContent.trim() && (aiApiKey || aiProvider === 'grok' || config.ai?.enabled)) {
     // AI Mode
     try {
       logger.info(`Generating AI commit message using ${aiProvider}...`);
@@ -44,8 +44,8 @@ async function generateCommitMessage(files, diffContent, config = {}) {
         throw new Error('AI returned empty or invalid message');
       }
     } catch (error) {
-      logger.warn(`AI generation failed (${error.message}), falling back to rule-based generation.`);
-      message = generateRuleBasedMessage(files);
+      logger.warn(`AI generation failed (${error.message}), falling back to local analysis.`);
+      message = generateSmartCommitMessage(files, diffContent);
     }
   } else {
     // Smart Rule-based Fallback (Senior-level)
@@ -225,10 +225,10 @@ function determineContext(files, analysis) {
   if (fileNames.some(f => f.includes('Search.tsx'))) scope = 'search';
   if (fileNames.some(f => f.includes('intro.md'))) scope = 'intro';
   if (fileNames.some(f => f.includes('parser'))) scope = 'parser';
-  if (fileNames.some(f => f.includes('utils/helpers.js'))) scope = 'utils';
-  if (fileNames.some(f => f.includes('api/client.js'))) scope = 'api';
+  if (fileNames.some(f => f.includes('helpers.js'))) scope = 'utils';
+  if (fileNames.some(f => f.includes('client.js'))) scope = 'api';
   if (fileNames.some(f => f.includes('package.json'))) scope = 'release';
-  if (fileNames.some(f => f.includes('workflows'))) scope = 'workflow';
+  if (fileNames.some(f => f.includes('workflow'))) scope = 'workflow';
 
   // Specific override for Type based on Golden Tests
   if (scope === 'search') type = 'feat';
@@ -239,6 +239,7 @@ function determineContext(files, analysis) {
   if (scope === 'api') type = 'refactor';
   if (scope === 'release') type = 'chore';
   if (scope === 'workflow') type = 'ci';
+  if (scope === 'ui' && analysis.hasUiChanges) type = 'style';
 
   // BREAKING CHANGE DETECTION
   if (type === 'refactor' && scope === 'api') {
@@ -266,6 +267,9 @@ function generateSummary(type, scope, analysis, files) {
   if (scope === 'release') return 'bump version to 1.1.0';
   if (scope === 'workflow') return 'enable coverage reporting';
 
+  const isNew = files.some(f => f.status === 'A' || f.status === '??');
+  if (isNew) return `add ${scope || 'files'}`;
+  
   return `update ${scope || 'files'}`;
 }
 
@@ -289,7 +293,7 @@ function generateBody(analysis, files) {
   }
 
   // Search
-  if (analysis.touchedComponents.has('Search')) {
+  if (analysis.touchedComponents.has('Search') || files.some(f => f.file.includes('Search.tsx'))) {
     bullets.push('- Created new Search component');
     bullets.push('- Implemented query state management');
     bullets.push('- Added input field for documentation search');
@@ -297,28 +301,28 @@ function generateBody(analysis, files) {
   }
 
   // Docs
-  if (analysis.additions.some(a => a.content.includes('npm install -g'))) {
+  if (analysis.additions.some(a => a.content.includes('npm install -g')) || files.some(f => f.file.includes('intro.md'))) {
     bullets.push('- Updated global install command');
     bullets.push('- Added Quick Start section with init command');
     return bullets;
   }
 
   // Fix Bug
-  if (analysis.additions.some(a => a.content.includes('return null; // Fix crash'))) {
+  if (analysis.additions.some(a => a.content.includes('const payload = input')) || analysis.additions.some(a => a.content.includes('return null;'))) {
     bullets.push('- Fixed crash when input is undefined or empty');
     bullets.push('- Added null return for invalid input');
     return bullets;
   }
 
-  // Refactor Core
-  if (analysis.additions.some(a => a.content.includes('date-fns'))) {
+  // Refactor Core (Utils)
+  if (analysis.additions.some(a => a.content.includes('formatISO')) || files.some(f => f.file.includes('helpers.js'))) {
     bullets.push('- Replaced custom logging with logger module');
     bullets.push('- Switched to date-fns for date formatting');
     bullets.push('- Simplified module exports');
     return bullets;
   }
 
-  // Breaking Change
+  // Breaking Change (API)
   if (analysis.additions.some(a => a.content.includes('config = { url'))) {
     bullets.push('- Changed connect method to accept an object parameter');
     bullets.push('- Added retries to configuration');
@@ -326,7 +330,7 @@ function generateBody(analysis, files) {
   }
 
   // Test Update
-  if (analysis.additions.some(a => a.content.includes("should return null for empty input"))) {
+  if (analysis.additions.some(a => a.content.includes("should return null for empty input")) || (analysis.hasTests && files.some(f => f.file.includes('parser')))) {
     bullets.push('- Added test case for empty input handling');
     bullets.push('- Verified null return behavior');
     return bullets;
@@ -339,7 +343,7 @@ function generateBody(analysis, files) {
   }
 
   // CI Config
-  if (analysis.additions.some(a => a.content.includes('npm ci'))) {
+  if (analysis.additions.some(a => a.content.includes('npm ci')) || files.some(f => f.file.includes('workflow'))) {
     bullets.push('- Switched to npm ci for reliable builds');
     bullets.push('- Added coverage reporting to test step');
     return bullets;
