@@ -1,0 +1,78 @@
+{
+  "name": "autopilot-vscode",
+  "displayName": "Autopilot",
+  "description": "Intelligent git automation — autopilot for VS Code",
+  "version": "0.1.0",
+  "publisher": "praisetechzw",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PraiseTechzw/autopilot-vscode"
+  },
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["SCM Providers", "Other"],
+  "activationEvents": ["workspaceContains:.autopilotrc.json", "onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "autopilot.start",        "title": "Autopilot: Start" },
+      { "command": "autopilot.stop",         "title": "Autopilot: Stop" },
+      { "command": "autopilot.pause",        "title": "Autopilot: Pause" },
+      { "command": "autopilot.resume",       "title": "Autopilot: Resume" },
+      { "command": "autopilot.undo",         "title": "Autopilot: Undo last commit" },
+      { "command": "autopilot.openSettings", "title": "Autopilot: Open settings" },
+      { "command": "autopilot.openLog",      "title": "Autopilot: Open output log" },
+      { "command": "autopilot.runDoctor",    "title": "Autopilot: Run doctor" },
+      { "command": "autopilot.showStatus",   "title": "Autopilot: Show status" },
+      { "command": "autopilot.init",         "title": "Autopilot: Initialize in this workspace" }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        { "id": "autopilot", "title": "Autopilot", "icon": "media/icon.svg" }
+      ]
+    },
+    "views": {
+      "autopilot": [
+        { "id": "autopilotSidebar", "name": "Autopilot", "icon": "media/icon.svg" }
+      ]
+    },
+    "menus": {
+      "view/item/context": [
+        { "command": "autopilot.undo",   "when": "viewItem == lastCommit",     "group": "autopilot@1" },
+        { "command": "autopilot.pause",  "when": "viewItem == statusWatching", "group": "autopilot@1" },
+        { "command": "autopilot.resume", "when": "viewItem == statusPaused",   "group": "autopilot@1" }
+      ]
+    },
+    "configuration": {
+      "title": "Autopilot",
+      "properties": {
+        "autopilot.cliPath": {
+          "type": "string", "default": "autopilot",
+          "description": "Path to the autopilot CLI binary (if not in PATH)"
+        },
+        "autopilot.pollInterval": {
+          "type": "number", "default": 2000,
+          "description": "How often (ms) to poll .autopilot-state.json for changes"
+        },
+        "autopilot.showNotifications": {
+          "type": "boolean", "default": true,
+          "description": "Show VS Code toast notifications for push/conflict events"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "node-notifier": "^10.0.1"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.85.0",
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.0",
+    "@vscode/vsce": "^2.22.0"
+  }
+}

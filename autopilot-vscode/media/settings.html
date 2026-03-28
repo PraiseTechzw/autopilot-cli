@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Autopilot Settings</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: var(--vscode-font-family);
+    font-size: var(--vscode-font-size);
+    color: var(--vscode-foreground);
+    background: var(--vscode-editor-background);
+    padding: 20px;
+    line-height: 1.6;
+  }
+  h2 {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: var(--vscode-foreground);
+    border-bottom: 1px solid var(--vscode-editorWidget-border, #444);
+    padding-bottom: 8px;
+  }
+  .field-group { margin-bottom: 22px; }
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 0.95em;
+  }
+  .hint {
+    color: var(--vscode-descriptionForeground);
+    font-size: 0.85em;
+    margin-top: 4px;
+  }
+  input[type="number"], input[type="text"], select {
+    width: 100%;
+    padding: 6px 10px;
+    background: var(--vscode-input-background);
+    color: var(--vscode-input-foreground);
+    border: 1px solid var(--vscode-input-border, #555);
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.95em;
+  }
+  input:focus, select:focus {
+    outline: 1px solid var(--vscode-focusBorder);
+  }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.95em;
+  }
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .tag {
+    background: var(--vscode-badge-background);
+    color: var(--vscode-badge-foreground);
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 0.85em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tag button {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    font-size: 1.1em;
+    line-height: 1;
+    opacity: 0.7;
+  }
+  .tag button:hover { opacity: 1; }
+  .add-branch-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .add-branch-row input { flex: 1; }
+  .btn {
+    padding: 6px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+  .btn-primary {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+  }
+  .btn-primary:hover { background: var(--vscode-button-hoverBackground); }
+  .btn-secondary {
+    background: var(--vscode-button-secondaryBackground);
+    color: var(--vscode-button-secondaryForeground);
+  }
+  .btn-secondary:hover { background: var(--vscode-button-secondaryHoverBackground); }
+  .watch-row { display: flex; gap: 8px; align-items: center; }
+  .watch-row input { flex: 1; background: var(--vscode-input-background); }
+  .warning-text {
+    color: var(--vscode-editorWarning-foreground, #cc9900);
+    font-size: 0.85em;
+    margin-top: 4px;
+  }
+  .save-row {
+    margin-top: 28px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  #saveStatus {
+    font-size: 0.9em;
+    color: var(--vscode-terminal-ansiGreen);
+  }
+  .debounce-label { font-style: italic; color: var(--vscode-descriptionForeground); }
+</style>
+</head>
+<body>
+<h2>⚙️ Autopilot Settings</h2>
+
+<div class="field-group">
+  <label for="debounceMs">Debounce Delay</label>
+  <input type="number" id="debounceMs" min="1000" max="300000" step="1000" value="20000" />
+  <div class="hint">Wait <span id="debounceLabel" class="debounce-label">20 seconds</span> of inactivity before committing.</div>
+</div>
+
+<div class="field-group">
+  <label>Protected Branches</label>
+  <div class="tag-list" id="branchTags"></div>
+  <div class="add-branch-row">
+    <input type="text" id="newBranch" placeholder="e.g. main" />
+    <button class="btn btn-secondary" onclick="addBranch()">Add</button>
+  </div>
+  <div class="hint">Autopilot will NOT push directly to these branches.</div>
+</div>
+
+<div class="field-group">
+  <label>Notifications</label>
+  <label class="toggle">
+    <input type="checkbox" id="notificationsEnabled" />
+    Enable VS Code toast notifications
+  </label>
+</div>
+
+<div class="field-group">
+  <label>Watch Path</label>
+  <div class="watch-row">
+    <input type="text" id="watchPath" readonly />
+    <button class="btn btn-secondary" onclick="pickFolder()">Change</button>
+  </div>
+  <div class="hint">Root directory autopilot monitors for changes.</div>
+</div>
+
+<div class="field-group">
+  <label>Auto Push</label>
+  <label class="toggle">
+    <input type="checkbox" id="autoPush" />
+    Automatically push after each commit
+  </label>
+</div>
+
+<div class="field-group">
+  <label>Allow Push to Protected Branches</label>
+  <label class="toggle">
+    <input type="checkbox" id="allowPushToProtected" />
+    Allow push to protected branches
+  </label>
+  <div class="warning-text">⚠️ Dangerous — only enable if you know what you're doing</div>
+</div>
+
+<div class="save-row">
+  <button class="btn btn-primary" onclick="save()">Save Settings</button>
+  <span id="saveStatus"></span>
+</div>
+
+<script>
+  const vscode = acquireVsCodeApi();
+  let protectedBranches = [];
+
+  // Handle messages from extension
+  window.addEventListener('message', e => {
+    const msg = e.data;
+    if (msg.command === 'loadConfig') {
+      const c = msg.config;
+      document.getElementById('debounceMs').value = c.debounceMs ?? 20000;
+      updateDebounceLabel(c.debounceMs ?? 20000);
+      document.getElementById('notificationsEnabled').checked = c.notificationsEnabled ?? true;
+      document.getElementById('watchPath').value = c.watchPath ?? '';
+      document.getElementById('autoPush').checked = c.autoPush ?? false;
+      document.getElementById('allowPushToProtected').checked = c.allowPushToProtected ?? false;
+      protectedBranches = c.protectedBranches ?? [];
+      renderBranches();
+    }
+    if (msg.command === 'saveSuccess') {
+      const el = document.getElementById('saveStatus');
+      el.textContent = '✅ Saved! Restart autopilot to apply changes.';
+      setTimeout(() => { el.textContent = ''; }, 4000);
+    }
+    if (msg.command === 'saveError') {
+      const el = document.getElementById('saveStatus');
+      el.style.color = 'var(--vscode-editorError-foreground)';
+      el.textContent = '❌ ' + msg.error;
+    }
+  });
+
+  document.getElementById('debounceMs').addEventListener('input', e => {
+    updateDebounceLabel(e.target.value);
+  });
+
+  function updateDebounceLabel(ms) {
+    const secs = Math.round(ms / 1000);
+    document.getElementById('debounceLabel').textContent = secs + ' seconds';
+  }
+
+  function renderBranches() {
+    const container = document.getElementById('branchTags');
+    container.innerHTML = '';
+    protectedBranches.forEach((b, i) => {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.innerHTML = b + '<button onclick="removeBranch(' + i + ')">×</button>';
+      container.appendChild(tag);
+    });
+  }
+
+  function addBranch() {
+    const input = document.getElementById('newBranch');
+    const val = input.value.trim();
+    if (val && !protectedBranches.includes(val)) {
+      protectedBranches.push(val);
+      renderBranches();
+      input.value = '';
+    }
+  }
+
+  function removeBranch(index) {
+    protectedBranches.splice(index, 1);
+    renderBranches();
+  }
+
+  function pickFolder() {
+    vscode.postMessage({ command: 'pickFolder' });
+  }
+
+  function save() {
+    vscode.postMessage({
+      command: 'save',
+      config: {
+        debounceMs: parseInt(document.getElementById('debounceMs').value),
+        protectedBranches: protectedBranches,
+        notificationsEnabled: document.getElementById('notificationsEnabled').checked,
+        autoPush: document.getElementById('autoPush').checked,
+        allowPushToProtected: document.getElementById('allowPushToProtected').checked
+      }
+    });
+  }
+
+  // Signal ready
+  vscode.postMessage({ command: 'ready' });
+</script>
+</body>
+</html>
