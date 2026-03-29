@@ -54,9 +54,9 @@ const createIgnoreFile = async (repoPath, patterns = []) => {
  * @returns {function} Filter function (path => boolean)
  */
 const createIgnoredFilter = (repoPath, userPatterns = []) => {
-  const normalizedRepoPath = normalizePath(repoPath);
+  const normalizedRepoPath = normalizePath(repoPath).toLowerCase();
 
-  // Critical ignores that are ALWAYS enforced
+  // Critical ignores that are ALWAYS enforced (lowercase for comparison)
   const criticalPrefixes = [
     '.git',
     'node_modules',
@@ -71,7 +71,7 @@ const createIgnoredFilter = (repoPath, userPatterns = []) => {
   const criticalFiles = [
     'autopilot.log',
     '.autopilot.pid',
-    '.DS_Store'
+    '.ds_store'
   ];
 
   const criticalExtensions = [
@@ -79,17 +79,17 @@ const createIgnoredFilter = (repoPath, userPatterns = []) => {
   ];
 
   return (absolutePath) => {
-    // 1. Get relative path safely using path.relative
-    // This handles Windows casing and separators correctly
-    const relativeRaw = path.relative(repoPath, absolutePath);
+    // 1. Normalize and lowercase for consistent matching
+    const normalizedTarget = normalizePath(absolutePath).toLowerCase();
     
-    // If outside repo, ignore (or handle differently? Chokidar usually stays inside)
-    if (relativeRaw.startsWith('..') || path.isAbsolute(relativeRaw)) {
-        return false;
+    // 2. Determine relative path
+    let relativePath;
+    if (normalizedTarget.startsWith(normalizedRepoPath)) {
+        relativePath = normalizedTarget.slice(normalizedRepoPath.length).replace(/^\/+/, '');
+    } else {
+        // Fallback to path.relative if startsWith fails for some reason
+        relativePath = normalizePath(path.relative(repoPath, absolutePath)).toLowerCase();
     }
-
-    // Normalize to forward slashes for matching
-    const relativePath = normalizePath(relativeRaw);
 
     // Handle root path case
     if (!relativePath || relativePath === '.') return false;
@@ -111,30 +111,13 @@ const createIgnoredFilter = (repoPath, userPatterns = []) => {
       if (filename.endsWith(ext)) return true;
     }
 
-    // 4. Check user patterns (simple glob-like)
-    // TODO: Use micromatch if more complex patterns needed, but for now simple matching
-    // Note: chokidar handles globs in its 'ignored' option if passed as array, 
-    // but here we are providing a function.
-    
-    // We can rely on chokidar's glob handling if we pass array, but we are returning a function.
-    // If we want to support user globs in this function, we'd need micromatch.
-    // However, Chokidar accepts an array of strings/globs/functions.
-    // We should probably rely on Chokidar for user patterns if possible, 
-    // BUT the requirement says "Apply ignore rules in TWO places: a) chokidar ignored function b) internal ignore matcher".
-    // So we must handle it here too.
-    
-    // Simple implementation for user patterns:
+    // 4. Check user patterns
     for (const pattern of userPatterns) {
-      // Remove leading slash for matching relative path
-      const cleanPattern = pattern.replace(/^\/+/, '');
+      const cleanPattern = pattern.toLowerCase().replace(/^\/+/, '');
       
-      // Exact match
       if (relativePath === cleanPattern) return true;
-      
-      // Directory match
       if (relativePath.startsWith(cleanPattern + '/')) return true;
       
-      // Extension match (*.log)
       if (cleanPattern.startsWith('*.')) {
         const ext = cleanPattern.slice(1);
         if (filename.endsWith(ext)) return true;

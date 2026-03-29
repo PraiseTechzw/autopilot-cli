@@ -66,7 +66,7 @@ test('CLI Integration', async (t) => {
   await t.test('watcher integration with noisy files', async () => {
     // Override config for faster test
     await fs.writeJson(path.join(tmpDir, '.autopilotrc.json'), {
-      debounceSeconds: 1,
+      debounceSeconds: 0.2,
       minSecondsBetweenCommits: 0,
       autoPush: false,
       blockedBranches: [] // allow commits on default branch
@@ -85,7 +85,7 @@ test('CLI Integration', async (t) => {
     // Spawn watcher in TEST MODE (foreground)
     const watcher = spawn(process.execPath, [BIN_PATH, 'start'], {
       cwd: tmpDir,
-      env: { ...process.env, AUTOPILOT_TEST_MODE: '1', AUTOPILOT_TEST_DURATION: '15000' },
+      env: { ...process.env, AUTOPILOT_TEST_MODE: '1', AUTOPILOT_TEST_DURATION: '15000', DEBUG: '1' },
       stdio: 'pipe'
     });
 

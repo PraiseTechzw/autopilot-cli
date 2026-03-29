@@ -106,7 +106,7 @@ class Watcher {
         ignoreInitial: true,
         persistent: true,
         awaitWriteFinish: {
-          stabilityThreshold: 1000,
+          stabilityThreshold: 200,
           pollInterval: 100,
         }
       });
@@ -210,11 +210,12 @@ class Watcher {
     // Internal Ignore Check (Redundant but safe)
     // We use the same filter function passed to Chokidar
     if (this.ignoredFilter && this.ignoredFilter(absolutePath)) {
+        logger.debug(`Ignoring filtered path: ${relativePath}`);
         return;
     }
 
     // Additional strict check for critical files just in case
-    if (relativePath.includes('.git/') || relativePath.includes('.autopilot/') || relativePath.endsWith('.autopilot.log') || relativePath.endsWith('.autopilot-state.json')) {
+    if (relativePath.includes('.git/') || relativePath.includes('.autopilot/') || relativePath.includes('autopilot.log') || relativePath.includes('.autopilot-state.json')) {
         return;
     }
 
@@ -230,7 +231,13 @@ class Watcher {
    * Schedule processing with debounce
    */
   scheduleProcess() {
-    const debounceMs = this.config?.debounceMs || (this.config?.debounceSeconds ? this.config.debounceSeconds * 1000 : 20000);
+    // Prioritize debounceSeconds if explicitly set, otherwise use debounceMs
+    let debounceMs = 20000;
+    if (this.config.debounceSeconds !== undefined) {
+        debounceMs = this.config.debounceSeconds * 1000;
+    } else if (this.config.debounceMs !== undefined) {
+        debounceMs = this.config.debounceMs;
+    }
     const maxWaitMs = (this.config?.maxWaitSeconds || 60) * 1000; // Default 60s max wait
     
     // Reset debounce timer
@@ -249,9 +256,10 @@ class Watcher {
       }, maxWaitMs);
     }
 
-    logger.debug('Debounce fired. Waiting...');
+    logger.debug(`Debounce scheduled for ${debounceMs}ms. Timer ID exists: ${!!this.debounceTimer}`);
     
     this.debounceTimer = setTimeout(() => {
+      logger.debug(`Debounce timer reached (${debounceMs}ms). Processing...`);
       this.processChanges();
     }, debounceMs);
   }
@@ -310,7 +318,8 @@ class Watcher {
     this.firstChangeTime = null;
 
     try {
-      logger.debug('Checking git status...');
+      logger.debug('Starting processChanges cycle...');
+    logger.debug('Checking git status...');
 
       // 0. Pause Check
       if (this.stateManager.isPaused()) {

@@ -25,11 +25,21 @@ function validateConfig(config) {
     errors.push('watchPath: directory does not exist at ' + config.watchPath);
   }
 
-  // Required: debounceMs (number, min 1000, max 300000)
-  if (typeof config.debounceMs !== 'number') {
-    errors.push('debounceMs must be a number (got ' + typeof config.debounceMs + ')');
-  } else if (config.debounceMs < 1000 || config.debounceMs > 300000) {
-    errors.push('debounceMs must be between 1000 and 300000 (got ' + config.debounceMs + ')');
+  // Optional: debounceMs or debounceSeconds
+  if (config.debounceMs !== undefined) {
+    if (typeof config.debounceMs !== 'number') {
+      errors.push('debounceMs must be a number (got ' + typeof config.debounceMs + ')');
+    } else if (config.debounceMs < 100 || config.debounceMs > 300000) {
+      errors.push('debounceMs must be between 100 and 300000 (got ' + config.debounceMs + ')');
+    }
+  }
+
+  if (config.debounceSeconds !== undefined) {
+    if (typeof config.debounceSeconds !== 'number') {
+      errors.push('debounceSeconds must be a number (got ' + typeof config.debounceSeconds + ')');
+    } else if (config.debounceSeconds < 0.1 || config.debounceSeconds > 300) {
+      errors.push('debounceSeconds must be between 0.1 and 300 (got ' + config.debounceSeconds + ')');
+    }
   }
 
   // Required: aiProvider ("gemini" | "grok" | "none")

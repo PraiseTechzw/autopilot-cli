@@ -18,7 +18,7 @@ describe('Golden Commit Messages', () => {
       // Simulate file list from diff
       const files = parseFilesFromDiff(diffContent);
       
-      const actual = await generateCommitMessage(files, diffContent);
+      const actual = await generateCommitMessage(files, diffContent, { aiProvider: 'none' });
       
       // Normalize line endings
       const normalizedActual = actual.replace(/\r\n/g, '\n').trim();
