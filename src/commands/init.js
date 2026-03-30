@@ -49,12 +49,12 @@ async function createIgnoreFile(repoPath) {
   const ignorePath = getIgnorePath(repoPath);
   
   if (fs.existsSync(ignorePath)) {
-    logger.info('[SKIPPED] .autopilotignore already exists');
+    logger.info('.autopilotignore already exists');
     return false;
   }
 
   await fs.writeFile(ignorePath, DEFAULT_IGNORE_PATTERNS.trim() + '\n', 'utf8');
-  logger.success('[CREATED] .autopilotignore');
+  logger.success('Created .autopilotignore');
   return true;
 }
 
@@ -68,15 +68,13 @@ async function createConfigFile(repoPath, overrides = {}) {
   const configPath = getConfigPath(repoPath);
   
   if (fs.existsSync(configPath)) {
-    // We could try to merge, but the requirement says handle safely and report.
-    // Idempotent: just don't overwrite if it exists.
-    logger.info('[SKIPPED] .autopilotrc.json already exists');
+    logger.info('.autopilotrc.json already exists');
     return false;
   }
 
   const finalConfig = { ...DEFAULT_CONFIG, ...overrides };
   await fs.writeJson(configPath, finalConfig, { spaces: 2 });
-  logger.success('[CREATED] .autopilotrc.json');
+  logger.success('Created .autopilotrc.json');
   return true;
 }
 
@@ -111,13 +109,7 @@ async function updateGitIgnore(repoPath) {
     if (added) {
       const newContent = content + (content && !content.endsWith('\n') ? '\n' : '') + newLines.join('\n') + '\n';
       await fs.writeFile(gitIgnorePath, newContent);
-      if (exists) {
-        logger.success('[UPDATED] .gitignore appended with Autopilot paths');
-      } else {
-        logger.success('[CREATED] .gitignore with Autopilot paths');
-      }
-    } else {
-      logger.info('[SKIPPED] .gitignore already contains Autopilot paths');
+      logger.success('Updated .gitignore');
     }
   } catch (error) {
     logger.warn(`Could not update .gitignore: ${error.message}`);
