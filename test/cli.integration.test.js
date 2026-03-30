@@ -75,7 +75,7 @@ test('CLI Integration', async (t) => {
     // Create initial commit
     await fs.writeFile(path.join(tmpDir, 'README.md'), '# Initial');
     // Ensure .vscode and autopilot files are ignored by git
-    await fs.writeFile(path.join(tmpDir, '.gitignore'), '.vscode/\nautopilot.log\n.autopilot.pid\n');
+    await fs.writeFile(path.join(tmpDir, '.gitignore'), '.vscode/\n.autopilot.log\n.autopilot.pid\n.autopilot-state.json\n.autopilot/\n');
     await runGit(['add', '.'], tmpDir);
     await runGit(['commit', '-m', 'Initial commit'], tmpDir);
 
@@ -123,7 +123,7 @@ test('CLI Integration', async (t) => {
     const noisyInterval = setInterval(async () => {
       try {
         await fs.appendFile(path.join(tmpDir, '.vscode/time-analytics.json'), `{"t": ${Date.now()}}\n`);
-        await fs.appendFile(path.join(tmpDir, 'autopilot.log'), `[${new Date().toISOString()}] Log entry\n`);
+        await fs.appendFile(path.join(tmpDir, '.autopilot.log'), `[${new Date().toISOString()}] Log entry\n`);
       } catch (e) { /* ignore */ }
     }, 500);
 

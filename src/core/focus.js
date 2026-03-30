@@ -12,7 +12,8 @@ const CalendarIntegration = require('../integrations/calendar');
 class FocusEngine {
   constructor(repoPath, config) {
     this.repoPath = repoPath;
-    this.logFile = path.join(repoPath, 'autopilot.log');
+    this.logFile = path.join(repoPath, '.autopilot', 'focus.log');
+    fs.ensureDirSync(path.dirname(this.logFile));
     this.config = config?.focus || {
       activeThresholdSeconds: 120, // 2 mins between events counts as continuous active time
       sessionTimeoutSeconds: 1800, // 30 mins gap = new session
