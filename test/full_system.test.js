@@ -26,7 +26,13 @@ global.fetch = async () => {};
 
 describe('Full System E2E Integration', () => {
   
+  let watcher;
+  
   beforeEach(async () => {
+    // Reset Event System singleton for test isolation
+    eventSystem.queue = [];
+    eventSystem.isFlushing = false;
+
     // Clean start
     await fs.emptyDir(TMP_ROOT);
     await fs.ensureDir(HOME_DIR);
@@ -37,7 +43,7 @@ describe('Full System E2E Integration', () => {
     spawnSync('git', ['init', '--bare'], { cwd: REMOTE_DIR });
 
     // Setup Repo
-    spawnSync('git', ['init'], { cwd: REPO_DIR });
+    spawnSync('git', ['init', '-b', 'master'], { cwd: REPO_DIR });
     spawnSync('git', ['config', 'user.email', 'test@example.com'], { cwd: REPO_DIR });
     spawnSync('git', ['config', 'user.name', 'Test User'], { cwd: REPO_DIR });
     spawnSync('git', ['remote', 'add', 'origin', REMOTE_DIR], { cwd: REPO_DIR });
@@ -81,6 +87,10 @@ describe('Full System E2E Integration', () => {
   });
 
   afterEach(async () => {
+    if (watcher) {
+        await watcher.stop();
+        watcher = null;
+    }
     mock.restoreAll();
     try {
         // Cleanup if needed
@@ -89,7 +99,7 @@ describe('Full System E2E Integration', () => {
   });
 
   it('should flow from Global Config -> Watcher -> AI Commit -> Trust Trailers -> Push -> Event', async () => {
-    const watcher = new Watcher(REPO_DIR);
+    watcher = new Watcher(REPO_DIR);
     
     // Enable debug logging
     watcher.logVerbose = (msg) => console.log(`[Watcher] ${msg}`);
@@ -145,9 +155,6 @@ describe('Full System E2E Integration', () => {
             reject(new Error('Timed out waiting for push_success event'));
         }, 30000);
     });
-
-    // Stop watcher
-    await watcher.stop();
 
     // --- VERIFICATION ---
     
