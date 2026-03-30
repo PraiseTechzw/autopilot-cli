@@ -517,53 +517,59 @@ class Watcher {
       this.isProcessing = false;
     }
   }
-  /**
-   * Update the external status file for the status command
-   */
   async updateStatusFile(updates = {}) {
     try {
-      let state = {};
-      if (fs.existsSync(this.statePath)) {
-        state = fs.readJsonSync(this.statePath);
-      }
-
       if (!this.startedAt) this.startedAt = Date.now();
 
       const branch = await git.getBranch(this.repoPath);
-      const uptime = Math.floor((Date.now() - this.startedAt) / 1000);
+      const uptimeSec = Math.floor((Date.now() - this.startedAt) / 1000);
       
-      const newState = {
-        pid: process.pid,
+      const stateUpdates = {
+        watcherPid: process.pid,
+        pid: process.pid, // legacy
         startedAt: new Date(this.startedAt).toISOString(),
         branch: branch,
-        isProtected: isProtectedBranch(branch, this.config),
-        status: updates.status || state.status || 'watching',
-        lastCommit: updates.lastCommit || state.lastCommit || null,
-        lastPush: updates.lastPush || state.lastPush || null,
-        queueLength: this.retryQueue ? this.retryQueue.queue.length : 0,
-        conflicts: !!(updates.conflicts || state.conflicts),
+        branchBlocked: isProtectedBranch(branch, this.config),
+        isProtected: isProtectedBranch(branch, this.config), // legacy
+        status: updates.status || this.stateManager.getState().status || 'watching',
+        queueDepth: this.retryQueue ? this.retryQueue.queue.length : 0,
+        conflicts: updates.conflicts || this.stateManager.getState().conflicts || null,
         watchPath: this.repoPath,
-        uptime: uptime
+        uptime: uptimeSec,
+        health: 'good',
+        teamMode: !!this.config?.teamMode,
+        aiMode: this.config?.ai?.enabled ? (this.config.ai.provider || 'default') : 'disabled'
       };
 
-      // Handle special updates like lastCommitHash/Message to the new structure
       if (updates.lastCommitHash) {
-        newState.lastCommit = {
+        stateUpdates.lastCommitHash = updates.lastCommitHash;
+        stateUpdates.lastCommitMessage = updates.lastCommitMessage;
+        stateUpdates.lastCommitAt = updates.lastCommitAt || Date.now();
+        
+        // Legacy
+        stateUpdates.lastCommit = {
           hash: updates.lastCommitHash,
           message: updates.lastCommitMessage,
-          timestamp: new Date(updates.lastCommitAt || Date.now()).toISOString()
+          timestamp: new Date(stateUpdates.lastCommitAt).toISOString()
         };
       }
 
       if (updates.lastPushStatus) {
-        newState.lastPush = {
-          hash: updates.lastPushHash || (newState.lastCommit ? newState.lastCommit.hash : null),
+        stateUpdates.lastPushStatus = updates.lastPushStatus;
+        stateUpdates.lastPushHash = updates.lastPushHash || this.stateManager.getState().lastCommitHash;
+        stateUpdates.lastPushAt = updates.lastPushAt || Date.now();
+        
+        // Legacy
+        stateUpdates.lastPush = {
+          hash: stateUpdates.lastPushHash,
           success: updates.lastPushStatus === 'succeeded',
-          timestamp: new Date(updates.lastPushAt || Date.now()).toISOString()
+          timestamp: new Date(stateUpdates.lastPushAt).toISOString()
         };
+      } else if (updates.lastPushHash) {
+        stateUpdates.lastPushHash = updates.lastPushHash;
       }
 
-      fs.writeJsonSync(this.statePath, newState, { spaces: 2 });
+      this.stateManager.setState(stateUpdates);
     } catch (err) {
       // Don't fail the watcher if status file write fails
       logger.debug(`Failed to update status file: ${err.message}`);

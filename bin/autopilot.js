@@ -62,6 +62,7 @@ program
 program
   .command('start')
   .description('Start autopilot watcher in foreground')
+  .option('--json', 'Output in JSON format')
   .action(startWatcher);
 
 program
@@ -72,6 +73,7 @@ program
 program
   .command('status')
   .description('Show autopilot watcher status')
+  .option('--json', 'Output in JSON format')
   .action(statusWatcher);
 
 program
@@ -124,6 +126,7 @@ program
   .command('config [action] [key] [value]')
   .description('Manage configuration (list, get, set)')
   .option('-g, --global', 'Use global configuration')
+  .option('--json', 'Output in JSON format')
   .action(configCommand);
 
 program
@@ -140,6 +143,7 @@ program
 program
   .command('doctor')
   .description('Diagnose and validate autopilot setup')
+  .option('--json', 'Output in JSON format')
   .action(doctor);
 
 program

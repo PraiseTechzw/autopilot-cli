@@ -41,6 +41,7 @@ const parseValue = (val) => {
 async function config(cmd, key, value, options) {
   const repoPath = options?.cwd || process.cwd();
   const isGlobal = options?.global || false;
+  const isJson = !!options?.json;
 
   if (cmd === 'list') {
     // If list --global, show only global config?
@@ -49,7 +50,7 @@ async function config(cmd, key, value, options) {
     // But for now, just loadConfig which merges them.
     const currentConfig = await loadConfig(repoPath);
     console.log(JSON.stringify(currentConfig, null, 2));
-    if (isGlobal) {
+    if (isGlobal && !isJson) {
         logger.info('(Note: Showing effective merged config. Use --global to set global values.)');
     }
     return;
@@ -57,6 +58,10 @@ async function config(cmd, key, value, options) {
 
   if (cmd === 'get') {
     if (!key) {
+      if (isJson) {
+        console.log(JSON.stringify({ error: 'Missing key' }));
+        process.exit(1);
+      }
       logger.error('Usage: autopilot config get <key>');
       return;
     }
@@ -64,15 +69,30 @@ async function config(cmd, key, value, options) {
     const currentConfig = await loadConfig(repoPath);
     const val = getByDot(currentConfig, key);
     if (val === undefined) {
-      logger.warn(`Key '${key}' not set`);
+      if (isJson) {
+        console.log(JSON.stringify({ error: 'Key not set' }));
+      } else {
+        logger.warn(`Key '${key}' not set`);
+      }
     } else {
-      console.log(typeof val === 'object' ? JSON.stringify(val, null, 2) : val);
+      if (isJson) {
+        // We might want to just output the value as JSON, but what if it's a primitive?
+        // Let's wrap in an object for top-level JSON or just stringify the val.
+        // Usually, the prompt expects a structural object. Let's output { key: value }.
+        console.log(JSON.stringify({ [key]: val }, null, 2));
+      } else {
+        console.log(typeof val === 'object' ? JSON.stringify(val, null, 2) : val);
+      }
     }
     return;
   }
 
   if (cmd === 'set') {
     if (!key || value === undefined) {
+      if (isJson) {
+        console.log(JSON.stringify({ error: 'Missing key or value' }));
+        process.exit(1);
+      }
       logger.error('Usage: autopilot config set <key> <value>');
       return;
     }
@@ -100,11 +120,20 @@ async function config(cmd, key, value, options) {
     setByDot(rawConfig, key, typedValue);
     
     await saveConfig(repoPath, rawConfig, isGlobal);
-    logger.success(`Set ${key} = ${typedValue} ${isGlobal ? '(Global)' : '(Local)'}`);
+    if (isJson) {
+      console.log(JSON.stringify({ success: true, key, value: typedValue, global: isGlobal }));
+    } else {
+      logger.success(`Set ${key} = ${typedValue} ${isGlobal ? '(Global)' : '(Local)'}`);
+    }
     return;
   }
 
-  logger.error('Unknown config command. Use list, get, or set.');
+  if (isJson) {
+    console.log(JSON.stringify({ error: 'Unknown config command. Use list, get, or set.' }));
+    process.exit(1);
+  } else {
+    logger.error('Unknown config command. Use list, get, or set.');
+  }
 }
 
 module.exports = config;

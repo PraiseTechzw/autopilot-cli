@@ -9,79 +9,92 @@ const path = require('path');
 const { validateConfig } = require('../core/configValidator');
 const git = require('../core/git');
 const safety = require('../core/safety');
+const EXIT_CODES = require('../utils/exit-codes');
 
-async function doctor() {
+async function doctor(options = {}) {
+  const isJson = !!options.json;
   const root = process.cwd();
-  console.log('\n  Autopilot doctor');
-  console.log('  ─────────────────────────────');
+  
+  if (!isJson) {
+    console.log('\n  Autopilot doctor');
+    console.log('  ─────────────────────────────');
+  }
 
   let issues = 0;
+  const diagnostics = [];
+
+  const addDiag = (check, pass, details) => {
+    diagnostics.push({ check, pass, details });
+    if (!pass) issues++;
+    if (!isJson) {
+      console.log(`  [${pass ? 'PASS' : 'FAIL'}] ${check}${details ? ': ' + details : ''}`);
+    }
+  };
+
+  const addInfo = (info) => {
+    if (!isJson) {
+      console.log(`  [INFO] ${info}`);
+    }
+  };
 
   // 1. Node version >= 18
   const nodeVersion = process.version;
   const major = parseInt(nodeVersion.slice(1).split('.')[0]);
-  if (major >= 18) {
-    console.log(`  [PASS] Node.js version: ${nodeVersion} (>=18 required)`);
-  } else {
-    console.log(`  [FAIL] Node.js version: ${nodeVersion} (>=18 required)`);
-    issues++;
-  }
+  addDiag('Node.js version >= 18', major >= 18, nodeVersion);
 
   // 2. Git installed
   try {
     const { stdout } = await execa('git', ['--version']);
-    console.log(`  [PASS] Git installed: ${stdout.trim()}`);
+    addDiag('Git installed', true, stdout.trim());
   } catch (err) {
-    console.log(`  [FAIL] Git not found`);
-    issues++;
+    addDiag('Git installed', false, 'Git not found');
   }
 
   // 3. Inside git repo
   try {
     await execa('git', ['rev-parse', '--is-inside-work-tree']);
-    console.log(`  [PASS] Inside a git repo: yes`);
+    addDiag('Inside a git repo', true, 'yes');
   } catch (err) {
-    console.log(`  [FAIL] Inside a git repo: no`);
-    issues++;
+    addDiag('Inside a git repo', false, 'no');
   }
 
   // 4. .autopilotrc.json exists and valid
   const configPath = path.join(root, '.autopilotrc.json');
   let config = null;
   if (!fs.existsSync(configPath)) {
-    console.log(`  [FAIL] .autopilotrc.json not found`);
-    issues++;
+    addDiag('.autopilotrc.json exists', false, 'not found');
   } else {
     try {
       config = fs.readJsonSync(configPath);
       const validation = validateConfig(config);
       if (validation.valid) {
-        console.log(`  [PASS] .autopilotrc.json found and valid`);
+        addDiag('.autopilotrc.json valid', true, 'found and valid');
       } else {
-        console.log(`  [FAIL] .autopilotrc.json has errors: ${validation.errors[0]}`);
-        issues++;
+        addDiag('.autopilotrc.json valid', false, validation.errors[0]);
       }
     } catch (err) {
-      console.log(`  [FAIL] .autopilotrc.json is not valid JSON`);
-      issues++;
+      addDiag('.autopilotrc.json valid', false, 'not valid JSON');
     }
   }
 
   // 5. AI API key present
-  const geminiKey = config?.aiApiKey || process.env.GEMINI_API_KEY;
-  const grokKey = config?.aiApiKey || process.env.GROK_API_KEY; // Actually need to know which one to check
-  const hasKey = (config?.aiProvider === 'gemini' && geminiKey) || 
-                 (config?.aiProvider === 'grok' && grokKey) ||
-                 (config?.aiProvider === 'none');
+  const geminiKey = process.env.GEMINI_API_KEY || (config && config.ai && config.ai.apiKey);
+  const grokKey = process.env.GROK_API_KEY || (config && config.ai && config.ai.grokApiKey);
+  
+  const aiProvider = (config && config.ai && config.ai.provider) || 'grok';
+  const aiEnabled = (config && config.ai && config.ai.enabled) !== false;
+  
+  const hasKey = (aiProvider === 'gemini' && geminiKey) || 
+                 (aiProvider === 'grok' && grokKey) ||
+                 (!aiEnabled);
   
   if (config) {
-    if (config.aiProvider === 'none') {
-      console.log(`  [PASS] Rule-based commit messages enabled (No AI provider)`);
+    if (!aiEnabled) {
+      addDiag('AI Configuration', true, 'Rule-based commit messages enabled (AI disabled)');
     } else if (!hasKey) {
-      console.log(`  [FAIL] AI API key missing for provider: ${config.aiProvider}`);
-      issues++;
+      addDiag('AI Configuration', false, `API key missing for provider: ${aiProvider}`);
     } else {
-      console.log(`  [PASS] AI API key present for provider: ${config.aiProvider}`);
+      addDiag('AI Configuration', true, `API key present for provider: ${aiProvider}`);
     }
   }
 
@@ -89,10 +102,9 @@ async function doctor() {
   try {
     await execa('git', ['ls-remote', 'origin'], { timeout: 5000 });
     const { stdout: remoteUrl } = await execa('git', ['remote', 'get-url', 'origin']);
-    console.log(`  [PASS] Remote origin reachable: ${remoteUrl.trim()}`);
+    addDiag('Remote origin reachable', true, remoteUrl.trim());
   } catch (err) {
-    console.log(`  [FAIL] Remote origin not reachable (check network or auth)`);
-    issues++;
+    addDiag('Remote origin reachable', false, 'check network or auth');
   }
 
   // 7. Current branch vs protected branches
@@ -101,10 +113,9 @@ async function doctor() {
     if (branch && config) {
       const isProtected = safety.isProtectedBranch(branch, config);
       if (isProtected) {
-        console.log(`  [FAIL] Current branch "${branch}" is protected — pushes will be blocked`);
-        issues++;
+        addDiag('Branch safety', false, `Current branch "${branch}" is protected — pushes will be blocked`);
       } else {
-        console.log(`  [PASS] Current branch "${branch}" is not protected`);
+        addDiag('Branch safety', true, `Current branch "${branch}" is not protected`);
       }
     }
   } catch (err) {}
@@ -114,19 +125,48 @@ async function doctor() {
   if (fs.existsSync(queuePath)) {
     try {
        const queue = fs.readJsonSync(queuePath);
-       console.log(`  [INFO] Retry queue: ${queue.length} pending jobs`);
+       addInfo(`Retry queue: ${queue.length} pending jobs`);
     } catch (err) {
-       console.log(`  [WARN] Could not read .autopilot-queue.json`);
+       if (!isJson) console.log(`  [WARN] Could not read .autopilot-queue.json`);
     }
   } else {
-     console.log(`  [PASS] Retry queue: 0 pending jobs`);
+    addInfo('Retry queue: 0 pending jobs');
   }
 
-  console.log('  ─────────────────────────────');
-  if (issues > 0) {
-    console.log(`  ${issues} issues found. Run "autopilot init" to reconfigure.`);
+  // Check state file health
+  const statePath = path.join(root, '.autopilot-state.json');
+  if (fs.existsSync(statePath)) {
+    try {
+       const state = fs.readJsonSync(statePath);
+       let alive = false;
+       if (state.pid || state.watcherPid) {
+         try {
+           process.kill(state.pid || state.watcherPid, 0);
+           alive = true;
+         } catch(e) {}
+       }
+       addDiag('Watcher consistency', true, alive ? 'Running' : 'Stopped');
+    } catch (err) {
+      addDiag('Watcher consistency', false, 'State file corrupted');
+    }
+  }
+
+  if (isJson) {
+    console.log(JSON.stringify({ 
+      health: issues === 0 ? 'good' : 'poor', 
+      issuesCount: issues, 
+      diagnostics 
+    }, null, 2));
+    process.exit(issues > 0 ? EXIT_CODES.GENERAL_ERROR : EXIT_CODES.SUCCESS);
   } else {
-    console.log('  Everything looks good! Autopilot is ready to fly.');
+    console.log('  ─────────────────────────────');
+    if (issues > 0) {
+      console.log(`  ${issues} issues found. Run "autopilot init" to reconfigure.`);
+      process.exit(EXIT_CODES.GENERAL_ERROR);
+    } else {
+      console.log('  Everything looks good! Autopilot is ready to fly.');
+      process.exit(EXIT_CODES.SUCCESS);
+    }
   }
 }
 

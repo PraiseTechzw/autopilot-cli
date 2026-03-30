@@ -173,6 +173,20 @@ Prefer a GUI? Use our official **Autopilot VS Code Extension**:
 | `autopilot insights` | View productivity stats and analytics. |
 | `autopilot doctor` | Diagnose configuration and environment issues. |
 
+### Note for Platform Integrations
+Many commands (`status`, `doctor`, `start`, `config`) support a `--json` flag to return structured output suitable for reading programmatically (e.g. by the VS Code extension).
+
+#### Exit Codes
+The CLI utilizes standardized exit codes for programmatic error handling:
+- `0`: Success / Running
+- `1`: General Error (Runtime failure)
+- `2`: Not a Git Repository
+- `3`: Not Initialized
+- `4`: Blocked Branch
+- `5`: Invalid Configuration
+- `6`: Watcher Already Running
+- `7`: Watcher Not Running
+
 ---
 
 ## ⚙️ Configuration
