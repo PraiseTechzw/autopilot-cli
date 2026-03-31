@@ -83,7 +83,7 @@ class StateManager {
 
   reset() {
     this.setState({
-      status: 'watching', 
+      status: 'running', 
       running: true,
       paused: false,
       reason: null,

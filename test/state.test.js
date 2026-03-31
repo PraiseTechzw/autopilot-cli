@@ -20,20 +20,37 @@ describe('StateManager', () => {
 
   it('should initialize as running (not paused)', () => {
     assert.strictEqual(stateManager.isPaused(), false);
-    assert.deepStrictEqual(stateManager.getState(), { status: 'running', reason: null, pausedAt: null });
+    const state = stateManager.getState();
+    // Verify core fields of the versioned contract
+    assert.strictEqual(state.version, 1);
+    assert.strictEqual(state.running, true);
+    assert.strictEqual(state.paused, false);
+    assert.strictEqual(state.reason, null);
+    assert.strictEqual(state.pausedAt, null);
+    // 'running' is the backward-compat status value
+    assert.strictEqual(state.status, 'running');
   });
 
   it('should pause with reason', () => {
     stateManager.pause('meeting');
     assert.strictEqual(stateManager.isPaused(), true);
-    assert.strictEqual(stateManager.getState().reason, 'meeting');
+    const state = stateManager.getState();
+    assert.strictEqual(state.reason, 'meeting');
+    assert.strictEqual(state.status, 'paused');
+    assert.strictEqual(state.paused, true);
+    assert.strictEqual(state.running, false);
   });
 
   it('should resume', () => {
     stateManager.pause('lunch');
     stateManager.resume();
     assert.strictEqual(stateManager.isPaused(), false);
-    assert.deepStrictEqual(stateManager.getState(), { status: 'running', reason: null, pausedAt: null });
+    const state = stateManager.getState();
+    assert.strictEqual(state.status, 'running');
+    assert.strictEqual(state.running, true);
+    assert.strictEqual(state.paused, false);
+    assert.strictEqual(state.reason, null);
+    assert.strictEqual(state.pausedAt, null);
   });
 
   it('should persist state across instances', () => {
@@ -44,3 +61,4 @@ describe('StateManager', () => {
     assert.strictEqual(newManager.getState().reason, 'persisted');
   });
 });
+

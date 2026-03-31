@@ -141,6 +141,24 @@ program
   .action(guideCommand);
 
 program
+  .command('version')
+  .description('Show CLI version (use --json for machine-readable output)')
+  .option('--json', 'Output in JSON format')
+  .action((options) => {
+    if (options.json) {
+      console.log(JSON.stringify({
+        version: pkg.version,
+        name: pkg.name,
+        contractVersion: 1,
+        node: process.version,
+        platform: process.platform
+      }));
+    } else {
+      console.log(pkg.version);
+    }
+  });
+
+program
   .command('doctor')
   .description('Diagnose and validate autopilot setup')
   .option('--json', 'Output in JSON format')

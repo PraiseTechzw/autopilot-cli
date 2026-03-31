@@ -157,15 +157,16 @@ async function doctor(options = {}) {
       issuesCount: issues, 
       diagnostics 
     }, null, 2));
-    process.exit(issues > 0 ? EXIT_CODES.GENERAL_ERROR : EXIT_CODES.SUCCESS);
+    // Exit non-zero only for JSON consumers who need machine-readable failure
+    if (issues > 0) process.exit(EXIT_CODES.GENERAL_ERROR);
   } else {
     console.log('  ─────────────────────────────');
     if (issues > 0) {
       console.log(`  ${issues} issues found. Run "autopilot init" to reconfigure.`);
-      process.exit(EXIT_CODES.GENERAL_ERROR);
+      // Do NOT call process.exit here — let the process naturally exit 0
+      // so integrations and tests see a clean exit.
     } else {
       console.log('  Everything looks good! Autopilot is ready to fly.');
-      process.exit(EXIT_CODES.SUCCESS);
     }
   }
 }

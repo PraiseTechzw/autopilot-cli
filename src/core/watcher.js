@@ -531,7 +531,8 @@ class Watcher {
         branch: branch,
         branchBlocked: isProtectedBranch(branch, this.config),
         isProtected: isProtectedBranch(branch, this.config), // legacy
-        status: updates.status || this.stateManager.getState().status || 'watching',
+        // Normalize: 'watching' is an implementation detail; public contract uses 'running'
+        status: updates.status || this.stateManager.getState().status || 'running',
         queueDepth: this.retryQueue ? this.retryQueue.queue.length : 0,
         conflicts: updates.conflicts || this.stateManager.getState().conflicts || null,
         watchPath: this.repoPath,
