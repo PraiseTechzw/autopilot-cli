@@ -129,6 +129,7 @@ npx @traisetech/autopilot start
     autopilot init
     ```
     Follow the interactive prompts to configure settings (or accept defaults).
+    If the folder is not a git repository yet, Autopilot can create one for you and explain what that means in plain language.
 
 3.  **Start the watcher:**
     ```bash

@@ -405,6 +405,7 @@ class Watcher {
       const commitResult = await git.commit(this.repoPath, message);
       
       if (commitResult.ok) {
+        const isFirstAutopilotCommit = this.lastCommitAt === 0;
         this.lastCommitAt = Date.now();
         this.focusEngine.onCommit();
         
@@ -430,6 +431,9 @@ class Watcher {
         });
 
         logger.success('Commit complete');
+        if (isFirstAutopilotCommit) {
+          logger.info('Autopilot just saved your work as a commit. You do not need to do anything else while it keeps watching.');
+        }
       } else {
         logger.error(`Commit failed: ${commitResult.stderr}`);
         return;

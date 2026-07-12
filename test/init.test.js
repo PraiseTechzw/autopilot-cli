@@ -11,6 +11,8 @@ const logger = require('../src/utils/logger');
 // Mock dependencies - moved to beforeEach to survive restoreAll
 // mock.method calls removed from here
 
+let gitRepoExists = true;
+
 describe('Init Command AI Configuration', () => {
   let answers = [];
   
@@ -23,9 +25,10 @@ describe('Init Command AI Configuration', () => {
     // Mock fs
     mock.method(fs, 'existsSync', (p) => {
       const str = String(p); // Ensure string
-      const result = str.endsWith('.git');
-      // console.error(`DEBUG: existsSync(${str}) -> ${result}`);
-      return result;
+      if (str.endsWith('.git')) {
+        return gitRepoExists;
+      }
+      return false;
     });
     mock.method(fs, 'writeFile', () => Promise.resolve());
     mock.method(fs, 'writeJson', () => Promise.resolve());
@@ -75,6 +78,7 @@ describe('Init Command AI Configuration', () => {
     });
     
     // Ensure tmpDir exists (conceptually)
+    gitRepoExists = true;
 });
 
   afterEach(() => {
@@ -136,6 +140,18 @@ describe('Init Command AI Configuration', () => {
     assert.strictEqual(config.ai.apiKey, '');
     assert.strictEqual(config.ai.grokApiKey, '');
     assert.strictEqual(config.ai.interactive, true); // Default is now true (Safety Mode)
+  });
+
+  it('should offer to initialize git when starting from a new folder', async () => {
+    gitRepoExists = false;
+    answers = ['y', 'N', 'N'];
+
+    await initRepo();
+
+    const config = global.capturedConfig;
+    assert.ok(config);
+    assert.strictEqual(config.ai.provider, 'grok');
+    assert.strictEqual(config.teamMode, false);
   });
 
 });

@@ -6,6 +6,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 const readline = require('readline');
+const execa = require('execa');
 const logger = require('../utils/logger');
 const { getConfigPath, getIgnorePath, getGitPath } = require('../utils/paths');
 const { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS } = require('../config/defaults');
@@ -29,6 +30,18 @@ function askQuestion(query) {
   }));
 }
 
+async function askYesNo(query, defaultYes = false) {
+  const suffix = defaultYes ? ' [Y/n]: ' : ' [y/N]: ';
+  const answer = await askQuestion(query.endsWith('?') ? `${query}${suffix}` : `${query}${suffix}`);
+  const normalized = answer.trim().toLowerCase();
+
+  if (!normalized) {
+    return defaultYes;
+  }
+
+  return normalized === 'y' || normalized === 'yes';
+}
+
 
 /**
  * Verify current directory is a git repository
@@ -38,6 +51,25 @@ function askQuestion(query) {
 function isGitRepo(repoPath) {
   const gitPath = getGitPath(repoPath);
   return fs.existsSync(gitPath);
+}
+
+async function initializeGitRepo(repoPath) {
+  logger.info('Git is the version history for your project. `git init` creates that history so Autopilot has a safe place to save commits.');
+
+  const shouldInit = await askYesNo('This folder is not a git repository yet. Create one now?', true);
+  if (!shouldInit) {
+    logger.error('Autopilot needs a git repository to track changes.');
+    return false;
+  }
+
+  try {
+    await execa('git', ['init'], { cwd: repoPath });
+    logger.success('Created a new git repository');
+    return true;
+  } catch (error) {
+    logger.error(`Could not create a git repository: ${error.stderr || error.message}`);
+    return false;
+  }
 }
 
 /**
@@ -129,8 +161,15 @@ async function initRepo() {
 
     // Verify git repository
     if (!isGitRepo(repoPath)) {
-      logger.error('Not a git repository. Please run this inside a git repo.');
-      process.exit(EXIT_CODES.NOT_GIT_REPO);
+      if (process.stdin.isTTY) {
+        const initialized = await initializeGitRepo(repoPath);
+        if (!initialized) {
+          process.exit(EXIT_CODES.NOT_GIT_REPO);
+        }
+      } else {
+        logger.error('Not a git repository. Please run this inside a git repo.');
+        process.exit(EXIT_CODES.NOT_GIT_REPO);
+      }
     }
 
     logger.success('Git repository detected');
@@ -156,6 +195,13 @@ async function initRepo() {
       // Select Provider
       const providerAns = await askQuestion('Select AI Provider (gemini/grok) [grok]: ');
       provider = providerAns.toLowerCase() === 'gemini' ? 'gemini' : 'grok';
+
+      if (provider === 'gemini') {
+        logger.info('Need a free Gemini key? Get one at https://aistudio.google.com/app/apikey');
+      } else {
+        logger.info('Need a Grok key? Create one at https://console.x.ai/');
+      }
+      logger.info('If you are still exploring, press Enter on the next prompt to keep using the default AI mode.');
       
       while (true) {
         const keyPrompt = provider === 'grok' 
@@ -210,13 +256,14 @@ async function initRepo() {
 
 
     const overrides = {
+      aiProvider: (customAI.toLowerCase() === 'y') ? provider : 'grok',
       ai: {
         enabled: true,
         provider: (customAI.toLowerCase() === 'y') ? provider : "grok",
         apiKey: apiKey || "",
         grokApiKey: grokApiKey || "",
         interactive: interactive,
-        model: provider === 'grok' ? "grok-beta" : "gemini-1.5-flash"
+        model: provider === 'grok' ? "grok-beta" : "gemini-2.5-flash"
       },
       teamMode: useTeamMode,
     };
