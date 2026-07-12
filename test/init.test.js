@@ -86,43 +86,41 @@ describe('Init Command AI Configuration', () => {
     delete global.capturedConfig;
   });
 
-  it('should configure Gemini correctly (custom)', async () => {
+  it('should store a custom API key when selected', async () => {
     // Answers:
     // 1. Team mode? N
-    // 2. Custom AI? y
-    // 3. Provider? gemini
-    // 4. API Key? test-gemini-key
-    // 5. Interactive? y
-    answers = ['N', 'y', 'gemini', 'test-gemini-key', 'y'];
+    // 2. Custom AI selection? 2
+    // 3. API Key? test-gemini-key
+    // 4. Interactive? y
+    answers = ['N', '2', 'test-gemini-key', 'y'];
     
     await initRepo();
     
     const config = global.capturedConfig;
     assert.ok(config);
     assert.strictEqual(config.ai.enabled, true);
-    assert.strictEqual(config.ai.provider, 'gemini');
+    assert.strictEqual(config.ai.provider, 'default');
     assert.strictEqual(config.ai.apiKey, 'test-gemini-key');
     assert.strictEqual(config.ai.interactive, true);
   });
 
-  it('should configure Grok correctly (custom)', async () => {
+  it('should keep custom API key setup simple', async () => {
     // Answers:
     // 1. Team mode? N
-    // 2. Custom AI? y
-    // 3. Provider? grok
-    // 4. API Key? test-grok-key
-    // 5. Interactive? n
-    answers = ['N', 'y', 'grok', 'test-grok-key', 'n'];
+    // 2. Custom AI selection? 2
+    // 3. API Key? test-grok-key
+    // 4. Interactive? n
+    answers = ['N', '2', 'test-grok-key', 'n'];
     
     await initRepo();
     
     const config = global.capturedConfig;
     assert.ok(config);
     assert.strictEqual(config.ai.enabled, true);
-    assert.strictEqual(config.ai.provider, 'grok');
-    assert.strictEqual(config.ai.grokApiKey, 'test-grok-key');
+    assert.strictEqual(config.ai.provider, 'default');
+    assert.strictEqual(config.ai.apiKey, 'test-grok-key');
     assert.strictEqual(config.ai.interactive, false);
-    assert.strictEqual(config.ai.model, 'grok-beta');
+    assert.strictEqual(config.ai.model, 'default');
   });
 
   it('should use Zero-Config AI by default', async () => {
@@ -136,10 +134,21 @@ describe('Init Command AI Configuration', () => {
     const config = global.capturedConfig;
     assert.ok(config);
     assert.strictEqual(config.ai.enabled, true);
-    assert.strictEqual(config.ai.provider, 'grok');
+    assert.strictEqual(config.ai.provider, 'default');
     assert.strictEqual(config.ai.apiKey, '');
-    assert.strictEqual(config.ai.grokApiKey, '');
     assert.strictEqual(config.ai.interactive, true); // Default is now true (Safety Mode)
+  });
+
+  it('should allow beginners to skip AI setup for now', async () => {
+    answers = ['N', '3'];
+
+    await initRepo();
+
+    const config = global.capturedConfig;
+    assert.ok(config);
+    assert.strictEqual(config.ai.enabled, false);
+    assert.strictEqual(config.ai.provider, 'default');
+    assert.strictEqual(config.ai.apiKey, '');
   });
 
   it('should offer to initialize git when starting from a new folder', async () => {
@@ -150,7 +159,7 @@ describe('Init Command AI Configuration', () => {
 
     const config = global.capturedConfig;
     assert.ok(config);
-    assert.strictEqual(config.ai.provider, 'grok');
+    assert.strictEqual(config.ai.provider, 'default');
     assert.strictEqual(config.teamMode, false);
   });
 

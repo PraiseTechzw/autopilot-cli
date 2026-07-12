@@ -5,8 +5,7 @@
 
 const path = require('path');
 const logger = require('../utils/logger');
-const gemini = require('./gemini');
-const grok = require('./grok');
+const openrouter = require('./openrouter');
 const HistoryManager = require('./history');
 
 const { generateRuleBasedMessage } = require('./commitMessageGenerator');
@@ -22,22 +21,22 @@ async function generateCommitMessage(files, diffContent, config = {}) {
   let message = '';
   
   const mode = config.commitMessageMode || 'smart';
-  const aiProvider = config.ai?.provider || config.aiProvider || 'grok';
-  const aiApiKey = config.ai?.apiKey || config.ai?.grokApiKey || config.aiApiKey;
+  const aiProvider = config.ai?.provider || config.aiProvider || 'default';
+  const aiApiKey = config.ai?.apiKey || config.aiApiKey;
 
   if (!files || files.length === 0) {
     message = 'update: minor changes';
   } else if (mode === 'simple') {
     message = 'chore: auto-commit changes';
-  } else if (aiProvider !== 'none' && diffContent && diffContent.trim() && (aiApiKey || aiProvider === 'grok' || config.ai?.enabled)) {
+  } else if (aiProvider !== 'none' && diffContent && diffContent.trim() && (aiApiKey || config.ai?.enabled)) {
     // AI Mode
     try {
       logger.info(`Generating AI commit message using ${aiProvider}...`);
-      
-      if (aiProvider === 'grok') {
-        message = await grok.generateGrokCommitMessage(diffContent, aiApiKey, config.ai?.grokModel);
+
+      if (aiProvider === 'openrouter') {
+        message = await openrouter.generateCommitMessage(diffContent, aiApiKey, config.ai?.model);
       } else {
-        message = await gemini.generateAICommitMessage(diffContent, aiApiKey, config.ai?.model);
+        message = generateSmartCommitMessage(files, diffContent);
       }
 
       if (!message || message.length < 3) {

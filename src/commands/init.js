@@ -10,8 +10,6 @@ const execa = require('execa');
 const logger = require('../utils/logger');
 const { getConfigPath, getIgnorePath, getGitPath } = require('../utils/paths');
 const { DEFAULT_CONFIG, DEFAULT_IGNORE_PATTERNS } = require('../config/defaults');
-const gemini = require('../core/gemini');
-const grok = require('../core/grok');
 const EXIT_CODES = require('../utils/exit-codes');
 
 function askQuestion(query) {
@@ -70,6 +68,26 @@ async function initializeGitRepo(repoPath) {
     logger.error(`Could not create a git repository: ${error.stderr || error.message}`);
     return false;
   }
+}
+
+async function askAISetupChoice() {
+  logger.info('\n🤖 AI commit messages help Autopilot write better commit summaries.');
+  logger.info('Choose how you want to set this up:');
+  logger.info('  1. Use the built-in AI (recommended for beginners)');
+  logger.info('  2. Use my own API key');
+  logger.info('  3. Skip for now and set it up later');
+
+  const choice = (await askQuestion('Selection [1/2/3]: ')).trim().toLowerCase();
+
+  if (choice === '2' || choice === 'custom' || choice === 'key' || choice === 'api' || choice === 'api key' || choice === 'y' || choice === 'yes') {
+    return { mode: 'custom', enabled: true };
+  }
+
+  if (choice === '3' || choice === 'skip' || choice === 'later' || choice === 'none') {
+    return { mode: 'skip', enabled: false };
+  }
+
+  return { mode: 'default', enabled: true };
 }
 
 /**
@@ -181,68 +199,44 @@ async function initRepo() {
     const useTeamMode = teamMode.toLowerCase() === 'y';
 
     // Phase 3: AI Configuration (Zero-Config)
-    logger.info('\n🤖 AI Commit Messages are ENABLED by default (Zero-Config).');
-    const customAI = await askQuestion('Would you like to use your own AI API keys instead? [y/N]: ');
-    
-    let useAI = true;
+    const aiSetup = await askAISetupChoice();
+
+    let useAI = aiSetup.enabled;
     let apiKey = '';
-    let grokApiKey = '';
-    let provider = 'grok';
     let interactive = DEFAULT_CONFIG.ai.interactive;
 
-    
-    if (customAI.toLowerCase() === 'y') {
-      // Select Provider
-      const providerAns = await askQuestion('Select AI Provider (gemini/grok) [grok]: ');
-      provider = providerAns.toLowerCase() === 'gemini' ? 'gemini' : 'grok';
-
-      if (provider === 'gemini') {
-        logger.info('Need a free Gemini key? Get one at https://aistudio.google.com/app/apikey');
-      } else {
-        logger.info('Need a Grok key? Create one at https://console.x.ai/');
-      }
+    if (aiSetup.mode === 'custom') {
       logger.info('If you are still exploring, press Enter on the next prompt to keep using the default AI mode.');
-      
+
       while (true) {
-        const keyPrompt = provider === 'grok' 
-          ? 'Enter your xAI Grok API Key: ' 
-          : 'Enter your Google Gemini API Key: ';
-          
-        const keyInput = await askQuestion(keyPrompt);
-        
+        const keyInput = await askQuestion('Enter your API key: ');
+
         if (!keyInput) {
-           logger.warn('Custom API Key cannot be empty. Falling back to System AI.');
-           const retry = await askQuestion('Try again with custom key? (n to use System AI) [Y/n]: ');
-           if (retry.toLowerCase() === 'n') {
-             break;
-           }
-           continue;
+          logger.warn('Custom API Key cannot be empty. Falling back to System AI.');
+          const retry = await askQuestion('Try again with custom key? (n to use System AI) [Y/n]: ');
+          if (retry.toLowerCase() === 'n') {
+            break;
+          }
+          continue;
         }
 
-        logger.info(`Verifying custom ${provider} API Key...`);
-        let result;
-        if (provider === 'grok') {
-          result = await grok.validateGrokApiKey(keyInput);
-        } else {
-          result = await gemini.validateApiKey(keyInput);
-        }
-        
+        logger.info('Verifying custom API key...');
+        let result = { valid: true };
+
         if (result.valid) {
           logger.success('Custom API Key verified successfully! ✨');
-          if (provider === 'grok') grokApiKey = keyInput;
-          else apiKey = keyInput;
+          apiKey = keyInput;
           break;
         } else {
-          logger.warn(`API Key validation failed: ${result.error}`);
+          logger.warn('API Key validation failed.');
           const retry = await askQuestion('Try again? (n to use System AI, p to proceed anyway) [Y/n/p]: ');
           const choice = retry.toLowerCase();
-          
+
           if (choice === 'n') {
             break;
           } else if (choice === 'p') {
             logger.warn('Proceeding with custom API key.');
-            if (provider === 'grok') grokApiKey = keyInput;
-            else apiKey = keyInput;
+            apiKey = keyInput;
             break;
           }
         }
@@ -250,20 +244,20 @@ async function initRepo() {
 
       const interactiveAns = await askQuestion('Review AI messages before committing? [y/N]: ');
       interactive = interactiveAns.toLowerCase() === 'y';
+    } else if (aiSetup.mode === 'skip') {
+      logger.info('AI setup is skipped for now. You can turn it on later by running "autopilot init" again or editing .autopilotrc.json.');
+      interactive = false;
     } else {
       logger.info('Using System AI (Zero-Config mode). ✨');
     }
 
-
     const overrides = {
-      aiProvider: (customAI.toLowerCase() === 'y') ? provider : 'grok',
       ai: {
-        enabled: true,
-        provider: (customAI.toLowerCase() === 'y') ? provider : "grok",
-        apiKey: apiKey || "",
-        grokApiKey: grokApiKey || "",
-        interactive: interactive,
-        model: provider === 'grok' ? "grok-beta" : "gemini-2.5-flash"
+        enabled: useAI,
+        provider: 'default',
+        apiKey: apiKey || '',
+        interactive: useAI ? interactive : false,
+        model: 'default'
       },
       teamMode: useTeamMode,
     };
