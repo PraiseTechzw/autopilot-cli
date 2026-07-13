@@ -63,7 +63,7 @@ We prioritize the safety of your code above all else. Autopilot follows strict r
 -   **Never force-pushes**: Autopilot only performs standard `git push` operations. It will never overwrite remote history.
 -   **Never commits ignored files**: It strictly respects your `.gitignore` and `.autopilotignore` rules.
 -   **Never operates during merge/rebase**: If your repo is in a merge, rebase, or cherry-pick state, Autopilot pauses automatically.
--   **Never transmits source code without opt-in**: Your code stays local. It is only sent to an AI provider (Gemini/Grok) if you explicitly enable AI features and provide your own API key.
+-   **Never transmits source code without opt-in**: Your code stays local. It is only sent to an AI provider when you explicitly enable AI features and provide your own API key.
 -   **Pauses when uncertain**: If a git error occurs, a conflict is detected, or the network fails, Autopilot pauses and waits for your intervention.
 -   **Allows all actions to be undone**: The `autopilot undo` command safely reverts the last automated commit without losing your file changes.
 
@@ -81,7 +81,7 @@ What happens when things go wrong? Autopilot is designed to fail safely.
 
 ## 🤖 AI & Privacy
 
-Autopilot offers **optional** AI integration (Google Gemini or xAI Grok) to generate context-aware commit messages.
+Autopilot offers **optional** AI integration through OpenRouter to generate context-aware commit messages.
 
 -   **Opt-In Only**: AI features are disabled by default. You must enable them and provide your own API key.
 -   **Data Usage**: When enabled, only the `git diff` (text changes) is sent to the AI provider to generate the message.
@@ -204,7 +204,8 @@ Autopilot uses an `.autopilotrc.json` file in your project root.
   "preventSecrets": true,
   "ai": {
     "enabled": true,
-    "provider": "gemini"
+    "provider": "openrouter",
+    "apiKey": "YOUR_OPENROUTER_API_KEY"
   }
 }
 ```

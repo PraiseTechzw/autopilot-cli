@@ -70,7 +70,7 @@ This document reflects the current `.autopilotrc.json` options.
 - **Description:** 
   - smart: file/diff-based conventional messages
   - simple: `chore: update changes`
-  - ai: uses configured AI provider (Gemini or Grok)
+  - ai: uses the configured AI provider when enabled
 
 ### `teamMode`
 - **Type:** boolean

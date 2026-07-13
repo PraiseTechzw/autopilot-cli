@@ -78,16 +78,12 @@ async function doctor(options = {}) {
   }
 
   // 5. AI API key present
-  const geminiKey = process.env.GEMINI_API_KEY || (config && config.ai && config.ai.apiKey);
-  const grokKey = process.env.GROK_API_KEY || (config && config.ai && config.ai.grokApiKey);
-  
-  const aiProvider = (config && config.ai && config.ai.provider) || 'grok';
+  const openrouterKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || (config && config.ai && config.ai.apiKey);
+  const aiProvider = (config && config.ai && config.ai.provider) || 'openrouter';
   const aiEnabled = (config && config.ai && config.ai.enabled) !== false;
-  
-  const hasKey = (aiProvider === 'gemini' && geminiKey) || 
-                 (aiProvider === 'grok' && grokKey) ||
-                 (!aiEnabled);
-  
+
+  const hasKey = aiProvider === 'openrouter' ? !!openrouterKey : !aiEnabled;
+
   if (config) {
     if (!aiEnabled) {
       addDiag('AI Configuration', true, 'Rule-based commit messages enabled (AI disabled)');

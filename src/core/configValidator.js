@@ -42,9 +42,9 @@ function validateConfig(config) {
     }
   }
 
-  // Required: aiProvider ("gemini" | "grok" | "none")
-  const validProviders = ['gemini', 'grok', 'none'];
-  if (!validProviders.includes(config.aiProvider)) {
+  // Optional: aiProvider ("openrouter" | "none")
+  const validProviders = ['openrouter', 'none'];
+  if (config.aiProvider !== undefined && !validProviders.includes(config.aiProvider)) {
     errors.push('aiProvider must be one of: ' + validProviders.join(', ') + ' (got ' + config.aiProvider + ')');
   }
 

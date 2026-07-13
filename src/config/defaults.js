@@ -6,15 +6,15 @@
 const DEFAULT_CONFIG = {
   watchPath: '.',
   debounceMs: 20000,
-  aiProvider: 'grok',
+  aiProvider: 'openrouter',
   aiApiKey: '',
   ai: {
     enabled: true,
-    provider: 'grok',
+    provider: 'openrouter',
     apiKey: '',
     grokApiKey: '',
     interactive: true,
-    model: 'grok-beta'
+    model: 'openai/gpt-oss-120b:free'
   },
   protectedBranches: ['main', 'master', 'production', 'prod', 'release'],
   allowPushToProtected: false,

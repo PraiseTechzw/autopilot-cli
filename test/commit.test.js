@@ -62,6 +62,40 @@ describe('Commit Message Generator', () => {
     assert.strictEqual(msg, '[autopilot] feat: add openrouter support');
   });
 
+  it('should use OpenRouter by default when AI is enabled and a key is available', async () => {
+    mock.restoreAll();
+
+    const originalFetch = global.fetch;
+    let fetchCalled = false;
+
+    global.fetch = async (_url, options) => {
+      fetchCalled = true;
+      const payload = JSON.parse(options.body);
+      assert.strictEqual(payload.model, 'openai/gpt-oss-120b:free');
+      return {
+        ok: true,
+        json: async () => ({
+          choices: [{ message: { content: 'feat: use openrouter by default' } }]
+        })
+      };
+    };
+
+    try {
+      const files = [{ status: 'M', file: 'src/core/commit.js' }];
+      const msg = await generateCommitMessage(files, 'diff --git a/src/core/commit.js b/src/core/commit.js\n+const value = 1;', {
+        ai: {
+          enabled: true,
+          apiKey: 'test-key'
+        }
+      });
+
+      assert.strictEqual(msg, '[autopilot] feat: use openrouter by default');
+      assert.strictEqual(fetchCalled, true);
+    } finally {
+      global.fetch = originalFetch;
+    }
+  });
+
   it('should require an explicit API key instead of using a hardcoded secret', async () => {
     mock.restoreAll();
     const originalFetch = global.fetch;
