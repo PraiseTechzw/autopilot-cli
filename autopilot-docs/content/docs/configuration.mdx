@@ -9,15 +9,15 @@ Autopilot CLI is designed to be zero-config out of the box, but it also offers p
 
 The `.autopilotrc.json` file in your project root controls how Autopilot monitors and commits changes.
 
-| Option | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| `minInterval` | `number` | `300` | Minimum time (in seconds) between automatic commits. Useful for debouncing rapid changes. |
-| `autoPush` | `boolean` | `true` | Whether to automatically push commits to the remote repository. |
+| Option            | Type       | Default              | Description                                                                                              |
+| :---------------- | :--------- | :------------------- | :------------------------------------------------------------------------------------------------------- |
+| `minInterval`     | `number`   | `300`                | Minimum time (in seconds) between automatic commits. Useful for debouncing rapid changes.                |
+| `autoPush`        | `boolean`  | `true`               | Whether to automatically push commits to the remote repository.                                          |
 | `blockedBranches` | `string[]` | `['main', 'master']` | List of branches where Autopilot is disabled to prevent accidental direct commits to protected branches. |
-| `requireChecks` | `boolean` | `false` | If `true`, Autopilot will wait for local checks (like pre-commit hooks) to pass before committing. |
-| `ignore` | `string[]` | `[]` | Additional glob patterns to ignore, supplementing `.gitignore` and `.autopilotignore`. |
-| `ai` | `object` | `{}` | Configuration for AI features (see below). |
-| `team` | `object` | `{}` | Configuration for Team features (see below). |
+| `requireChecks`   | `boolean`  | `false`              | If `true`, Autopilot will wait for local checks (like pre-commit hooks) to pass before committing.       |
+| `ignore`          | `string[]` | `[]`                 | Additional glob patterns to ignore, supplementing `.gitignore` and `.autopilotignore`.                   |
+| `ai`              | `object`   | `{}`                 | Configuration for AI features (see below).                                                               |
+| `team`            | `object`   | `{}`                 | Configuration for Team features (see below).                                                             |
 
 ### AI Configuration & Privacy Disclosure
 
@@ -28,6 +28,7 @@ Autopilot supports optional integration with **OpenRouter** to generate context-
 #### Data Usage Transparency
 
 If (and only if) you explicitly enable AI and provide your own API key:
+
 1.  **What is sent**: Autopilot sends the **text diff** of your staged changes to the API provider to generate a summary.
 2.  **What is NOT sent**: We do not send your entire codebase, your history, or your file contents (other than the diff).
 3.  **No Training**: We do not store, proxy, or train on your code. The interaction is directly between your local machine and the AI provider.
@@ -39,19 +40,19 @@ If (and only if) you explicitly enable AI and provide your own API key:
 {
   "ai": {
     "enabled": true,
-    "provider": "gemini", 
-    "apiKey": "YOUR_API_KEY",
-    "model": "gemini-2.5-flash",
+    "provider": "openrouter",
+    "apiKey": "YOUR_OPENROUTER_API_KEY",
+    "model": "openai/gpt-oss-120b:free",
     "interactive": false
   }
 }
 ```
 
-*   **enabled**: Toggle AI features on/off (default: `false`).
-*   **provider**: Choose between `openrouter` (default) or `none`.
-*   **apiKey**: Your personal API Key.
-*   **model**: Specific model to use.
-*   **interactive**: If `true`, prompts you to review/edit the generated message before committing.
+- **enabled**: Toggle AI features on/off (default: `false`).
+- **provider**: Choose between `openrouter` (default) or `none`.
+- **apiKey**: Your personal API Key.
+- **model**: Specific model to use.
+- **interactive**: If `true`, prompts you to review/edit the generated message before committing.
 
 ### Team Configuration
 
@@ -67,9 +68,9 @@ Settings to ensure smooth collaboration.
 }
 ```
 
-*   **pullBeforePush**: Automatically runs `git pull --rebase` before pushing to avoid conflicts.
-*   **preventSecrets**: Scans for AWS, Stripe, and GitHub keys before committing.
-*   **preventLargeFiles**: Blocks commits containing files larger than 50MB.
+- **pullBeforePush**: Automatically runs `git pull --rebase` before pushing to avoid conflicts.
+- **preventSecrets**: Scans for AWS, Stripe, and GitHub keys before committing.
+- **preventLargeFiles**: Blocks commits containing files larger than 50MB.
 
 ### Example Configuration
 

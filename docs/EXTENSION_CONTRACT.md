@@ -144,7 +144,7 @@ All `--json` commands output to **stdout** only. Errors are included in the JSON
     { "check": "Git installed", "pass": true, "details": "git version 2.43.0" },
     { "check": "Inside a git repo", "pass": true, "details": "yes" },
     { "check": ".autopilotrc.json valid", "pass": true, "details": "found and valid" },
-    { "check": "AI Configuration", "pass": true, "details": "API key present for provider: grok" },
+    { "check": "AI Configuration", "pass": true, "details": "API key present for provider: openrouter" },
     { "check": "Remote origin reachable", "pass": true, "details": "https://github.com/user/repo.git" },
     { "check": "Branch safety", "pass": true, "details": "Current branch \"main\" is not protected" },
     { "check": "Watcher consistency", "pass": true, "details": "Stopped" }
@@ -183,7 +183,7 @@ Outputs the full effective merged configuration object. Shape matches `.autopilo
 ### 4.4 `autopilot config get <key> --json`
 
 ```json
-{ "ai.provider": "grok" }
+{ "ai.provider": "openrouter" }
 ```
 
 ### 4.5 `autopilot config set <key> <value> --json`
@@ -223,7 +223,7 @@ This file is written atomically (temp + rename) by the watcher process.
   "watcherPid": 12345,
   "updatedAt": "2026-03-30T20:00:00.000Z",
   "teamMode": false,
-  "aiMode": "grok",
+  "aiMode": "openrouter",
   "startedAt": "2026-03-30T19:00:00.000Z",
   "watchPath": "/path/to/repo",
   "uptime": 3600
@@ -255,7 +255,7 @@ This file is written atomically (temp + rename) by the watcher process.
 | `watcherPid` | `number \| null` | ✅ | OS PID of watcher process |
 | `updatedAt` | `string` | ✅ | ISO 8601 timestamp of last write |
 | `teamMode` | `boolean` | ✅ | Whether team mode is active |
-| `aiMode` | `string` | ✅ | `"grok"`, `"gemini"`, `"disabled"`, `"System"` |
+| `aiMode` | `string` | ✅ | `"openrouter"`, `"disabled"`, `"System"` |
 | `startedAt` | `string` | ✅ | ISO 8601 watcher start time |
 | `watchPath` | `string` | ✅ | Absolute path being watched |
 | `uptime` | `number` | ✅ | Seconds since watcher start |

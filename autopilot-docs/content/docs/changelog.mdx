@@ -6,6 +6,7 @@ description: Latest updates and improvements to Autopilot CLI.
 ## [2.2.0] - 2026-02-14
 
 ### Added
+
 - **Automatic Leaderboard Sync**:
   - Watcher auto-syncs stats after commit or push using site API.
 - **Durable Backend Storage**:
@@ -14,15 +15,18 @@ description: Latest updates and improvements to Autopilot CLI.
   - Ingests `push_success` from CLI and stores telemetry.
 
 ### Improved
+
 - **Config Consistency**: Standardized `blockedBranches` and loader back-compat.
 - **AI Provider Hardening**: Added request timeouts; doctor validates keys.
 - **Programmatic Imports**: Fixed command imports wiring in CLI.
 
 ### Docs/Website
+
 - **Metadata & Assets**: Added OG image and proper favicon; corrected manifest path.
 - **Foreground Watcher**: Updated wording on homepage and commands.
 
 ### Tests
+
 - **Grok Parity**: Added Grok tests mirroring Gemini coverage.
 
 Stay up to date with the latest changes to Autopilot CLI. For a full history of releases, visit our [GitHub Releases](https://github.com/PraiseTechzw/autopilot-cli/releases) page.
@@ -30,12 +34,14 @@ Stay up to date with the latest changes to Autopilot CLI. For a full history of 
 ## [2.0.1] - 2026-02-05
 
 ### Fixed
+
 - **Dashboard Stability**: Fixed a crash in `autopilot dashboard` caused by incorrect named import of `getRunningPid`.
 - **Command Reliability**: Added regression tests for `dashboard`, `pause`, `resume`, `stop`, and `status` commands to ensure stability.
 
 ## [2.0.0] - 2026-02-04
 
 ### Added
+
 - **Safety System (Phase 1)**:
   - **Undo/Rollback**: `autopilot undo` command to safely revert the last autopilot commit.
   - **Team Mode**: Enhanced `autopilot init` with team configuration. Implements "Pull-Before-Push" to prevent conflicts.
@@ -51,12 +57,14 @@ Stay up to date with the latest changes to Autopilot CLI. For a full history of 
     - Productivity metrics (peak hours, streaks).
     - CSV export capability (`--export csv`).
 - **Intelligence (Phase 3)**:
-  - **AI Commit Messages**: Integration with Google Gemini for context-aware, senior-level commit message generation.
+  - **AI Commit Messages**: Integration with OpenRouter for context-aware, senior-level commit message generation.
   - **Workflow Presets**: `autopilot preset` command to quickly switch between workflows:
     - `safe-team`: Optimized for collaboration (Team Mode + Secret Checks).
     - `solo-speed`: Optimized for rapid individual development.
     - `strict-ci`: Enforces testing and linting before every commit.
+
 ### Docs/Website
+
 - Added Leaderboard page with live simulated rankings.
 - Updated homepage Feature Showcase to demonstrate Insights and Safety & Team features.
 - Added Leaderboard to top navigation.
@@ -65,6 +73,7 @@ Stay up to date with the latest changes to Autopilot CLI. For a full history of 
 ## [0.1.8] - 2026-02-04
 
 ### Reliability & Core
+
 - **Watcher Engine Overhaul**:
   - Implemented dual ignore checks (chokidar + internal matcher) to guarantee no ignored files trigger builds.
   - Added "Max Wait" fallback (60s) to prevent debounce starvation on busy repos.
@@ -76,6 +85,7 @@ Stay up to date with the latest changes to Autopilot CLI. For a full history of 
   - Added `AUTOPILOT_TEST_MODE=1` flag for deterministic CI testing (foreground run + auto-exit).
 
 ### CI/CD & Standards
+
 - **GitHub Workflows**:
   - `ci.yml`: Automated testing on Windows, Ubuntu, and macOS for every PR.
   - `release.yml`: Automated GitHub Releases with changelog generation and tarball assets.
@@ -84,6 +94,7 @@ Stay up to date with the latest changes to Autopilot CLI. For a full history of 
   - Added Issue Templates (Bug/Feature), PR Template, `SECURITY.md`, and `CODEOWNERS`.
 
 ### Fixed
+
 - **Windows Paths**: Fixed path normalization issues causing ignore rules to fail on Windows.
 - **Self-Triggering**: Fixed issue where writing `autopilot.log` could trigger a new commit loop.
 
@@ -93,12 +104,12 @@ Stay up to date with the latest changes to Autopilot CLI. For a full history of 
 
 Introduces a built-in update notifier and documentation enhancements.
 
--   **New:** **CLI Update Notifier**
-    -   Automatically checks for new versions on npm registry (once every 24 hours).
-    -   Zero-dependency implementation using native Node.js `https`.
-    -   Non-intrusive visual notification box on startup when updates are available.
--   **Docs:** Added live NPM download statistics to landing page and sidebar.
--   **Docs:** Enhanced install command widget with one-click copy.
+- **New:** **CLI Update Notifier**
+  - Automatically checks for new versions on npm registry (once every 24 hours).
+  - Zero-dependency implementation using native Node.js `https`.
+  - Non-intrusive visual notification box on startup when updates are available.
+- **Docs:** Added live NPM download statistics to landing page and sidebar.
+- **Docs:** Enhanced install command widget with one-click copy.
 
 ## v0.1.6
 
@@ -106,14 +117,14 @@ Introduces a built-in update notifier and documentation enhancements.
 
 Major upgrade to the commit message generation engine, bringing it to professional standards.
 
--   **New:** **Smart Commit Generator 2.0**
-    -   Offline diff parsing using `git diff` (no external APIs).
-    -   Full Conventional Commits compliance (`feat`, `fix`, `docs`, `style`, `test`).
-    -   Intelligent scope detection for UI, Theme, Search, and Docs.
-    -   Golden Test Suite with 10 fixtures for guaranteed message quality.
--   **Improvement:** Switched from file-based status checks to staged diff analysis for commit messages.
--   **Fix:** Resolved issue where new files were incorrectly flagged as `fix` instead of `feat`.
--   **Dev:** Added `npm run verify` script for pre-release checks.
+- **New:** **Smart Commit Generator 2.0**
+  - Offline diff parsing using `git diff` (no external APIs).
+  - Full Conventional Commits compliance (`feat`, `fix`, `docs`, `style`, `test`).
+  - Intelligent scope detection for UI, Theme, Search, and Docs.
+  - Golden Test Suite with 10 fixtures for guaranteed message quality.
+- **Improvement:** Switched from file-based status checks to staged diff analysis for commit messages.
+- **Fix:** Resolved issue where new files were incorrectly flagged as `fix` instead of `feat`.
+- **Dev:** Added `npm run verify` script for pre-release checks.
 
 ## v0.1.4
 
@@ -121,11 +132,11 @@ Major upgrade to the commit message generation engine, bringing it to profession
 
 Focus on stability, Windows compatibility, and release safety.
 
--   **Fix:** **Windows Compatibility**: Resolved absolute path issues in ignore rules.
--   **Fix:** **Watcher Noise**: Fixed infinite commit loops caused by `.vscode` analytics.
--   **Fix:** **CLI Crash**: Resolved `autopilot start` failure due to miswired Commander action handlers.
--   **New:** **Release Gates**: Added `prepublishOnly` hooks to block broken releases.
--   **New:** **Diagnostics**: Added `autopilot doctor` for environment health checks.
+- **Fix:** **Windows Compatibility**: Resolved absolute path issues in ignore rules.
+- **Fix:** **Watcher Noise**: Fixed infinite commit loops caused by `.vscode` analytics.
+- **Fix:** **CLI Crash**: Resolved `autopilot start` failure due to miswired Commander action handlers.
+- **New:** **Release Gates**: Added `prepublishOnly` hooks to block broken releases.
+- **New:** **Diagnostics**: Added `autopilot doctor` for environment health checks.
 
 ## v0.1.3
 
@@ -133,21 +144,21 @@ Focus on stability, Windows compatibility, and release safety.
 
 **Initial Public Release** as `@traisetech/autopilot`.
 
--   **Feature:** Intelligent auto commit & push.
--   **Feature:** Background watcher with debouncing.
--   **Feature:** Branch protection (blocks commits to `main`/`master` by default).
--   **Feature:** Remote-ahead safety checks.
--   **Feature:** Per-project configuration via `.autopilotrc.json`.
+- **Feature:** Intelligent auto commit & push.
+- **Feature:** Background watcher with debouncing.
+- **Feature:** Branch protection (blocks commits to `main`/`master` by default).
+- **Feature:** Remote-ahead safety checks.
+- **Feature:** Per-project configuration via `.autopilotrc.json`.
 
 ## v0.1.1
 
 **Release Date:** 2026-01-30
 
--   **Change:** Renamed package scope to `@traisetech`.
--   **Change:** Optimized distribution size.
+- **Change:** Renamed package scope to `@traisetech`.
+- **Change:** Optimized distribution size.
 
 ## v0.1.0
 
 **Release Date:** 2026-01-29
 
--   **New:** Initial development release with core architecture.
+- **New:** Initial development release with core architecture.

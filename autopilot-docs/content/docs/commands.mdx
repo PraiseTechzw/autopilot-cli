@@ -5,29 +5,51 @@ description: Complete reference for all Autopilot CLI commands.
 
 # CLI Reference
 
-Autopilot CLI exposes a set of commands to manage the background watcher process, check system health, and analyze productivity.
+Autopilot CLI exposes a set of commands to manage the background watcher process, check system health, and analyze productivity. This page documents every command, its options, and what it does under the hood.
+
+**Requirements:** Node.js 18+, Git installed and on your `PATH`. Windows, macOS, and Linux are all supported — see [Windows notes](#windows-notes) for platform-specific behavior.
+
+---
+
+## Global options
+
+These flags work across most commands, not just the one they're listed under:
+
+| Flag | Description |
+|---|---|
+| `--json` | Return structured JSON output instead of formatted text. Supported by `status`, `doctor`, `start`, `config`, and `insights`. Useful for scripting or editor integrations (e.g. the VS Code extension). |
+| `--help` | Show help for the command. |
+| `--version` | Print the installed Autopilot version. |
+
+---
 
 ## `autopilot init`
 
 Initializes Autopilot in the current directory.
 
 **Syntax:**
+
 ```bash
 autopilot init [options]
 ```
 
 **Options:**
-- `--team`: Initialize with team collaboration settings (Pull-Before-Push, secret checks).
-- `--ai`: Enable AI commit message generation (requires an OpenRouter API key).
+
+| Flag | Description |
+|---|---|
+| `--team` | Initialize with team collaboration settings (pull-before-push, secret scanning). |
+| `--ai` | Enable AI-generated commit messages via [OpenRouter](https://openrouter.ai). Prompts for a free API key if one isn't already configured — no model selection needed, Autopilot picks a free model automatically. |
 
 **What it does:**
-1.  Checks if the current directory is a git repository.
-2.  Creates a `.autopilotrc.json` configuration file with default settings.
-3.  Adds `.autopilot/` to your `.gitignore` file to prevent logs from being committed.
-4.  Optionally configures AI and Team presets.
-5.  If you are starting from an empty folder, it can create the git repository for you first.
+
+1. Checks whether the current directory is a git repository. If not, and the folder is empty or new, offers to run `git init` for you.
+2. Creates a `.autopilotrc.json` configuration file with default settings.
+3. Adds `.autopilot/` to your `.gitignore` to keep local logs out of version control.
+4. If `--ai` is passed, walks you through connecting an OpenRouter API key.
+5. If `--team` is passed, applies the `safe-team` preset (see [`autopilot preset`](#autopilot-preset)).
 
 **Example:**
+
 ```bash
 cd my-project
 autopilot init --ai
@@ -37,20 +59,29 @@ autopilot init --ai
 
 ## `autopilot start`
 
-Starts the foreground file watcher.
+Starts the file watcher.
 
 **Syntax:**
+
 ```bash
-autopilot start
+autopilot start [options]
 ```
 
-**What it does:**
-*   Runs a foreground watcher process in your terminal.
-*   Monitors the current directory (and subdirectories) for file changes using `chokidar`.
-*   Respects `.gitignore` and `.autopilotignore` rules.
-*   Automatically commits and pushes changes after the debounce period.
+**Options:**
 
-**Common Output:**
+| Flag | Description |
+|---|---|
+| `--background` | Run the watcher as a detached background process instead of holding the terminal in the foreground. |
+| `--json` | Print machine-readable startup status. |
+
+**What it does:**
+
+- Monitors the current directory and subdirectories for file changes using `chokidar`.
+- Respects `.gitignore` and `.autopilotignore` rules.
+- Waits for the configured debounce period (default 20s), then stages, commits, and — if enabled — pushes changes.
+
+**Example output:**
+
 ```text
 🚀 Starting Autopilot watcher…
 Logs: ./autopilot.log
@@ -64,47 +95,54 @@ Press Ctrl+C to stop, or run "autopilot stop" in another terminal.
 Stops the running Autopilot daemon for the current project.
 
 **Syntax:**
+
 ```bash
 autopilot stop
 ```
 
 **What it does:**
-1.  Reads the Process ID (PID) from `.autopilot/autopilot.pid`.
-2.  Sends a termination signal to that process.
-3.  Cleans up the PID file.
+
+1. Reads the process ID from `.autopilot/autopilot.pid`.
+2. Sends a termination signal to that process.
+3. Removes the PID file.
+
+> **Windows note:** see [Windows notes](#windows-notes) — process termination is handled differently than on macOS/Linux, but the command behaves the same from your perspective.
 
 ---
 
 ## `autopilot status`
 
-Checks the status of the Autopilot daemon.
+Checks whether the Autopilot daemon is running.
 
 **Syntax:**
+
 ```bash
-autopilot status
+autopilot status [--json]
 ```
 
 **Output:**
-Displays whether the watcher is Running, Stopped, or Paused, along with the PID and log file location.
+
+Reports whether the watcher is Running, Stopped, or Paused, along with its process ID and the active log file path.
 
 ---
 
 ## `autopilot pause`
 
-Temporarily pauses the watcher without killing the process.
+Temporarily pauses the watcher without stopping the process.
 
 **Syntax:**
+
 ```bash
 autopilot pause [reason]
 ```
 
 **Example:**
+
 ```bash
 autopilot pause "Refactoring large file"
 ```
 
-**Use Case:**
-Useful when performing large refactors or rebases where you don't want intermediate auto-commits.
+**Use case:** performing a large refactor, rebase, or merge where you don't want intermediate auto-commits interrupting the process.
 
 ---
 
@@ -113,6 +151,7 @@ Useful when performing large refactors or rebases where you don't want intermedi
 Resumes a paused watcher.
 
 **Syntax:**
+
 ```bash
 autopilot resume
 ```
@@ -121,37 +160,70 @@ autopilot resume
 
 ## `autopilot undo`
 
-Safely reverts the last commit made by Autopilot.
+Safely reverts the most recent commit made by Autopilot.
 
 **Syntax:**
+
 ```bash
 autopilot undo
 ```
 
 **What it does:**
-1.  Verifies the last commit was made by Autopilot (checks for `[autopilot]` prefix or author).
-2.  Performs a `git reset --soft HEAD~1`.
-3.  Keeps your file changes in the staging area so you don't lose work.
+
+1. Verifies the last commit was made by Autopilot (checks the `[autopilot]` marker or commit author).
+2. Runs `git reset --soft HEAD~1`.
+3. Keeps your file changes staged, so nothing is lost — only the commit itself is undone.
+
+> Autopilot will refuse to undo a commit it didn't make, to avoid accidentally reverting your own manual work.
 
 ---
 
 ## `autopilot preset`
 
-Apply a pre-configured workflow preset.
+Applies a pre-configured workflow to `.autopilotrc.json`.
 
 **Syntax:**
+
 ```bash
 autopilot preset [name]
 ```
 
-**Available Presets:**
-*   `safe-team`: Optimized for teams. Enables pull-before-push, secret scanning, and linting.
-*   `solo-speed`: Optimized for speed. Disables some checks for rapid prototyping.
-*   `strict-ci`: Enforces strict quality gates (tests + lint) before every commit.
+**Available presets:**
+
+| Preset | Behavior |
+|---|---|
+| `safe-team` | Enables pull-before-push, secret scanning, and lint checks before committing. |
+| `solo-speed` | Disables non-essential checks for fastest possible commit cycles. |
+| `strict-ci` | Requires tests and lint to pass before any commit is created. |
 
 **Example:**
+
 ```bash
 autopilot preset safe-team
+```
+
+Each preset is just a named set of values written into `.autopilotrc.json` — see [Configuration](/docs/configuration) for the full list of individual settings if you'd rather configure by hand.
+
+---
+
+## `autopilot config`
+
+Reads or writes individual configuration values without hand-editing `.autopilotrc.json`.
+
+**Syntax:**
+
+```bash
+autopilot config get <key>
+autopilot config set <key> <value>
+autopilot config list [--json]
+```
+
+**Examples:**
+
+```bash
+autopilot config set ai.enabled true
+autopilot config set debounceSeconds 30
+autopilot config list
 ```
 
 ---
@@ -161,49 +233,90 @@ autopilot preset safe-team
 Diagnoses environment and configuration issues.
 
 **Syntax:**
+
 ```bash
-autopilot doctor
+autopilot doctor [--json]
 ```
 
 **Checks:**
-*   Node.js version compatibility.
-*   Git installation and authentication.
-*   File permissions.
-*   Configuration validity.
-*   API connectivity (if AI is enabled).
+
+- Node.js version compatibility
+- Git installation and authentication
+- File and directory permissions
+- `.autopilotrc.json` validity
+- AI provider connectivity (if AI is enabled)
+
+**Example output:**
+
+```text
+✔ Node.js v20.11.0 (compatible)
+✔ Git installed and authenticated
+✔ .autopilotrc.json valid
+✖ AI provider unreachable — check your OpenRouter API key
+```
+
+Run this first whenever something isn't behaving as expected — it's the fastest way to isolate the problem.
+
+---
+
+## `autopilot dashboard`
+
+Opens a live, real-time view of watcher activity.
+
+**Syntax:**
+
+```bash
+autopilot dashboard
+```
+
+**What it does:**
+
+Launches an interactive terminal UI showing current status, active branch, pending changes, and a rolling log of recent commits and pushes. Read-only — it doesn't affect the watcher itself and can be safely closed at any time.
 
 ---
 
 ## `autopilot insights`
 
-Displays productivity analytics and project stats.
+Displays productivity analytics for the current project.
 
 **Syntax:**
+
 ```bash
 autopilot insights [--export csv]
 ```
 
-**Features:**
-*   **Commit Quality Score**: AI-based analysis of your commit habits.
-*   **Productivity Metrics**: Peak coding hours, active streaks.
-*   **Export**: Export data to CSV for external analysis (e.g., spreadsheet leaderboards).
+**Options:**
+
+| Flag | Description |
+|---|---|
+| `--export csv` | Writes the underlying data to `autopilot-insights.csv` in the project root, for use in a spreadsheet or external analytics tool. |
+
+**Includes:**
+
+- **Commit quality score** — a rough measure of how descriptive and well-scoped your commits are.
+- **Productivity metrics** — peak coding hours and active streaks.
 
 ---
 
 ## `autopilot leaderboard`
 
-Interacts with the global Autopilot leaderboard.
+Interacts with the optional global Autopilot leaderboard.
 
 **Syntax:**
+
 ```bash
 autopilot leaderboard [--sync]
 ```
 
 **Options:**
-- `--sync`: Pushes your local productivity stats (focus time, streaks, scores) to the global leaderboard.
-- (No args): Opens the leaderboard in your default browser.
+
+| Flag | Description |
+|---|---|
+| `--sync` | Pushes your local productivity stats (focus time, streaks, score) to the global leaderboard. |
+| *(none)* | Opens the leaderboard in your default browser. |
 
 **Example:**
+
 ```bash
 # Sync your latest stats
 autopilot leaderboard --sync
@@ -211,3 +324,33 @@ autopilot leaderboard --sync
 # View rankings
 autopilot leaderboard
 ```
+
+> Participation is opt-in and off by default. Only anonymized metrics are synced — no code or file contents ever leave your machine for this feature. See [AI & Privacy](/#-ai--privacy) for the full data policy.
+
+---
+
+## Exit codes
+
+Autopilot uses standardized exit codes so scripts and CI pipelines can react programmatically:
+
+| Code | Meaning |
+|---|---|
+| `0` | Success / watcher running |
+| `1` | General error (runtime failure) |
+| `2` | Not a git repository |
+| `3` | Not initialized (`autopilot init` not yet run) |
+| `4` | Blocked branch (push attempted to a protected branch) |
+| `5` | Invalid configuration |
+| `6` | Watcher already running |
+| `7` | Watcher not running |
+
+---
+
+## Windows notes
+
+Autopilot is fully supported on Windows, with two behavioral differences worth knowing:
+
+- **Process signals:** Windows doesn't support POSIX signals like `SIGTERM` natively. `autopilot stop` uses an equivalent Windows-safe termination method — you don't need to do anything differently, but if you're scripting around the daemon directly, don't assume `SIGTERM` semantics.
+- **Paths:** Use forward slashes (`/`) in `.autopilotignore` — they're normalized automatically, but backslash-only paths can behave inconsistently across shells (PowerShell vs. Git Bash vs. cmd.exe).
+
+If anything looks wrong, `autopilot doctor` checks Windows-specific conditions (like whether Git is on your `PATH`) as part of its standard checks.

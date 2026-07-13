@@ -9,12 +9,13 @@ description: An intelligent Git automation CLI that safely commits and pushes yo
 
 ## What's New in v2.0
 
-*   **Gemini AI Integration**: Smarter commit messages using Google's Gemini 2.5 Flash model.
-*   **Focus Engine**: Track your productivity, active coding time, and flow states.
-*   **Team Mode**: Enforce team standards, prevent secret leaks, and handle large files.
-*   **Safety Net**: Undo accidental commits with `autopilot undo`.
+- **OpenRouter AI Integration**: Smarter commit messages using your preferred OpenRouter model.
+- **Focus Engine**: Track your productivity, active coding time, and flow states.
+- **Team Mode**: Enforce team standards, prevent secret leaks, and handle large files.
+- **Safety Net**: Undo accidental commits with `autopilot undo`.
 
 It's designed for:
+
 - 🚀 **Solo Developers** who want to focus on coding, not committing.
 - 👥 **Teams** who want to standardize commit quality and enforce safety checks.
 - 🛡️ **Safety-Conscious** users who never want to lose work.
@@ -37,25 +38,33 @@ npm install -g @traisetech/autopilot
 Follow these four commands to get up and running:
 
 ### 1. Initialize
+
 Navigate to your project root and generate the configuration file:
+
 ```bash
 autopilot init
 ```
 
 ### 2. Start Watching
+
 Start the background daemon. Autopilot will now monitor your files and sync changes automatically.
+
 ```bash
 autopilot start
 ```
 
 ### 3. Check Status
+
 Verify that the watcher is running and see recent activity:
+
 ```bash
 autopilot status
 ```
 
 ### 4. Stop
+
 When you're done for the day (or need to switch branches manually):
+
 ```bash
 autopilot stop
 ```
@@ -65,20 +74,48 @@ autopilot stop
 ## Explore Documentation
 
 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mt-8">
-  <a href="/docs/installation" className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900">
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Installation</h3>
-    <p className="text-sm text-gray-500 dark:text-gray-400">Detailed installation guides for all platforms.</p>
+  <a
+    href="/docs/installation"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Installation
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Detailed installation guides for all platforms.
+    </p>
   </a>
-  <a href="/docs/configuration" className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900">
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Configuration</h3>
-    <p className="text-sm text-gray-500 dark:text-gray-400">Customize debounce timers, ignored files, and more.</p>
+  <a
+    href="/docs/configuration"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Configuration
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Customize debounce timers, ignored files, and more.
+    </p>
   </a>
-  <a href="/docs/commands" className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900">
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">CLI Reference</h3>
-    <p className="text-sm text-gray-500 dark:text-gray-400">Full list of commands and flags.</p>
+  <a
+    href="/docs/commands"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      CLI Reference
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Full list of commands and flags.
+    </p>
   </a>
-  <a href="/docs/troubleshooting" className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900">
-    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Troubleshooting</h3>
-    <p className="text-sm text-gray-500 dark:text-gray-400">Common issues and how to resolve them.</p>
+  <a
+    href="/docs/troubleshooting"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Troubleshooting
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Common issues and how to resolve them.
+    </p>
   </a>
 </div>
