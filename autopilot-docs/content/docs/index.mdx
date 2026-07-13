@@ -5,21 +5,32 @@ description: An intelligent Git automation CLI that safely commits and pushes yo
 
 # What is Autopilot?
 
-**Autopilot CLI** is an intelligent Git automation CLI that safely commits and pushes your code so you can focus on building. It runs in the background, watching your project files and handling Git operations for you. It intelligently batches changes, generates conventional commit messages, and syncs with your remote repository—all without interrupting your flow.
+**Autopilot CLI** is an intelligent Git automation tool that safely commits and pushes your code so you can focus on building. It runs quietly in the background, watching your project files and handling Git operations for you — batching related changes, writing conventional commit messages, and syncing with your remote, all without interrupting your flow.
+
+Most AI commit tools ask you to run a command every time you want a message written. Autopilot doesn't wait to be asked — it's the difference between a tool you operate and a tool that just takes care of things.
 
 ## What's New in v2.0
 
-- **OpenRouter AI Integration**: Smarter commit messages using your preferred OpenRouter model.
-- **Focus Engine**: Track your productivity, active coding time, and flow states.
-- **Team Mode**: Enforce team standards, prevent secret leaks, and handle large files.
-- **Safety Net**: Undo accidental commits with `autopilot undo`.
+- **OpenRouter AI Integration** — commit messages are generated automatically using a free model, selected and rotated for you. You don't choose a model or manage multiple provider keys; Autopilot picks a working one and falls back automatically if it's ever unavailable.
+- **Focus Engine** — track your productivity, active coding time, and flow states.
+- **Team Mode** — enforce team standards, prevent secret leaks, and handle large files.
+- **Safety Net** — undo accidental commits instantly with `autopilot undo`.
 
 It's designed for:
 
-- 🚀 **Solo Developers** who want to focus on coding, not committing.
+- 🚀 **Solo developers** who want to focus on coding, not committing.
+- 🌱 **Beginners** who are still learning Git and want safe defaults instead of a learning curve.
 - 👥 **Teams** who want to standardize commit quality and enforce safety checks.
-- 🛡️ **Safety-Conscious** users who never want to lose work.
-- ⚡ **Rapid Prototyping** where speed matters more than granular commit history.
+- 🛡️ **Safety-conscious users** who never want to lose work.
+- ⚡ **Rapid prototyping**, where speed matters more than granular commit history.
+
+---
+
+## Requirements
+
+- Node.js 18 or later
+- Git installed and available on your `PATH`
+- Works on Windows, macOS, and Linux
 
 ---
 
@@ -39,13 +50,13 @@ Follow these four commands to get up and running:
 
 ### 1. Initialize
 
-Navigate to your project root and generate the configuration file:
+Navigate to your project root and generate the configuration file. If you're starting from an empty folder, Autopilot will offer to set up Git for you too.
 
 ```bash
 autopilot init
 ```
 
-### 2. Start Watching
+### 2. Start watching
 
 Start the background daemon. Autopilot will now monitor your files and sync changes automatically.
 
@@ -53,7 +64,9 @@ Start the background daemon. Autopilot will now monitor your files and sync chan
 autopilot start
 ```
 
-### 3. Check Status
+> **Heads up:** by default, Autopilot won't push directly to `main` or `master` — this is a safety default, not a bug. See [Configuration](/docs/configuration) to change it once you're comfortable, or use `autopilot preset solo-speed` if you'd rather move fast on a personal project.
+
+### 3. Check status
 
 Verify that the watcher is running and see recent activity:
 
@@ -63,7 +76,7 @@ autopilot status
 
 ### 4. Stop
 
-When you're done for the day (or need to switch branches manually):
+When you're done for the day, or need to switch branches manually:
 
 ```bash
 autopilot stop
