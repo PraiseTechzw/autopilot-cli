@@ -4,15 +4,34 @@ const logger = require('../utils/logger');
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_MODELS = [
- "openai/gpt-oss-120b:free",
- "openrouter/free",
- "google/gemma-4-31b-it:free"
-
+  'openai/gpt-oss-120b:free',
+  'openrouter/free',
+  'google/gemma-4-31b-it:free'
 ];
 
+function findEnvFile(startDir = process.cwd()) {
+  let currentDir = path.resolve(startDir);
+
+  while (true) {
+    const envPath = path.join(currentDir, '.env');
+    if (fs.existsSync(envPath)) {
+      return envPath;
+    }
+
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+
+    currentDir = parentDir;
+  }
+
+  return null;
+}
+
 function loadEnvFile() {
-  const envPath = path.join(process.cwd(), '.env');
-  if (!fs.existsSync(envPath)) {
+  const envPath = findEnvFile();
+  if (!envPath) {
     return {};
   }
 
@@ -25,13 +44,14 @@ function loadEnvFile() {
       continue;
     }
 
-    const separatorIndex = trimmed.indexOf('=');
+    const normalizedLine = trimmed.replace(/^export\s+/, '');
+    const separatorIndex = normalizedLine.indexOf('=');
     if (separatorIndex === -1) {
       continue;
     }
 
-    const key = trimmed.slice(0, separatorIndex).trim();
-    const value = trimmed.slice(separatorIndex + 1).trim().replace(/^['"]|['"]$/g, '');
+    const key = normalizedLine.slice(0, separatorIndex).trim();
+    const value = normalizedLine.slice(separatorIndex + 1).trim().replace(/^['"]|['"]$/g, '');
     values[key] = value;
   }
 
@@ -103,5 +123,6 @@ async function generateCommitMessage(diff, apiKey, model = DEFAULT_MODELS[0]) {
 
 module.exports = {
   generateCommitMessage,
+  resolveApiKey,
   DEFAULT_MODELS
 };

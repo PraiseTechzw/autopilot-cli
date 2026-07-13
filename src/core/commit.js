@@ -23,6 +23,7 @@ async function generateCommitMessage(files, diffContent, config = {}) {
   const mode = config.commitMessageMode || 'smart';
   const aiProvider = config.ai?.provider || config.aiProvider || 'default';
   const aiApiKey = config.ai?.apiKey || config.aiApiKey;
+  const shouldUseOpenRouter = ['openrouter', 'default', undefined, null].includes(aiProvider);
 
   if (!files || files.length === 0) {
     message = 'update: minor changes';
@@ -33,7 +34,7 @@ async function generateCommitMessage(files, diffContent, config = {}) {
     try {
       logger.info(`Generating AI commit message using ${aiProvider}...`);
 
-      if (aiProvider === 'openrouter') {
+      if (shouldUseOpenRouter) {
         message = await openrouter.generateCommitMessage(diffContent, aiApiKey, config.ai?.model);
       } else {
         message = generateSmartCommitMessage(files, diffContent);

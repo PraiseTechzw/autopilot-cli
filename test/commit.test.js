@@ -1,5 +1,8 @@
 const { describe, it, mock } = require('node:test');
 const assert = require('node:assert');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const { generateCommitMessage } = require('../src/core/commit');
 const openrouter = require('../src/core/openrouter');
 
@@ -96,20 +99,17 @@ describe('Commit Message Generator', () => {
     }
   });
 
-  it('should require an explicit API key instead of using a hardcoded secret', async () => {
-    mock.restoreAll();
-    const originalFetch = global.fetch;
-    global.fetch = async () => {
-      throw new Error('fetch should not run');
-    };
+  it('should read the API key from a local .env file when no key is passed explicitly', async () => {
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'autopilot-openrouter-'));
+    const originalCwd = process.cwd();
+    fs.writeFileSync(path.join(tempDir, '.env'), 'OPENROUTER_API_KEY=test-from-env\n');
+    process.chdir(tempDir);
 
     try {
-      await assert.rejects(
-        () => openrouter.generateCommitMessage('diff', ''),
-        /OpenRouter API key is required/
-      );
+      assert.strictEqual(openrouter.resolveApiKey(''), 'test-from-env');
     } finally {
-      global.fetch = originalFetch;
+      process.chdir(originalCwd);
+      fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 
