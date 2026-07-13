@@ -5,11 +5,11 @@ description: Go from zero to automated commits in under 5 minutes.
 
 # Quick Start Guide
 
-This guide will walk you through setting up Autopilot CLI in a new project and demonstrating its core functionality.
+This guide walks you through setting up Autopilot CLI in a new project and demonstrates its core functionality, end to end.
 
-## 1. Setup a Project
+## 1. Set up a project
 
-First, let's create a new directory and initialize a git repository. Autopilot now offers to do this for you during `autopilot init`, but it is helpful to know what is happening under the hood.
+First, create a new directory and initialize a git repository. Autopilot can do this for you automatically during `autopilot init` if it doesn't find a repo, but it's worth knowing what's happening under the hood.
 
 ```bash
 mkdir my-new-project
@@ -27,9 +27,19 @@ autopilot init
 
 This creates a `.autopilotrc.json` file in your project root. You can inspect it, but the defaults are fine for now.
 
-## 3. Recommended Workflow: Use a Dev Branch
+## 3. Connect a remote repository
 
-By default, Autopilot is configured **NOT** to push to protected branches like `main` or `master` for safety reasons. We strongly recommend working on a feature or development branch.
+Autopilot pushes to a remote, so it needs one to push to. If you already have a GitHub (or similar) repository, connect it:
+
+```bash
+git remote add origin https://github.com/your-username/my-new-project.git
+```
+
+> **Skipping this step?** That's fine — Autopilot will still watch and commit locally, it just won't have anywhere to push to. It logs `[INFO] No remote configured — committing locally only` instead of failing, so nothing breaks. Add a remote later with the same command whenever you're ready.
+
+## 4. Recommended workflow: use a dev branch
+
+By default, Autopilot is configured **not** to push to protected branches like `main` or `master`, as a safety measure. We strongly recommend working on a feature or development branch instead.
 
 Create and switch to a new branch:
 
@@ -37,9 +47,19 @@ Create and switch to a new branch:
 git checkout -b develop
 ```
 
-## 4. Start the Watcher
+## 5. (Optional) Enable AI commit messages
 
-Now, start the background daemon. This command will spawn a separate process that watches your files.
+By default, Autopilot writes commit messages from a template. If you'd rather have them generated for you:
+
+```bash
+autopilot config set ai.enabled true
+```
+
+You'll be prompted for a free [OpenRouter](https://openrouter.ai) API key the first time this runs. Autopilot picks a working free model on its own — there's nothing further to configure.
+
+## 6. Start the watcher
+
+Now start the background daemon. This spawns a separate process that watches your files:
 
 ```bash
 autopilot start
@@ -47,46 +67,66 @@ autopilot start
 
 You should see a message confirming that the watcher has started.
 
-## 5. Make Some Changes
+## 7. Make some changes
 
-Now for the magic. Create a new file or modify an existing one.
+Now for the magic. Create a new file or modify an existing one:
 
 ```bash
 echo "Hello Autopilot" > README.md
 ```
 
-Wait a few seconds (default debounce is ~30 seconds). Autopilot will detect the change, stage it, create a conventional commit message (e.g., `docs: update README.md`), and push it to your remote `develop` branch.
+Wait a few seconds — the default debounce period is 20 seconds. Autopilot will detect the change, stage it, create a commit message (a conventional-commit style message like `docs: update README.md` if AI is enabled, or a template-based one otherwise), and push it to your remote `develop` branch, if one is configured.
 
-## 6. Monitor Status
+## 8. Monitor status
 
-You can check what the daemon is doing at any time:
+Check what the daemon is doing at any time:
 
 ```bash
 autopilot status
 ```
 
-This will tell you if the service is `running`, `stopped`, or if it encountered an error.
+This reports whether the service is `running`, `stopped`, `paused`, or has encountered an error.
 
-## 7. Stop the Watcher
+## 9. Stop the watcher
 
-When you are finished coding for the session, stop the background process:
+When you're finished coding for the session, stop the background process:
 
 ```bash
 autopilot stop
 ```
 
-## Viewing Logs
+---
 
-If something isn't working as expected, you can check the logs. Autopilot writes logs to the `.autopilot` directory in your project root (this directory is added to `.gitignore` automatically during init).
+## Viewing logs
 
-To view the latest logs:
+If something isn't working as expected, check the logs. Autopilot writes them to the `.autopilot` directory in your project root (this directory is added to `.gitignore` automatically during `init`).
+
+**macOS / Linux / Git Bash:**
 
 ```bash
 cat .autopilot/autopilot.log
 ```
 
-**Common Log Entries:**
-- `[INFO] File changed: README.md` - Watcher detected a file event.
-- `[INFO] Debounce timer triggered` - Waiting for more changes before committing.
-- `[SUCCESS] Committed and pushed` - Operation completed successfully.
-- `[WARN] Protected branch detected` - Autopilot skipped the push to avoid messing up `main`.
+**Windows (PowerShell or cmd.exe):**
+
+```powershell
+type .autopilot\autopilot.log
+```
+
+**Common log entries:**
+
+| Entry | Meaning |
+|---|---|
+| `[INFO] File changed: README.md` | The watcher detected a file event. |
+| `[INFO] Debounce timer triggered` | Waiting for more changes before committing. |
+| `[INFO] No remote configured — committing locally only` | Commit succeeded, but there's nowhere configured to push to yet. |
+| `[SUCCESS] Committed and pushed` | Operation completed successfully. |
+| `[WARN] Protected branch detected` | Autopilot skipped the push to avoid committing straight to `main`. |
+
+---
+
+## Next steps
+
+- [CLI Reference](/docs/commands) — the full list of commands and flags.
+- [Configuration](/docs/configuration) — customize debounce timers, ignored files, and presets.
+- [Troubleshooting](/docs/troubleshooting) — common issues and how to resolve them.
