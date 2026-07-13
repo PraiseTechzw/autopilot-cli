@@ -2,10 +2,11 @@ import Link from 'next/link';
 import { ArrowRight, Download, Play, Terminal, ShieldCheck, Eye, Lock, Laptop, CheckCircle2 } from 'lucide-react';
 import { FeatureShowcase } from '@/components/FeatureShowcase';
 import { InstallCommand } from '@/components/InstallCommand';
-import { CommitGraphHero } from '@/components/CommitGraphHero';
-import { ScrollReveal } from '@/components/ScrollReveal';
+
 import { REPO_URL, NPM_URL } from '@/lib/constants';
 import { getWeeklyDownloads, getTotalDownloads } from '@/lib/npm';
+import { CommitGraphHero } from '@/components/Commitgraphhero';
+import { ScrollReveal } from '@/components/Scrollreveal';
 
 export default async function Home() {
   const [weeklyDownloads, totalDownloads] = await Promise.all([
