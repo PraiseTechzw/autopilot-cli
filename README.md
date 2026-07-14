@@ -9,7 +9,7 @@
 **Latest release:** v4.0.1 keeps the 4.x line aligned with the real brand assets, safer staging, and cleaner public docs.
 
 ![Autopilot banner](autopilot-docs/public/info-banner.png)
-![Autopilot logo](autopilot-docs/public/logo.png)
+
 
 [![npm version](https://img.shields.io/npm/v/@traisetech/autopilot?style=flat-square&color=success)](https://www.npmjs.com/package/@traisetech/autopilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)

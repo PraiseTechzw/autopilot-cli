@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { render, Box, Text, useInput, useApp } from 'ink';
+import { render, Box, Text, useInput } from 'ink';
 import fs from 'fs-extra';
 import StateManager from '../core/state.js';
 import git from '../core/git.js';
@@ -31,7 +31,6 @@ const DashboardHotkeys = ({ root, enabled }) => {
 };
 
 const Dashboard = () => {
-  const { exit } = useApp();
   const root = process.cwd();
   const isInteractive = process.stdin.isTTY;
 
