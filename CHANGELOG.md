@@ -1,11 +1,11 @@
 # Changelog
 
 
-## [4.0.1] - 2026-07-14
+## [4.0.2] - 2026-07-14
 
 ### Fixed
 
-- **Release Alignment**: Updated public docs and homepage labels to match the current `4.0.1` package version.
+- **Release Alignment**: Updated public docs and homepage labels to match the current `4.0.2` package version.
 - **Watcher Staging**: Skips nested Git repos such as `test-repo-sync/` so staging no longer fails on embedded repositories.
 - **Brand Refresh**: Aligned the docs site colors and public assets with the real logo palette.
 

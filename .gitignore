@@ -46,3 +46,4 @@ autopilot.log
 .autopilot.log
 .autopilot-state.json
 test-repo-sync/
+test/temp-test-repo/

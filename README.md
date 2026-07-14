@@ -6,7 +6,7 @@
 
 **An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.**
 
-**Latest release:** v4.0.1 keeps the 4.x line aligned with the real brand assets, safer staging, and cleaner public docs.
+**Latest release:** v4.0.2 keeps the 4.x line aligned with the real brand assets, safer staging, and cleaner public docs.
 
 ![Autopilot banner](autopilot-docs/public/info-banner.png)
 
