@@ -4,7 +4,6 @@ const logger = require('../utils/logger');
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_MODELS = [
-  'openai/gpt-oss-120b:free',
   'openrouter/free',
   'google/gemma-4-31b-it:free'
 ];
