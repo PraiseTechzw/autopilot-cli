@@ -246,7 +246,6 @@ class Watcher {
       }
     };
 
-    void syncNow('startup');
     this.leaderboardSyncTimer = setInterval(() => {
       void syncNow('interval');
     }, intervalMs);
@@ -443,10 +442,21 @@ class Watcher {
       }
 
       // 7. Commit
-      logger.info('Committing changes...');
-      
       // Add all changes
-      await git.addAll(this.repoPath);
+      const addResult = await git.addAll(this.repoPath);
+      if (!addResult.ok) {
+        logger.error(`Failed to stage changes: ${addResult.stderr}`);
+        return;
+      }
+
+      const hasStagedChanges = await git.hasStagedChanges(this.repoPath);
+      if (!hasStagedChanges) {
+        logger.info('No staged changes after git add -A. Skipping commit.');
+        await this.updateStatusFile({ status: 'watching' });
+        return;
+      }
+
+      logger.info('Committing changes...');
       
       const changedFiles = statusObj.files;
       let message = 'update: auto-commit changes';
@@ -551,7 +561,7 @@ class Watcher {
           // Emit Event for Leaderboard/Telemetry
           try {
             const identity = await getIdentity();
-            await eventSystem.emit({
+          await eventSystem.emit({
               type: 'push_success',
               userId: identity.id,
               commitHash: latestHash,
@@ -561,19 +571,18 @@ class Watcher {
           } catch (err) {
             logger.debug(`Failed to emit push event: ${err.message}`);
           }
+
+          try {
+            const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
+            await syncLeaderboard(apiUrl, { cwd: this.repoPath });
+          } catch (err) {
+            logger.debug(`Leaderboard sync failed after push: ${err.message}`);
+          }
         }
       }
-      
+
       // Cleanup
       await this.updateStatusFile({ status: 'watching' });
-      
-      // Sync leaderboard
-      try {
-        const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
-        await syncLeaderboard(apiUrl, { cwd: this.repoPath });
-      } catch (err) {
-        logger.debug(`Leaderboard sync failed: ${err.message}`);
-      }
 
     } catch (error) {
       logger.error(`Process error: ${error.message}`);

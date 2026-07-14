@@ -77,6 +77,20 @@ async function addAll(root) {
 }
 
 /**
+ * Check whether there are staged changes ready to commit
+ * @param {string} root - Repository root path
+ * @returns {Promise<boolean>} True if staged changes exist
+ */
+async function hasStagedChanges(root) {
+  try {
+    await execa('git', ['diff', '--cached', '--quiet'], { cwd: root });
+    return false;
+  } catch (error) {
+    return error.exitCode === 1;
+  }
+}
+
+/**
  * Commit staged changes
  * @param {string} root - Repository root path
  * @param {string} message - Commit message
@@ -315,6 +329,7 @@ module.exports = {
   hasChanges,
   getPorcelainStatus,
   addAll,
+  hasStagedChanges,
   commit,
   fetch,
   runGit,
