@@ -14,6 +14,34 @@ export interface UserStats {
 
 const LOCAL_LEADERBOARD_PATH = path.join(process.cwd(), 'data', 'leaderboard.json');
 
+function describeError(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  if (error && typeof error === 'object') {
+    const candidate = error as Record<string, unknown>;
+    const parts: string[] = [];
+
+    for (const key of ['message', 'details', 'hint', 'code', 'status'] as const) {
+      const value = candidate[key];
+      if (typeof value === 'string' && value.trim()) {
+        parts.push(`${key}: ${value}`);
+      }
+    }
+
+    if (parts.length > 0) {
+      return parts.join(' | ');
+    }
+
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return '[unserializable error]';
+    }
+  }
+
+  return String(error);
+}
+
 function normalizeRows(rows: Array<{
   id: string;
   username: string;
@@ -103,6 +131,6 @@ export async function updateUserStats(stats: UserStats): Promise<UserStats[]> {
   const { error } = await supabase
     .from('leaderboard')
     .upsert(row, { onConflict: 'id' });
-  if (error) throw error;
+  if (error) throw new Error(describeError(error));
   return await getLeaderboard();
 }

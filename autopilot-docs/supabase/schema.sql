@@ -23,6 +23,7 @@ update to anon,
   service_role using (true) with check (true);
 grant select on public.leaderboard to anon,
   authenticated;
+grant select, insert, update on public.leaderboard to service_role;
 create table if not exists public.events (
   id bigserial primary key,
   type text not null,
@@ -42,3 +43,4 @@ create policy "events_insert_service" on public.events for
 insert to service_role with check (true);
 create policy "events_select_service" on public.events for
 select to service_role using (true);
+grant insert, select on public.events to service_role;
