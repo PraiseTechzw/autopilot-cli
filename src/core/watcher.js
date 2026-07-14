@@ -442,29 +442,23 @@ class Watcher {
       }
 
       // 7. Commit
-      // Stage only paths that are safe to commit from this repo.
-      const stagedPaths = [];
-      for (const file of statusObj.files) {
-        if (file.status === 'D' || file.status === ' D') {
+      const nestedRepoExclusions = [];
+      const entries = await fs.readdir(this.repoPath, { withFileTypes: true });
+      for (const entry of entries) {
+        if (!entry.isDirectory()) {
           continue;
         }
 
-        const candidatePath = path.join(this.repoPath, file.file);
-        if (await fs.pathExists(path.join(candidatePath, '.git'))) {
-          logger.warn(`Skipping nested Git repository: ${file.file}`);
-          continue;
+        const nestedGitPath = path.join(this.repoPath, entry.name, '.git');
+        if (await fs.pathExists(nestedGitPath)) {
+          nestedRepoExclusions.push(entry.name);
+          logger.warn(`Skipping nested Git repository: ${entry.name}`);
         }
-
-        stagedPaths.push(file.file);
       }
 
-      if (stagedPaths.length === 0) {
-        logger.info('No stageable changes found. Skipping commit.');
-        await this.updateStatusFile({ status: 'watching' });
-        return;
-      }
-
-      const addResult = await git.addAll(this.repoPath, stagedPaths);
+      const addResult = nestedRepoExclusions.length > 0
+        ? await git.addAllExcept(this.repoPath, nestedRepoExclusions)
+        : await git.addAll(this.repoPath);
       if (!addResult.ok) {
         logger.error(`Failed to stage changes: ${addResult.stderr}`);
         return;

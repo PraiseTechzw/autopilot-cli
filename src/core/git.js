@@ -85,6 +85,29 @@ async function addAll(root, paths = null) {
 }
 
 /**
+ * Stage all changes while excluding specific nested repository paths.
+ * @param {string} root - Repository root path
+ * @param {string[]} excludePaths - Relative paths to nested repos
+ * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
+ */
+async function addAllExcept(root, excludePaths = []) {
+  try {
+    const args = ['add', '-A', '--', '.'];
+    for (const excluded of excludePaths) {
+      if (!excluded) continue;
+      const normalized = excluded.replace(/\\/g, '/').replace(/\/+$/, '');
+      args.push(`:!${normalized}`);
+      args.push(`:!${normalized}/**`);
+    }
+
+    const { stdout, stderr } = await execa('git', args, { cwd: root });
+    return { ok: true, stdout, stderr };
+  } catch (error) {
+    return { ok: false, stdout: '', stderr: error.message };
+  }
+}
+
+/**
  * Check whether there are staged changes ready to commit
  * @param {string} root - Repository root path
  * @returns {Promise<boolean>} True if staged changes exist
@@ -337,6 +360,7 @@ module.exports = {
   hasChanges,
   getPorcelainStatus,
   addAll,
+  addAllExcept,
   hasStagedChanges,
   commit,
   fetch,

@@ -17,7 +17,7 @@
     "prod",
     "release"
   ],
-  "allowPushToProtected": false,
+  "allowPushToProtected": false ,
   "notificationsEnabled": true,
   "maxRetryAttempts": 5,
   "leaderboardSyncEnabled": true,
