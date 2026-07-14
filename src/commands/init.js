@@ -73,7 +73,7 @@ async function initializeGitRepo(repoPath) {
 async function askAISetupChoice() {
   logger.info('\n🤖 AI commit messages help Autopilot write better commit summaries.');
   logger.info('Choose how you want to set this up:');
-  logger.info('  1. Use the built-in AI (recommended for beginners)');
+  logger.info('  1. Use OpenRouter AI (recommended for beginners)');
   logger.info('  2. Use my own API key');
   logger.info('  3. Skip for now and set it up later');
 
@@ -212,8 +212,8 @@ async function initRepo() {
         const keyInput = await askQuestion('Enter your API key: ');
 
         if (!keyInput) {
-          logger.warn('Custom API Key cannot be empty. Falling back to System AI.');
-          const retry = await askQuestion('Try again with custom key? (n to use System AI) [Y/n]: ');
+          logger.warn('Custom API Key cannot be empty. Falling back to OpenRouter defaults.');
+          const retry = await askQuestion('Try again with custom key? (n to use OpenRouter defaults) [Y/n]: ');
           if (retry.toLowerCase() === 'n') {
             break;
           }
@@ -229,7 +229,7 @@ async function initRepo() {
           break;
         } else {
           logger.warn('API Key validation failed.');
-          const retry = await askQuestion('Try again? (n to use System AI, p to proceed anyway) [Y/n/p]: ');
+          const retry = await askQuestion('Try again? (n to use OpenRouter defaults, p to proceed anyway) [Y/n/p]: ');
           const choice = retry.toLowerCase();
 
           if (choice === 'n') {
@@ -248,7 +248,7 @@ async function initRepo() {
       logger.info('AI setup is skipped for now. You can turn it on later by running "autopilot init" again or editing .autopilotrc.json.');
       interactive = false;
     } else {
-      logger.info('Using System AI (Zero-Config mode). ✨');
+      logger.info('Using OpenRouter AI (Zero-Config mode). ✨');
     }
 
     const overrides = {

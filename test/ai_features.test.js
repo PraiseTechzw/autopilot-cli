@@ -1,6 +1,7 @@
 const { test, describe, it, mock, beforeEach, afterEach } = require('node:test');
 const assert = require('node:assert');
 const logger = require('../src/utils/logger');
+const openrouter = require('../src/core/openrouter');
 
 // Mock fetch globally
 global.fetch = async () => {};
@@ -128,7 +129,7 @@ describe('AI Features Integration', () => {
       assert.strictEqual(msg, '[autopilot] feat: grok message');
     });
 
-    it('should default to Grok if provider is missing', async () => {
+    it('should default to OpenRouter if provider is missing', async () => {
       const config = {
         commitMessageMode: 'ai',
         ai: {
@@ -137,10 +138,10 @@ describe('AI Features Integration', () => {
         }
       };
 
-      mock.method(grok, 'generateGrokCommitMessage', async () => 'feat: default grok');
+      mock.method(openrouter, 'generateCommitMessage', async () => 'feat: default openrouter');
 
       const msg = await commit.generateCommitMessage([{ status: 'M', file: 'test.js' }], 'diff', config);
-      assert.strictEqual(msg, '[autopilot] feat: default grok');
+      assert.strictEqual(msg, '[autopilot] feat: default openrouter');
     });
 
 
