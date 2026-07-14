@@ -28,10 +28,11 @@ While Autopilot is a local-first tool, you can export your data to create your o
 
 ### Exporting Data
 
-You can export your session data to a CSV file for analysis in Excel, Google Sheets, or custom dashboards.
+You can export your session data to CSV or JSON for analysis in Excel, Google Sheets, custom dashboards, or CI artifacts.
 
 ```bash
 autopilot insights --export csv
+autopilot insights --export json
 ```
 
 This generates an `autopilot-insights.csv` file containing:
@@ -39,6 +40,8 @@ This generates an `autopilot-insights.csv` file containing:
 *   Event Type (File Change, Commit, Push)
 *   File Path
 *   Duration
+
+`autopilot insights --export json` generates `autopilot-insights.json` with the same metrics plus a timestamped metadata wrapper.
 
 ### Gamifying Your Workflow
 

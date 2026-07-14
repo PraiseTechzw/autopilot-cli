@@ -1,5 +1,46 @@
 [
   {
+    "title": "Accessibility",
+    "description": "How Autopilot stays usable for keyboard-first and assistive workflows.",
+    "route": "/docs/accessibility",
+    "type": "page"
+  },
+  {
+    "title": "Accessibility",
+    "route": "/docs/accessibility#accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 1
+  },
+  {
+    "title": "CLI Accessibility",
+    "route": "/docs/accessibility#cli-accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
+    "title": "Dashboard Accessibility",
+    "route": "/docs/accessibility#dashboard-accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
+    "title": "Docs Accessibility",
+    "route": "/docs/accessibility#docs-accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
+    "title": "Recommendations",
+    "route": "/docs/accessibility#recommendations",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
     "title": "Advanced Usage",
     "description": "Real-world workflows for CI/CD, monorepos, team setups, and custom automation.",
     "route": "/docs/advanced-usage",
@@ -87,6 +128,47 @@
     "route": "/docs/advanced-usage#performance",
     "type": "heading",
     "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Benchmarks",
+    "description": "How to compare Autopilot with other commit assistants fairly.",
+    "route": "/docs/benchmarks",
+    "type": "page"
+  },
+  {
+    "title": "Benchmarks",
+    "route": "/docs/benchmarks#benchmarks",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 1
+  },
+  {
+    "title": "What To Measure",
+    "route": "/docs/benchmarks#what-to-measure",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 2
+  },
+  {
+    "title": "Comparing With Alternatives",
+    "route": "/docs/benchmarks#comparing-with-alternatives",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 2
+  },
+  {
+    "title": "Large Repo Checks",
+    "route": "/docs/benchmarks#large-repo-checks",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 2
+  },
+  {
+    "title": "Interpreting Results",
+    "route": "/docs/benchmarks#interpreting-results",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
     "level": 2
   },
   {
@@ -395,6 +477,27 @@
     "level": 3
   },
   {
+    "title": "Branch Rules",
+    "route": "/docs/configuration#branch-rules",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Offline Mode",
+    "route": "/docs/configuration#offline-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Commit Signing",
+    "route": "/docs/configuration#commit-signing",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
     "title": "Team Configuration",
     "route": "/docs/configuration#team-configuration",
     "type": "heading",
@@ -460,6 +563,13 @@
   {
     "title": "\"Aggressive Sync\" Mode",
     "route": "/docs/configuration#aggressive-sync-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "\"Signed Release\" Mode",
+    "route": "/docs/configuration#signed-release-mode",
     "type": "heading",
     "parentTitle": "Configuration",
     "level": 3
@@ -531,6 +641,47 @@
     "route": "/docs/contributing#code-style",
     "type": "heading",
     "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Extensibility",
+    "description": "Current extension points and what’s planned next.",
+    "route": "/docs/extensibility",
+    "type": "page"
+  },
+  {
+    "title": "Extensibility",
+    "route": "/docs/extensibility#extensibility",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 1
+  },
+  {
+    "title": "Current Extension Points",
+    "route": "/docs/extensibility#current-extension-points",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 2
+  },
+  {
+    "title": "Beyond Git Automation",
+    "route": "/docs/extensibility#beyond-git-automation",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 2
+  },
+  {
+    "title": "Plugin System",
+    "route": "/docs/extensibility#plugin-system",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 2
+  },
+  {
+    "title": "Future Direction",
+    "route": "/docs/extensibility#future-direction",
+    "type": "heading",
+    "parentTitle": "Extensibility",
     "level": 2
   },
   {
@@ -739,6 +890,47 @@
     "route": "/docs/installation#uninstalling",
     "type": "heading",
     "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Localization",
+    "description": "Guidance for translating Autopilot docs and keeping the CLI accessible globally.",
+    "route": "/docs/localization",
+    "type": "page"
+  },
+  {
+    "title": "Localization",
+    "route": "/docs/localization#localization",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 1
+  },
+  {
+    "title": "Translation Strategy",
+    "route": "/docs/localization#translation-strategy",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 2
+  },
+  {
+    "title": "What Should Stay in English",
+    "route": "/docs/localization#what-should-stay-in-english",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 2
+  },
+  {
+    "title": "What Can Be Localized",
+    "route": "/docs/localization#what-can-be-localized",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 2
+  },
+  {
+    "title": "Practical Tips",
+    "route": "/docs/localization#practical-tips",
+    "type": "heading",
+    "parentTitle": "Localization",
     "level": 2
   },
   {
@@ -1023,6 +1215,61 @@
     "type": "heading",
     "parentTitle": "Safety Rails",
     "level": 3
+  },
+  {
+    "title": "Security",
+    "description": "Secret scanning, signing, GitHub Actions, and other safety details.",
+    "route": "/docs/security",
+    "type": "page"
+  },
+  {
+    "title": "Security",
+    "route": "/docs/security#security",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 1
+  },
+  {
+    "title": "Secret Scanning",
+    "route": "/docs/security#secret-scanning",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Large File Protection",
+    "route": "/docs/security#large-file-protection",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Protected Branches",
+    "route": "/docs/security#protected-branches",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Commit Signing",
+    "route": "/docs/security#commit-signing",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "GitHub Actions",
+    "route": "/docs/security#github-actions",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Recommended Practices",
+    "route": "/docs/security#recommended-practices",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
   },
   {
     "title": "Troubleshooting",

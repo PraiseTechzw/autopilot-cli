@@ -11,8 +11,8 @@ const SECRET_PATTERNS = [
   { name: 'GitHub Token', regex: /(gh[pousr]_[a-zA-Z0-9]{36,255})/ },
   { name: 'Stripe Secret Key', regex: /(sk_live_[0-9a-zA-Z]{24})/ },
   { name: 'Google API Key', regex: /AIza[0-9A-Za-z\\-_]{35}/ },
-  { name: 'Bearer Token', regex: /Bearer [a-zA-Z0-9\-\._~\+\/]+=*/ },
-  { name: 'Generic Private Key', regex: /-----BEGIN PRIVATE KEY-----/ }
+  { name: 'Bearer Token', regex: /\bBearer\s+[A-Za-z0-9._~+/=-]{20,}\b/ },
+  { name: 'Generic Private Key', regex: /-----BEGIN [A-Z ]*PRIVATE KEY-----[\s\S]{32,}-----END [A-Z ]*PRIVATE KEY-----/ }
 ];
 
 const MAX_FILE_SIZE_MB = 50;
@@ -31,6 +31,16 @@ function matchesBranchPattern(branchName, pattern) {
   if (pattern === branchName) return true;
   if (!pattern.includes('*') && !pattern.includes('?')) return false;
   return globToRegExp(pattern).test(branchName);
+}
+
+function findSecretFindings(content) {
+  if (typeof content !== 'string' || content.length === 0) {
+    return [];
+  }
+
+  return SECRET_PATTERNS
+    .filter((pattern) => pattern.regex.test(content))
+    .map((pattern) => pattern.name);
 }
 
 /**
@@ -116,10 +126,8 @@ const validateBeforeCommit = async (repoPath, config) => {
             
             const content = buffer.toString('utf8', 0, bytesRead);
             
-            for (const pattern of SECRET_PATTERNS) {
-              if (pattern.regex.test(content)) {
-                errors.push(`Possible ${pattern.name} detected in ${file.file}`);
-              }
+            for (const finding of findSecretFindings(content)) {
+              errors.push(`Possible ${finding} detected in ${file.file}`);
             }
           }
         } catch (err) {
@@ -263,5 +271,6 @@ module.exports = {
   checkTeamStatus,
   isProtectedBranch,
   getBranchPolicy,
-  matchesBranchPattern
+  matchesBranchPattern,
+  findSecretFindings
 };

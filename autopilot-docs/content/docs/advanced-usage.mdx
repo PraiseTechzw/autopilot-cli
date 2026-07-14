@@ -23,7 +23,7 @@ Common CI usage patterns:
 
 - Run `autopilot doctor` in a workflow to fail fast on broken setup.
 - Run `autopilot status --json` as a health check for local runners.
-- Use `autopilot insights --export csv` to produce report artifacts for maintainers.
+- Use `autopilot insights --export csv` or `autopilot insights --export json` to produce report artifacts for maintainers.
 
 ## Team Workflows
 
@@ -116,4 +116,3 @@ On large repositories, performance depends on:
 - How often the watcher syncs status and leaderboard data.
 
 Keep generated directories excluded and prefer a smaller watch scope when possible.
-

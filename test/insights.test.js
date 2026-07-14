@@ -68,4 +68,28 @@ describe('Insights Command', () => {
     const exists = await fs.pathExists(csvPath);
     assert.strictEqual(exists, true, `CSV file should exist at ${csvPath}`);
   });
+
+  it('should export json if requested', async () => {
+    mock.method(git, 'runGit', (root, args) => {
+        if (args.includes('log')) {
+            return Promise.resolve({
+                ok: true,
+                stdout: '====COMMIT====\ne5b7e2d6f5c8a9b0c1d2e3f4a5b6c7d8e9f0a1b2|author|2023-01-01T12:00:00.000Z|feat: test|Body content\nAutopilot-Commit: true\n====BODY_END====\n1\t1\tfile.js',
+                stderr: ''
+            });
+        }
+        return Promise.resolve({ ok: true, stdout: '', stderr: '' });
+    });
+
+    await insights({ export: 'json', cwd: tempDir });
+
+    const jsonPath = path.join(tempDir, 'autopilot-insights.json');
+    const exists = await fs.pathExists(jsonPath);
+    assert.strictEqual(exists, true, `JSON file should exist at ${jsonPath}`);
+
+    const payload = await fs.readJson(jsonPath);
+    assert.ok(payload.generatedAt);
+    assert.ok(payload.metrics);
+    assert.strictEqual(payload.metrics.totalCommits, 1);
+  });
 });

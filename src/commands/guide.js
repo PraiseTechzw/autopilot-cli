@@ -32,7 +32,7 @@ async function guide() {
             title: '4. Productivity Insights',
             desc: 'Analyze your coding habits and quality.',
             cmd: 'autopilot insights',
-            tip: 'Try "autopilot insights --export csv" for a detailed report.'
+            tip: 'Try "autopilot insights --export csv" or "--export json" for a detailed report.'
         },
         {
             title: '5. Global Leaderboard',
