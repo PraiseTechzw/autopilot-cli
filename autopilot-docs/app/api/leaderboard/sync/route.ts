@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerClient } from '@/lib/supabase';
-import { UserStats } from '@/lib/leaderboard';
+import { updateUserStats, UserStats } from '@/lib/leaderboard';
 
 export async function POST(request: Request) {
   try {
@@ -20,41 +19,7 @@ export async function POST(request: Request) {
       streak: body.streak || 0,
       lastActive: new Date().toISOString()
     };
-
-    const supabase = getServerClient();
-    const row = {
-      id: stats.id,
-      username: stats.username,
-      score: stats.score,
-      commits: stats.commits,
-      focus_minutes: stats.focusMinutes,
-      streak: stats.streak,
-      last_active: stats.lastActive,
-    };
-    const { error: upsertError } = await supabase
-      .from('leaderboard')
-      .upsert(row, { onConflict: 'id' });
-
-    if (upsertError) {
-      console.error('Supabase upsert error:', upsertError);
-      return NextResponse.json({
-        error: 'Failed to sync leaderboard',
-        details: upsertError.message,
-        hint: 'Check if RLS policies allow upsert or if SUPABASE_SERVICE_ROLE_KEY is missing.'
-      }, { status: 500 });
-    }
-
-    const { data: all, error: fetchError } = await supabase
-      .from('leaderboard')
-      .select('id,score')
-      .order('score', { ascending: false })
-      .limit(100);
-
-    if (fetchError || !all) {
-      console.warn('Leaderboard fetch error or empty:', fetchError);
-      return NextResponse.json({ success: true, rank: null });
-    }
-
+    const all = await updateUserStats(stats);
     const rank = (all.findIndex(u => u.id === stats.id) + 1) || null;
     return NextResponse.json({ success: true, rank });
   } catch (error) {

@@ -6,6 +6,8 @@
 const path = require('path');
 const logger = require('../utils/logger');
 const openrouter = require('./openrouter');
+const gemini = require('./gemini');
+const grok = require('./grok');
 const HistoryManager = require('./history');
 
 const { generateRuleBasedMessage } = require('./commitMessageGenerator');
@@ -21,21 +23,25 @@ async function generateCommitMessage(files, diffContent, config = {}) {
   let message = '';
   
   const mode = config.commitMessageMode || 'smart';
-  const aiProvider = config.ai?.provider || config.aiProvider || 'default';
+  const aiProvider = resolveAiProvider(config);
   const aiApiKey = config.ai?.apiKey || config.aiApiKey;
-  const shouldUseOpenRouter = ['openrouter', 'default', undefined, null].includes(aiProvider);
+  const aiEnabled = config.ai?.enabled ?? false;
 
   if (!files || files.length === 0) {
     message = 'update: minor changes';
   } else if (mode === 'simple') {
     message = 'chore: auto-commit changes';
-  } else if (aiProvider !== 'none' && diffContent && diffContent.trim() && (aiApiKey || config.ai?.enabled)) {
+  } else if (aiProvider !== 'none' && diffContent && diffContent.trim() && aiEnabled) {
     // AI Mode
     try {
       logger.info(`Generating AI commit message using ${aiProvider}...`);
 
-      if (shouldUseOpenRouter) {
+      if (aiProvider === 'openrouter') {
         message = await openrouter.generateCommitMessage(diffContent, aiApiKey, config.ai?.model);
+      } else if (aiProvider === 'gemini') {
+        message = await gemini.generateAICommitMessage(diffContent, aiApiKey || config.ai?.grokApiKey, config.ai?.model);
+      } else if (aiProvider === 'grok') {
+        message = await grok.generateGrokCommitMessage(diffContent, aiApiKey || config.ai?.grokApiKey, config.ai?.model);
       } else {
         message = generateSmartCommitMessage(files, diffContent);
       }
@@ -56,6 +62,25 @@ async function generateCommitMessage(files, diffContent, config = {}) {
   const finalMessage = `[autopilot] ${message.trim()}`;
   
   return finalMessage;
+}
+
+function resolveAiProvider(config = {}) {
+  const rawProvider = (config.ai?.provider || config.aiProvider || '').toString().trim().toLowerCase();
+  const normalizedProvider = rawProvider === 'default' ? '' : rawProvider;
+  const explicitApiKey = config.ai?.apiKey || config.aiApiKey || '';
+
+  if (normalizedProvider === 'openrouter' || normalizedProvider === 'gemini' || normalizedProvider === 'grok' || normalizedProvider === 'none') {
+    return normalizedProvider;
+  }
+
+  // Backward-compatible fallback:
+  // - If the user provided a key but no explicit provider, prefer OpenRouter.
+  // - Otherwise use the zero-config Grok path.
+  if (explicitApiKey) {
+    return 'openrouter';
+  }
+
+  return 'grok';
 }
 
 /**
