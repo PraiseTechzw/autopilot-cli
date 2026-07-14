@@ -14,7 +14,7 @@ const DEFAULT_CONFIG = {
     apiKey: '',
     grokApiKey: '',
     interactive: true,
-    model: 'openai/gpt-oss-120b:free'
+    model: 'default'
   },
   protectedBranches: ['main', 'master', 'production', 'prod', 'release'],
   allowPushToProtected: false,

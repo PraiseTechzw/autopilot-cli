@@ -1,21 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { render, Box, Text, useInput, useApp } from 'ink';
-import Gradient from 'ink-gradient';
-import BigText from 'ink-big-text';
-import Spinner from 'ink-spinner';
 import fs from 'fs-extra';
-import path from 'path';
 import StateManager from '../core/state.js';
 import git from '../core/git.js';
 import HistoryManager from '../core/history.js';
 import processUtils from '../utils/process.js';
 
-const { useState, useEffect } = React;
 const { getRunningPid } = processUtils;
-
 const e = React.createElement;
 
-// Dashboard Component
+const Badge = ({ label, color }) => e(Text, { color, bold: true }, label);
+
 const Dashboard = () => {
   const { exit } = useApp();
   const root = process.cwd();
@@ -27,15 +22,12 @@ const Dashboard = () => {
   const [todayStats, setTodayStats] = useState({ commits: 0 });
   const [pausedState, setPausedState] = useState(null);
 
-  // Poll for updates
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 1. Check process status
         const currentPid = await getRunningPid(root);
         setPid(currentPid);
 
-        // 2. Check Paused State
         const stateManager = new StateManager(root);
         if (stateManager.isPaused()) {
           setStatus('paused');
@@ -48,97 +40,81 @@ const Dashboard = () => {
           setPausedState(null);
         }
 
-        // 3. Last Commit
         const historyManager = new HistoryManager(root);
-        const last = historyManager.getLastCommit();
-        setLastCommit(last);
+        setLastCommit(historyManager.getLastCommit());
 
-        // 4. Pending Files
         const statusObj = await git.getPorcelainStatus(root);
         if (statusObj.ok) {
           setPendingFiles(statusObj.files);
         }
 
-        // 5. Today Stats (Simple count from history)
         const history = historyManager.getHistory();
         const today = new Date().toDateString();
-        const count = history.filter(c => new Date(c.timestamp).toDateString() === today).length;
+        const count = history.filter((c) => new Date(c.timestamp).toDateString() === today).length;
         setTodayStats({ commits: count });
-
-      } catch (err) {
-        // ignore errors
+      } catch {
+        // Keep the dashboard resilient in non-interactive or partially initialized repos.
       }
     };
 
-    fetchData();
-    const timer = setInterval(fetchData, 5000);
-    return () => clearInterval(timer);
-  }, []);
+    void fetchData();
+    const timer = setInterval(() => {
+      void fetchData();
+    }, 5000);
 
-  // Keyboard controls
-  useInput((input, key) => {
+    return () => clearInterval(timer);
+  }, [root]);
+
+  useInput((input) => {
     if (input === 'q') {
       exit();
     }
+
     if (input === 'p') {
-      // Toggle pause
       const stateManager = new StateManager(root);
       if (stateManager.isPaused()) {
         stateManager.resume();
       } else {
         stateManager.pause('Dashboard toggle');
       }
-      // Immediate refresh
     }
   });
 
-  return e(Box, { flexDirection: "column", padding: 1, borderStyle: "round", borderColor: "cyan" },
-    // Header
-    e(Box, { marginBottom: 1 },
-      e(Gradient, { name: "morning" },
-        e(BigText, { text: "Autopilot", font: "simple" })
-      )
+  return e(
+    Box,
+    { flexDirection: 'column', padding: 1, borderStyle: 'round', borderColor: 'cyan' },
+    e(
+      Box,
+      { marginBottom: 1, flexDirection: 'column' },
+      e(Text, { bold: true }, 'Autopilot Dashboard'),
+      e(Text, null, 'Real-time repo status and activity')
     ),
-
-    // Status
-    e(Box, { marginBottom: 1 },
-      e(Text, { bold: true }, "Status: "),
-      status === 'running' && e(Text, { color: "green" }, `🟢 Running (PID: ${pid})`),
-      status === 'paused' && e(Text, { color: "yellow" }, `⏸️  Paused (${pausedState?.reason})`),
-      status === 'stopped' && e(Text, { color: "red" }, "🔴 Stopped"),
-      status === 'loading' && e(Text, {}, e(Spinner, { type: "dots" }), " Loading...")
+    e(
+      Box,
+      { marginBottom: 1 },
+      e(Text, { bold: true }, 'Status: '),
+      status === 'running' && e(Badge, { label: `Running (PID: ${pid ?? 'unknown'})`, color: 'green' }),
+      status === 'paused' && e(Badge, { label: `Paused (${pausedState?.reason || 'no reason'})`, color: 'yellow' }),
+      status === 'stopped' && e(Badge, { label: 'Stopped', color: 'red' }),
+      status === 'loading' && e(Text, null, 'Loading...')
     ),
-
-    // Activity
-    e(Box, { flexDirection: "column", marginBottom: 1 },
-      e(Text, { underline: true }, "Activity"),
-      e(Box, {},
-        e(Text, {}, "Last Commit: "),
-        e(Text, { color: "cyan" }, lastCommit ? `${lastCommit.message} (${new Date(lastCommit.timestamp).toLocaleTimeString()})` : 'None')
-      ),
-      e(Box, {},
-        e(Text, {}, "Today's Commits: "),
-        e(Text, { color: "green" }, todayStats.commits)
-      )
+    e(
+      Box,
+      { flexDirection: 'column', marginBottom: 1 },
+      e(Text, { bold: true }, 'Activity'),
+      e(Text, null, `Last Commit: ${lastCommit ? lastCommit.message : 'None'}`),
+      e(Text, null, `Today: ${todayStats.commits} commit(s)`)
     ),
-
-    // Pending Changes
-    e(Box, { flexDirection: "column", marginBottom: 1 },
-      e(Text, { underline: true }, `Pending Changes (${pendingFiles.length})`),
-      e(Box, { flexDirection: "column" },
-        pendingFiles.length === 0 ?
-          e(Text, { color: "gray" }, "No pending changes") :
-          pendingFiles.slice(0, 5).map((f, idx) =>
-            e(Text, { key: `${f.file}-${idx}`, color: "yellow" }, ` ${f.status} ${f.file}`)
-          )
-      ),
-      pendingFiles.length > 5 && e(Text, { color: "gray" }, ` ...and ${pendingFiles.length - 5} more`)
+    e(
+      Box,
+      { flexDirection: 'column', marginBottom: 1 },
+      e(Text, { bold: true }, `Pending Changes (${pendingFiles.length})`),
+      pendingFiles.length === 0
+        ? e(Text, null, 'No pending changes')
+        : pendingFiles.slice(0, 5).map((f, idx) => e(Text, { key: `${f.file}-${idx}` }, `- ${f.status} ${f.file}`)),
+      pendingFiles.length > 5 && e(Text, null, `...and ${pendingFiles.length - 5} more`)
     ),
-
-    // Footer
-    e(Box, { marginTop: 1, borderStyle: "single", borderColor: "gray" },
-      e(Text, {}, "Press 'p' to toggle pause, 'q' to quit dashboard")
-    )
+    e(Box, null, e(Text, null, "Press 'p' to toggle pause, 'q' to quit"))
   );
 };
 
@@ -147,5 +123,6 @@ export default function runDashboard() {
     console.error('Error: Dashboard requires an interactive terminal (TTY).');
     process.exit(1);
   }
+
   render(e(Dashboard));
 }

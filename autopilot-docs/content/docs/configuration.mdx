@@ -42,7 +42,7 @@ If (and only if) you explicitly enable AI and provide your own API key:
     "enabled": true,
     "provider": "openrouter",
     "apiKey": "YOUR_OPENROUTER_API_KEY",
-    "model": "openai/gpt-oss-120b:free",
+    "model": "default",
     "interactive": false
   }
 }
@@ -51,8 +51,10 @@ If (and only if) you explicitly enable AI and provide your own API key:
 - **enabled**: Toggle AI features on/off (default: `false`).
 - **provider**: Choose between `openrouter` (default) or `none`.
 - **apiKey**: Your personal API Key.
-- **model**: Specific model to use.
+- **model**: Specific model to use. Set to `default` to auto-pick from Autopilot's free-model list.
 - **interactive**: If `true`, prompts you to review/edit the generated message before committing.
+
+If you want to pin your own free-model shortlist, set `AUTOPILOT_OPENROUTER_MODELS` to a comma-separated list of model slugs.
 
 ### Team Configuration
 

@@ -74,7 +74,7 @@ describe('Commit Message Generator', () => {
     global.fetch = async (_url, options) => {
       fetchCalled = true;
       const payload = JSON.parse(options.body);
-      assert.strictEqual(payload.model, 'openai/gpt-oss-120b:free');
+      assert.strictEqual(payload.model, 'openai/gpt-oss-20b:free');
       return {
         ok: true,
         json: async () => ({
@@ -143,8 +143,8 @@ describe('Commit Message Generator', () => {
       const result = await openrouter.generateCommitMessage('diff --git a/src/core/commit.js b/src/core/commit.js\n+const value = 1;', 'test-key');
       assert.strictEqual(result, 'feat: add fallback support');
       assert.deepStrictEqual(attemptedModels.slice(0, 2), [
-        'openai/gpt-oss-120b:free',
-        'openrouter/free'
+        'openai/gpt-oss-20b:free',
+        'google/gemma-4-31b-it:free'
       ]);
     } finally {
       global.fetch = originalFetch;

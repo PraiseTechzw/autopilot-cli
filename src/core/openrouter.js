@@ -4,8 +4,9 @@ const logger = require('../utils/logger');
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_MODELS = [
+  'openai/gpt-oss-20b:free',
+  'google/gemma-4-31b-it:free',
   'openrouter/free',
-  'google/gemma-4-31b-it:free'
 ];
 
 function findEnvFile(startDir = process.cwd()) {
@@ -62,6 +63,28 @@ function resolveApiKey(apiKey) {
   return apiKey || process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || envValues.OPENROUTER_API_KEY || envValues.OPENAI_API_KEY;
 }
 
+function parseModelList(rawList) {
+  if (!rawList || typeof rawList !== 'string') {
+    return [];
+  }
+
+  return rawList
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
+function getModelCandidates(model) {
+  const configuredModels = parseModelList(process.env.AUTOPILOT_OPENROUTER_MODELS);
+  const baseModels = configuredModels.length > 0 ? configuredModels : DEFAULT_MODELS;
+
+  if (model && typeof model === 'string' && model !== 'default') {
+    return [model, ...baseModels.filter((candidate) => candidate !== model)];
+  }
+
+  return baseModels;
+}
+
 async function generateCommitMessage(diff, apiKey, model = DEFAULT_MODELS[0]) {
   const key = resolveApiKey(apiKey);
 
@@ -69,9 +92,7 @@ async function generateCommitMessage(diff, apiKey, model = DEFAULT_MODELS[0]) {
     throw new Error('OpenRouter API key is required');
   }
 
-  const modelsToTry = model && typeof model === 'string' && model !== 'default'
-    ? [model, ...DEFAULT_MODELS.filter(candidate => candidate !== model)]
-    : DEFAULT_MODELS;
+  const modelsToTry = getModelCandidates(model);
 
   for (const candidateModel of modelsToTry) {
     try {
@@ -123,5 +144,7 @@ async function generateCommitMessage(diff, apiKey, model = DEFAULT_MODELS[0]) {
 module.exports = {
   generateCommitMessage,
   resolveApiKey,
-  DEFAULT_MODELS
+  DEFAULT_MODELS,
+  parseModelList,
+  getModelCandidates
 };
