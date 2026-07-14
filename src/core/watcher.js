@@ -79,6 +79,10 @@ class Watcher {
       
       // Load configuration
       await this.reloadConfig();
+      this.config = {
+        ...this.config,
+        watchPath: typeof this.config?.watchPath === 'string' ? this.config.watchPath : this.repoPath
+      };
       
       // Validate configuration
       const validation = validateConfig(this.config);

@@ -175,7 +175,9 @@ class FocusEngine {
     };
     try {
       try {
-        await fs.ensureDir(path.dirname(this.logFile));
+        // Make the directory available before we queue the append.
+        // Using the sync helper keeps test assertions deterministic.
+        fs.ensureDirSync(path.dirname(this.logFile));
       } catch (mkdirError) {
         logger.debug(`Focus log directory unavailable: ${mkdirError.message}`);
       }

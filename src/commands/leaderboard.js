@@ -7,9 +7,25 @@ const crypto = require('crypto');
 // Default API URL (can be overridden by env)
 const DEFAULT_API_URL = 'https://autopilot-cli.vercel.app';
 
+async function resolveFocusLogPath(repoPath) {
+  const candidates = [
+    path.join(repoPath, '.autopilot', 'focus.log'),
+    path.join(repoPath, '.autopilot.log'),
+    path.join(repoPath, 'autopilot.log')
+  ];
+
+  for (const candidate of candidates) {
+    if (await fs.pathExists(candidate)) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 async function calculateFocusTime(repoPath) {
-  const logPath = path.join(repoPath, 'autopilot.log');
-  if (!await fs.pathExists(logPath)) return 0;
+  const logPath = await resolveFocusLogPath(repoPath);
+  if (!logPath) return 0;
 
   try {
     const content = await fs.readFile(logPath, 'utf8');
@@ -29,7 +45,7 @@ async function calculateFocusTime(repoPath) {
 
     return Math.round(totalMs / 60000); // minutes
   } catch (error) {
-    logger.warn(`Failed to parse autopilot.log: ${error.message}`);
+    logger.warn(`Failed to parse focus log: ${error.message}`);
     return 0;
   }
 }
@@ -113,4 +129,4 @@ async function syncLeaderboard(apiUrl, options) {
   }
 }
 
-module.exports = { leaderboard, syncLeaderboard };
+module.exports = { leaderboard, syncLeaderboard, calculateFocusTime, resolveFocusLogPath };
