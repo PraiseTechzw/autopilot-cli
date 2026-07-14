@@ -20,6 +20,8 @@ const DEFAULT_CONFIG = {
   allowPushToProtected: false,
   notificationsEnabled: true,
   maxRetryAttempts: 5,
+  leaderboardSyncEnabled: true,
+  leaderboardSyncIntervalMinutes: 10,
   ignorePaths: ['.git', 'node_modules', '.autopilot/', '.autopilot-state.json', '.autopilot.log', '.autopilot-queue.json'],
   
   // Legacy/Internal

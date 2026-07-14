@@ -69,8 +69,7 @@ async function syncLeaderboard(apiUrl, options) {
 
     const commits = await getGitStats(repoPath);
     if (commits.length === 0) {
-      logger.warn('No git history found. Cannot sync stats.');
-      return;
+      logger.warn('No git history found. Syncing focus stats with zero commits.');
     }
 
     const metrics = calculateMetrics(commits);

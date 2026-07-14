@@ -45,6 +45,8 @@ class Watcher {
     this.retryQueue = new RetryQueue(repoPath, git.push.bind(git));
     this.statePath = path.join(repoPath, '.autopilot-state.json');
     this.startedAt = Date.now();
+    this.leaderboardSyncTimer = null;
+    this.isSyncingLeaderboard = false;
   }
 
   logVerbose(message) {
@@ -129,6 +131,7 @@ class Watcher {
       this.isWatching = true;
       logger.success(`Autopilot is watching ${this.repoPath}`);
       logger.info(`Logs: ${this.logFilePath}`);
+      this.startLeaderboardSyncLoop();
       
       // Heartbeat to update status file (for uptime/queue length)
       this.heartbeatTimer = setInterval(() => {
@@ -174,6 +177,11 @@ class Watcher {
         this.heartbeatTimer = null;
       }
 
+      if (this.leaderboardSyncTimer) {
+        clearInterval(this.leaderboardSyncTimer);
+        this.leaderboardSyncTimer = null;
+      }
+
       if (this.watcher) {
         await this.watcher.close();
         this.watcher = null;
@@ -198,6 +206,38 @@ class Watcher {
     } catch (error) {
       logger.error(`Error stopping watcher: ${error.message}`);
     }
+  }
+
+  startLeaderboardSyncLoop() {
+    if (this.leaderboardSyncTimer || this.config?.leaderboardSyncEnabled === false) {
+      return;
+    }
+
+    const intervalMinutes = this.config?.leaderboardSyncIntervalMinutes || 10;
+    const intervalMs = Math.max(60000, intervalMinutes * 60000);
+
+    const syncNow = async (reason) => {
+      if (!this.isWatching || this.isSyncingLeaderboard) {
+        return;
+      }
+
+      this.isSyncingLeaderboard = true;
+
+      try {
+        const apiUrl = process.env.AUTOPILOT_API_URL || 'https://autopilot-cli.vercel.app';
+        await syncLeaderboard(apiUrl, { cwd: this.repoPath });
+        logger.debug(`Leaderboard sync complete (${reason})`);
+      } catch (err) {
+        logger.debug(`Leaderboard sync failed (${reason}): ${err.message}`);
+      } finally {
+        this.isSyncingLeaderboard = false;
+      }
+    };
+
+    void syncNow('startup');
+    this.leaderboardSyncTimer = setInterval(() => {
+      void syncNow('interval');
+    }, intervalMs);
   }
 
   /**
