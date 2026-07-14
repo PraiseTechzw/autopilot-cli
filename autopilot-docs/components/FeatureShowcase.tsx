@@ -11,8 +11,8 @@ const features = [
     title: 'Smart Commits',
     description: 'Generates professional conventional commit messages automatically based on your changes.',
     icon: GitCommit,
-    color: 'text-blue-500',
-    bg: 'bg-blue-500/10',
+    color: 'text-link',
+    bg: 'bg-link/10',
     steps: [
       { text: 'autopilot start', type: 'command' },
       { text: 'Starting Autopilot', type: 'section', delay: 200 },
@@ -31,8 +31,8 @@ const features = [
     title: 'Productivity',
     description: 'Track your focus time, streaks, and coding habits with the built-in insights engine.',
     icon: Zap,
-    color: 'text-yellow-500',
-    bg: 'bg-yellow-500/10',
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/10',
     steps: [
       { text: 'autopilot insights', type: 'command' },
       { text: '📊 Autopilot Productivity Insights', type: 'section', delay: 200 },
@@ -51,8 +51,8 @@ const features = [
     title: 'Safety & Team',
     description: 'Undo accidental commits and enforce team standards with preset configurations.',
     icon: Shield,
-    color: 'text-green-500',
-    bg: 'bg-green-500/10',
+    color: 'text-link',
+    bg: 'bg-link/10',
     steps: [
       { text: 'autopilot undo', type: 'command' },
       { text: '⚠️  Undo Last Commit', type: 'section', delay: 200 },
@@ -71,8 +71,8 @@ const features = [
     title: 'Zero Config',
     description: 'Works out of the box, but fully configurable via .autopilotrc.json if needed.',
     icon: Settings,
-    color: 'text-purple-500',
-    bg: 'bg-purple-500/10',
+    color: 'text-slate-300',
+    bg: 'bg-slate-500/10',
     steps: [
       { text: 'autopilot init', type: 'command' },
       { text: '🚀 Autopilot Init', type: 'section', delay: 400 },
@@ -156,10 +156,10 @@ export function FeatureShowcase() {
               {/* Glow Effect */}
               <div className={clsx(
                 "absolute -inset-4 bg-gradient-to-r rounded-2xl blur-2xl opacity-30 transition-all duration-1000",
-                activeFeature === 0 ? "from-blue-500 to-cyan-500" :
-                activeFeature === 1 ? "from-yellow-500 to-orange-500" :
-                activeFeature === 2 ? "from-green-500 to-emerald-500" :
-                "from-purple-500 to-pink-500"
+                activeFeature === 0 ? "from-link to-emerald-500" :
+                activeFeature === 1 ? "from-emerald-500 to-lime-500" :
+                activeFeature === 2 ? "from-lime-500 to-green-500" :
+                "from-slate-500 to-slate-400"
               )} />
               
               <TerminalDemo 

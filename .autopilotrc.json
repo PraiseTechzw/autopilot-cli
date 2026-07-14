@@ -1,11 +1,51 @@
 {
   "watchPath": ".",
   "debounceMs": 20000,
-  "aiProvider": "none",
+  "aiProvider": "openrouter",
   "aiApiKey": "",
-  "protectedBranches": ["main", "master", "production"],
+  "ai": {
+    "enabled": true,
+    "provider": "default",
+    "apiKey": "",
+    "interactive": true,
+    "model": "default"
+  },
+  "protectedBranches": [
+    "main",
+    "master",
+    "production",
+    "prod",
+    "release"
+  ],
   "allowPushToProtected": false,
   "notificationsEnabled": true,
   "maxRetryAttempts": 5,
-  "ignorePaths": [".git", "node_modules", ".autopilot-state.json", ".autopilot-queue.json"]
+  "leaderboardSyncEnabled": true,
+  "leaderboardSyncIntervalMinutes": 10,
+  "offlineMode": false,
+  "signCommits": false,
+  "branchRules": [],
+  "ignorePaths": [
+    ".git",
+    "node_modules",
+    ".autopilot/",
+    ".autopilot-state.json",
+    ".autopilot.log",
+    ".autopilot-queue.json"
+  ],
+  "minSecondsBetweenCommits": 180,
+  "autoPush": true,
+  "requireChecks": false,
+  "checks": [],
+  "commitMessageMode": "ai",
+  "teamMode": false,
+  "pullBeforePush": true,
+  "conflictStrategy": "abort",
+  "maxUnpushedCommits": 5,
+  "preCommitChecks": {
+    "secrets": true,
+    "fileSize": true,
+    "lint": false,
+    "test": null
+  }
 }

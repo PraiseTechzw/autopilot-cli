@@ -442,8 +442,29 @@ class Watcher {
       }
 
       // 7. Commit
-      // Add all changes
-      const addResult = await git.addAll(this.repoPath);
+      // Stage only paths that are safe to commit from this repo.
+      const stagedPaths = [];
+      for (const file of statusObj.files) {
+        if (file.status === 'D' || file.status === ' D') {
+          continue;
+        }
+
+        const candidatePath = path.join(this.repoPath, file.file);
+        if (await fs.pathExists(path.join(candidatePath, '.git'))) {
+          logger.warn(`Skipping nested Git repository: ${file.file}`);
+          continue;
+        }
+
+        stagedPaths.push(file.file);
+      }
+
+      if (stagedPaths.length === 0) {
+        logger.info('No stageable changes found. Skipping commit.');
+        await this.updateStatusFile({ status: 'watching' });
+        return;
+      }
+
+      const addResult = await git.addAll(this.repoPath, stagedPaths);
       if (!addResult.ok) {
         logger.error(`Failed to stage changes: ${addResult.stderr}`);
         return;

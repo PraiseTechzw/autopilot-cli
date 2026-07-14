@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Github, Menu, Command } from 'lucide-react';
+import Image from 'next/image';
+import { Github, Menu } from 'lucide-react';
 import { Search } from './Search';
 import { ThemeToggle } from './ThemeToggle';
 import { useSidebar } from './SidebarProvider';
@@ -19,8 +20,8 @@ export function Topbar({ versionBadge }: TopbarProps) {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="h-8 w-8 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 group-hover:scale-105 transition-all duration-300">
-              <Command className="h-5 w-5 text-white" />
+            <div className="h-9 w-9 rounded-xl bg-[#050816] border border-[#263244] flex items-center justify-center shadow-lg shadow-black/30 group-hover:shadow-[0_0_20px_rgba(184,255,31,0.18)] group-hover:scale-105 transition-all duration-300 overflow-hidden">
+              <Image src="/logo.png" alt="Autopilot logo" width={36} height={36} className="h-full w-full object-cover" priority />
             </div>
             <span className="font-bold text-xl tracking-tight text-foreground transition-colors">
               Autopilot<span className="text-link">CLI</span>
@@ -39,7 +40,7 @@ export function Topbar({ versionBadge }: TopbarProps) {
 
         <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
            <div className="w-full relative group">
-             <div className="absolute -inset-0.5 bg-gradient-to-r from-link/20 to-cyan-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-500" />
+             <div className="absolute -inset-0.5 bg-gradient-to-r from-link/20 to-emerald-500/20 rounded-lg blur opacity-0 group-hover:opacity-100 transition duration-500" />
              <div className="relative">
                <Search />
              </div>

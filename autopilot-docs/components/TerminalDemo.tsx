@@ -139,7 +139,7 @@ function LineContent({ step, isLast }: { step: TerminalStep, isLast: boolean }) 
   if (step.type === 'processing') {
     if (isLast) {
       return (
-        <div className="flex items-center text-blue-400 gap-2">
+        <div className="flex items-center text-link gap-2">
           <Loader2 className="w-3 h-3 animate-spin" />
           <span>{step.text}</span>
         </div>
@@ -147,7 +147,7 @@ function LineContent({ step, isLast }: { step: TerminalStep, isLast: boolean }) 
     }
     // If finished, show as static text (simulating history)
     return (
-      <div className="flex items-center text-blue-400 gap-2 opacity-80">
+      <div className="flex items-center text-link gap-2 opacity-80">
         <span className="w-3 h-3" /> {/* Spacer to align text with spinner version */}
         <span>{step.text}</span>
       </div>
@@ -170,7 +170,7 @@ function LineContent({ step, isLast }: { step: TerminalStep, isLast: boolean }) 
     case 'warning':
       return <div className="text-yellow-400 flex gap-2"><span className="shrink-0">⚠️</span><span>{step.text}</span></div>;
     case 'info':
-      return <div className="text-blue-400 flex gap-2"><span className="shrink-0">ℹ️</span><span>{step.text}</span></div>;
+      return <div className="text-link flex gap-2"><span className="shrink-0">ℹ️</span><span>{step.text}</span></div>;
     case 'debug':
       return <div className="text-gray-500 flex gap-2"><span className="shrink-0">🔍</span><span>{step.text}</span></div>;
     case 'section':

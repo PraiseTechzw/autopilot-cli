@@ -67,9 +67,9 @@ export default async function Home() {
           <div className="flex justify-center mb-8 animate-fade-in">
             <Link
               href="/docs/changelog"
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-semibold hover:bg-emerald-500/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-link/10 border border-link/20 text-link text-sm font-semibold hover:bg-link/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
-              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+              <span className="inline-block h-2 w-2 rounded-full bg-link" />
               v4.0.0 is live
             </Link>
           </div>
@@ -77,7 +77,7 @@ export default async function Home() {
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-[1.08] animate-fade-in">
             Git automation that
             <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-link via-lime-400 to-emerald-500 dark:from-link dark:via-lime-400 dark:to-emerald-400">
               respects your control
             </span>
           </h1>
@@ -150,32 +150,32 @@ export default async function Home() {
                 title: 'Safety first',
                 description:
                   'Never force-pushes. Never commits secrets. Never operates during merge conflicts. Automation stops the moment anything is ambiguous.',
-                color: 'text-green-500',
-                bg: 'bg-green-500/10',
+                color: 'text-link',
+                bg: 'bg-link/10',
               },
               {
                 icon: Eye,
                 title: 'Full transparency',
                 description:
                   'Every commit is explainable and reversible with undo. AI assists — it never decides on your behalf.',
-                color: 'text-blue-500',
-                bg: 'bg-blue-500/10',
+                color: 'text-emerald-400',
+                bg: 'bg-emerald-500/10',
               },
               {
                 icon: Lock,
                 title: 'Privacy guaranteed',
                 description:
                   'Your source code never leaves your machine unless you opt in to AI commit messages. Productivity metrics are anonymized and contain zero code.',
-                color: 'text-purple-500',
-                bg: 'bg-purple-500/10',
+                color: 'text-lime-400',
+                bg: 'bg-lime-500/10',
               },
               {
                 icon: Laptop,
                 title: 'Local first',
                 description:
                   'Runs entirely on your machine. Works offline for everything except AI-generated messages. Your workflow, your rules.',
-                color: 'text-orange-500',
-                bg: 'bg-orange-500/10',
+                color: 'text-slate-300',
+                bg: 'bg-slate-500/10',
               },
             ].map((p, i) => (
               <ScrollReveal key={p.title} delay={i * 80}>
@@ -310,7 +310,7 @@ function Step({
     <div
       className={`relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group ${reverse ? 'md:flex-row-reverse' : ''}`}
     >
-      <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-background bg-blue-500/10 text-link font-mono font-bold text-xs z-10 shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2 shadow-sm">
+      <div className="flex items-center justify-center w-10 h-10 rounded-full border-4 border-background bg-link/10 text-link font-mono font-bold text-xs z-10 shrink-0 md:absolute md:left-1/2 md:-translate-x-1/2 shadow-sm">
         {number}
       </div>
 
@@ -320,8 +320,8 @@ function Step({
           <h3 className="text-lg font-bold text-foreground">{title}</h3>
         </div>
         <p className="text-muted-foreground mb-4 text-sm leading-relaxed">{description}</p>
-        <div className="bg-[#1c1c1c] rounded-lg p-3 font-mono text-xs text-gray-300 flex items-center gap-2">
-          <span className="text-green-400">$</span> {command}
+        <div className="bg-[#050816] rounded-lg p-3 font-mono text-xs text-gray-300 flex items-center gap-2 border border-[#263244]">
+          <span className="text-link">$</span> {command}
         </div>
       </div>
     </div>
@@ -387,7 +387,7 @@ function CommandCard({
         </p>
       </div>
 
-      <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-blue-600 to-indigo-600 group-hover:w-full transition-all duration-700" />
+      <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-link to-emerald-500 group-hover:w-full transition-all duration-700" />
     </div>
   );
 }

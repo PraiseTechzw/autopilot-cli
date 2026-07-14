@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarProvider } from "@/components/SidebarProvider";
@@ -36,10 +36,10 @@ export const metadata: Metadata = {
     description: 'Stop worrying about commits. Autopilot CLI watches your changes and syncs them automatically with safety rails.',
     images: [
       {
-        url: '/og-image.svg',
+        url: '/info-banner.png',
         width: 1200,
         height: 630,
-        alt: 'Autopilot CLI Banner',
+        alt: 'Autopilot CLI brand banner',
       },
     ],
   },
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Autopilot CLI',
     description: 'Intelligent Git automation with safety rails. Focus on code, not commits.',
-    images: ['/og-image.svg'],
+    images: ['/info-banner.png'],
     creator: '@PraiseTechzw',
   },
   icons: {
@@ -67,6 +67,10 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0b1220',
 };
 
 export default function RootLayout({

@@ -6,4 +6,11 @@ build/
 .env.*
 coverage/
 *.log
+.autopilot.log
+.autopilot.pid
+.autopilot-state.json
+.autopilot/
 .DS_Store
+.git/
+.idea/
+.vscode/

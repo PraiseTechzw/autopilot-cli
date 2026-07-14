@@ -4,79 +4,79 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  /* Premium Light Theme (Vercel-inspired) */
-  --background: #ffffff;
-  --foreground: #0a0a0a;
+  /* Autopilot Brand Dark Theme */
+  --background: #0b1220;
+  --foreground: #f8fafc;
 
-  --card: #ffffff;
-  --card-foreground: #0a0a0a;
+  --card: #111827;
+  --card-foreground: #f8fafc;
 
-  --popover: #ffffff;
-  --popover-foreground: #0a0a0a;
+  --popover: #111827;
+  --popover-foreground: #f8fafc;
 
-  --primary: #000000;
-  --primary-foreground: #ffffff;
+  --primary: #b8ff1f;
+  --primary-foreground: #000000;
 
-  --secondary: #fafafa;
-  --secondary-foreground: #171717;
+  --secondary: #111827;
+  --secondary-foreground: #e5e7eb;
 
-  --muted: #f5f5f5;
-  --muted-foreground: #737373;
+  --muted: #0f172a;
+  --muted-foreground: #94a3b8;
 
-  --accent: #f5f5f5;
-  --accent-foreground: #0a0a0a;
+  --accent: #111827;
+  --accent-foreground: #f8fafc;
 
   --destructive: #ef4444;
   --destructive-foreground: #fafafa;
 
-  --border: #e5e5e5;
-  --input: #e5e5e5;
-  --ring: #0a0a0a;
+  --border: #263043;
+  --input: #263043;
+  --ring: #b8ff1f;
 
-  --link: #0070f3;
-  --link-hover: #0051a2;
+  --link: #b8ff1f;
+  --link-hover: #7ae52b;
 
-  --code-bg: #f5f5f5;
-  --code-border: #e5e5e5;
+  --code-bg: #050816;
+  --code-border: #263043;
 
   --radius: 0.5rem;
 }
 
 .dark {
-  /* Premium Dark Theme */
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Autopilot Night Theme */
+  --background: #000000;
+  --foreground: #f8fafc;
 
-  --card: #0a0a0a;
-  --card-foreground: #ededed;
+  --card: #050816;
+  --card-foreground: #f8fafc;
 
-  --popover: #0a0a0a;
-  --popover-foreground: #ededed;
+  --popover: #050816;
+  --popover-foreground: #f8fafc;
 
-  --primary: #ffffff;
-  --primary-foreground: #0a0a0a;
+  --primary: #b8ff1f;
+  --primary-foreground: #000000;
 
-  --secondary: #171717;
-  --secondary-foreground: #ededed;
+  --secondary: #0b1220;
+  --secondary-foreground: #e5e7eb;
 
-  --muted: #171717;
-  --muted-foreground: #a3a3a3;
+  --muted: #111827;
+  --muted-foreground: #94a3b8;
 
-  --accent: #171717;
-  --accent-foreground: #ededed;
+  --accent: #111827;
+  --accent-foreground: #f8fafc;
 
   --destructive: #7f1d1d;
   --destructive-foreground: #fafafa;
 
-  --border: #262626;
-  --input: #262626;
-  --ring: #d4d4d8;
+  --border: #273244;
+  --input: #273244;
+  --ring: #b8ff1f;
 
-  --link: #3291ff;
-  --link-hover: #0070f3;
+  --link: #b8ff1f;
+  --link-hover: #a4f31f;
 
-  --code-bg: #1c1c1c;
-  --code-border: #333333;
+  --code-bg: #050816;
+  --code-border: #273244;
 }
 
 @theme inline {

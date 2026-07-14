@@ -2,11 +2,14 @@
 
 <div align="center">
 
-![Autopilot Logo](https://img.shields.io/badge/Autopilot-blue?style=for-the-badge&logo=git&logoColor=white)
+![Autopilot Logo](https://img.shields.io/badge/Autopilot-%23b8ff1f?style=for-the-badge&logo=git&logoColor=black)
 
 **An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.**
 
 **Latest release:** v4.0.0 brings free-model defaults, automatic leaderboard sync, branch-specific rules, offline mode, commit signing, and richer docs.
+
+![Autopilot banner](autopilot-docs/public/info-banner.png)
+![Autopilot logo](autopilot-docs/public/logo.png)
 
 [![npm version](https://img.shields.io/npm/v/@traisetech/autopilot?style=flat-square&color=success)](https://www.npmjs.com/package/@traisetech/autopilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)

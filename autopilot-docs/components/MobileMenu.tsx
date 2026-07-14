@@ -64,7 +64,7 @@ export function MobileMenu() {
                                 className="flex items-center gap-3 px-4 py-3 text-base font-medium text-foreground hover:bg-muted/50 rounded-lg transition-colors"
                                 onClick={close}
                             >
-                                <Trophy className="h-5 w-5 text-yellow-500" />
+                                <Trophy className="h-5 w-5 text-link" />
                                 Leaderboard
                             </Link>
 

@@ -67,9 +67,17 @@ async function getPorcelainStatus(root) {
  * @param {string} root - Repository root path
  * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
  */
-async function addAll(root) {
+async function addAll(root, paths = null) {
   try {
-    const { stdout, stderr } = await execa('git', ['add', '-A'], { cwd: root });
+    const args = ['add'];
+    if (Array.isArray(paths) && paths.length > 0) {
+      args.push('--');
+      args.push(...paths);
+    } else {
+      args.push('-A');
+    }
+
+    const { stdout, stderr } = await execa('git', args, { cwd: root });
     return { ok: true, stdout, stderr };
   } catch (error) {
     return { ok: false, stdout: '', stderr: error.message };

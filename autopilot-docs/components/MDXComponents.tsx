@@ -17,7 +17,7 @@ function Callout({ type = 'default', title, children }: { type?: 'default' | 'in
   
   return (
     <div className={clsx("my-6 flex gap-3 rounded-lg border p-4 shadow-sm", {
-      'border-blue-200 bg-blue-50/50 text-blue-900 dark:border-blue-900/50 dark:bg-blue-900/10 dark:text-blue-100': type === 'info',
+      'border-emerald-200 bg-emerald-50/50 text-emerald-900 dark:border-emerald-900/50 dark:bg-emerald-900/10 dark:text-emerald-100': type === 'info',
       'border-yellow-200 bg-yellow-50/50 text-yellow-900 dark:border-yellow-900/50 dark:bg-yellow-900/10 dark:text-yellow-100': type === 'warning',
       'border-red-200 bg-red-50/50 text-red-900 dark:border-red-900/50 dark:bg-red-900/10 dark:text-red-100': type === 'error',
       'border-green-200 bg-green-50/50 text-green-900 dark:border-green-900/50 dark:bg-green-900/10 dark:text-green-100': type === 'success',
