@@ -45,3 +45,4 @@ autopilot.log
 .autopilot.pid
 .autopilot.log
 .autopilot-state.json
+test-repo-sync/

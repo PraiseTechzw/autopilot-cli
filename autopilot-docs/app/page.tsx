@@ -70,7 +70,7 @@ export default async function Home() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-link/10 border border-link/20 text-link text-sm font-semibold hover:bg-link/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             >
               <span className="inline-block h-2 w-2 rounded-full bg-link" />
-              v4.0.0 is live
+              v4.0.1 is live
             </Link>
           </div>
 

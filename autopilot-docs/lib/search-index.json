@@ -178,6 +178,20 @@
     "type": "page"
   },
   {
+    "title": "[4.0.1] - 2026-07-14",
+    "route": "/docs/changelog#401---2026-07-14",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
     "title": "[4.0.0] - 2026-07-14",
     "route": "/docs/changelog#400---2026-07-14",
     "type": "heading",
@@ -193,7 +207,7 @@
   },
   {
     "title": "Fixed",
-    "route": "/docs/changelog#fixed",
+    "route": "/docs/changelog#fixed-1",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -242,7 +256,7 @@
   },
   {
     "title": "Fixed",
-    "route": "/docs/changelog#fixed-1",
+    "route": "/docs/changelog#fixed-2",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -291,7 +305,7 @@
   },
   {
     "title": "Fixed",
-    "route": "/docs/changelog#fixed-2",
+    "route": "/docs/changelog#fixed-3",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -719,8 +733,8 @@
     "level": 1
   },
   {
-    "title": "What's New in v4.0.0",
-    "route": "/docs#whats-new-in-v400",
+    "title": "What's New in v4.0.1",
+    "route": "/docs#whats-new-in-v401",
     "type": "heading",
     "parentTitle": "Introduction",
     "level": 2

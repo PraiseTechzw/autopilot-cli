@@ -254,7 +254,7 @@ async function initRepo() {
     const overrides = {
       ai: {
         enabled: useAI,
-        provider: 'default',
+        provider: 'openrouter',
         apiKey: apiKey || '',
         interactive: useAI ? interactive : false,
         model: 'default'

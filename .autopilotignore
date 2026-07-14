@@ -14,3 +14,4 @@ coverage/
 .git/
 .idea/
 .vscode/
+test-repo-sync/

@@ -99,7 +99,7 @@ describe('Init Command AI Configuration', () => {
     const config = global.capturedConfig;
     assert.ok(config);
     assert.strictEqual(config.ai.enabled, true);
-    assert.strictEqual(config.ai.provider, 'default');
+    assert.strictEqual(config.ai.provider, 'openrouter');
     assert.strictEqual(config.ai.apiKey, 'test-gemini-key');
     assert.strictEqual(config.ai.interactive, true);
   });
@@ -117,7 +117,7 @@ describe('Init Command AI Configuration', () => {
     const config = global.capturedConfig;
     assert.ok(config);
     assert.strictEqual(config.ai.enabled, true);
-    assert.strictEqual(config.ai.provider, 'default');
+    assert.strictEqual(config.ai.provider, 'openrouter');
     assert.strictEqual(config.ai.apiKey, 'test-grok-key');
     assert.strictEqual(config.ai.interactive, false);
     assert.strictEqual(config.ai.model, 'default');
@@ -134,7 +134,7 @@ describe('Init Command AI Configuration', () => {
     const config = global.capturedConfig;
     assert.ok(config);
     assert.strictEqual(config.ai.enabled, true);
-    assert.strictEqual(config.ai.provider, 'default');
+    assert.strictEqual(config.ai.provider, 'openrouter');
     assert.strictEqual(config.ai.apiKey, '');
     assert.strictEqual(config.ai.interactive, true); // Default is now true (Safety Mode)
   });
@@ -147,7 +147,7 @@ describe('Init Command AI Configuration', () => {
     const config = global.capturedConfig;
     assert.ok(config);
     assert.strictEqual(config.ai.enabled, false);
-    assert.strictEqual(config.ai.provider, 'default');
+    assert.strictEqual(config.ai.provider, 'openrouter');
     assert.strictEqual(config.ai.apiKey, '');
   });
 
@@ -159,7 +159,7 @@ describe('Init Command AI Configuration', () => {
 
     const config = global.capturedConfig;
     assert.ok(config);
-    assert.strictEqual(config.ai.provider, 'default');
+    assert.strictEqual(config.ai.provider, 'openrouter');
     assert.strictEqual(config.teamMode, false);
   });
 

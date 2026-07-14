@@ -75,12 +75,12 @@ function resolveAiProvider(config = {}) {
 
   // Backward-compatible fallback:
   // - If the user provided a key but no explicit provider, prefer OpenRouter.
-  // - Otherwise use the zero-config Grok path.
-  if (explicitApiKey) {
+  // - If no provider is set, OpenRouter is the default AI path.
+  if (explicitApiKey || !normalizedProvider) {
     return 'openrouter';
   }
 
-  return 'grok';
+  return 'openrouter';
 }
 
 /**
