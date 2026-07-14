@@ -11,9 +11,29 @@ const e = React.createElement;
 
 const Badge = ({ label, color }) => e(Text, { color, bold: true }, label);
 
+const DashboardHotkeys = ({ root, enabled }) => {
+  useInput((input) => {
+    if (input === 'q') {
+      process.exit(0);
+    }
+
+    if (input === 'p') {
+      const stateManager = new StateManager(root);
+      if (stateManager.isPaused()) {
+        stateManager.resume();
+      } else {
+        stateManager.pause('Dashboard toggle');
+      }
+    }
+  }, { isActive: enabled });
+
+  return null;
+};
+
 const Dashboard = () => {
   const { exit } = useApp();
   const root = process.cwd();
+  const isInteractive = process.stdin.isTTY;
 
   const [status, setStatus] = useState('loading');
   const [pid, setPid] = useState(null);
@@ -65,21 +85,6 @@ const Dashboard = () => {
     return () => clearInterval(timer);
   }, [root]);
 
-  useInput((input) => {
-    if (input === 'q') {
-      exit();
-    }
-
-    if (input === 'p') {
-      const stateManager = new StateManager(root);
-      if (stateManager.isPaused()) {
-        stateManager.resume();
-      } else {
-        stateManager.pause('Dashboard toggle');
-      }
-    }
-  });
-
   return e(
     Box,
     { flexDirection: 'column', padding: 1, borderStyle: 'round', borderColor: 'cyan' },
@@ -114,7 +119,8 @@ const Dashboard = () => {
         : pendingFiles.slice(0, 5).map((f, idx) => e(Text, { key: `${f.file}-${idx}` }, `- ${f.status} ${f.file}`)),
       pendingFiles.length > 5 && e(Text, null, `...and ${pendingFiles.length - 5} more`)
     ),
-    e(Box, null, e(Text, null, "Press 'p' to toggle pause, 'q' to quit"))
+    e(Box, null, e(Text, null, "Press 'p' to toggle pause, 'q' to quit")),
+    isInteractive && e(DashboardHotkeys, { root, enabled: true })
   );
 };
 
