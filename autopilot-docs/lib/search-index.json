@@ -159,6 +159,13 @@
     "level": 1
   },
   {
+    "title": "Global options",
+    "route": "/docs/commands#global-options",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
     "title": "`autopilot init`",
     "route": "/docs/commands#autopilot-init",
     "type": "heading",
@@ -215,8 +222,22 @@
     "level": 2
   },
   {
+    "title": "`autopilot config`",
+    "route": "/docs/commands#autopilot-config",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
     "title": "`autopilot doctor`",
     "route": "/docs/commands#autopilot-doctor",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot dashboard`",
+    "route": "/docs/commands#autopilot-dashboard",
     "type": "heading",
     "parentTitle": "CLI Reference",
     "level": 2
@@ -248,6 +269,20 @@
     "type": "heading",
     "parentTitle": "CLI Reference",
     "level": 1
+  },
+  {
+    "title": "Exit codes",
+    "route": "/docs/commands#exit-codes",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "Windows notes",
+    "route": "/docs/commands#windows-notes",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
   },
   {
     "title": "Configuration",
@@ -429,6 +464,13 @@
     "level": 2
   },
   {
+    "title": "Requirements",
+    "route": "/docs#requirements",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
     "title": "Quick Install",
     "route": "/docs#quick-install",
     "type": "heading",
@@ -450,14 +492,14 @@
     "level": 3
   },
   {
-    "title": "2. Start Watching",
+    "title": "2. Start watching",
     "route": "/docs#2-start-watching",
     "type": "heading",
     "parentTitle": "Introduction",
     "level": 3
   },
   {
-    "title": "3. Check Status",
+    "title": "3. Check status",
     "route": "/docs#3-check-status",
     "type": "heading",
     "parentTitle": "Introduction",
@@ -692,8 +734,8 @@
     "level": 1
   },
   {
-    "title": "1. Setup a Project",
-    "route": "/docs/quick-start#1-setup-a-project",
+    "title": "1. Set up a project",
+    "route": "/docs/quick-start#1-set-up-a-project",
     "type": "heading",
     "parentTitle": "Quick Start",
     "level": 2
@@ -706,43 +748,64 @@
     "level": 2
   },
   {
-    "title": "3. Recommended Workflow: Use a Dev Branch",
-    "route": "/docs/quick-start#3-recommended-workflow-use-a-dev-branch",
+    "title": "3. Connect a remote repository",
+    "route": "/docs/quick-start#3-connect-a-remote-repository",
     "type": "heading",
     "parentTitle": "Quick Start",
     "level": 2
   },
   {
-    "title": "4. Start the Watcher",
-    "route": "/docs/quick-start#4-start-the-watcher",
+    "title": "4. Recommended workflow: use a dev branch",
+    "route": "/docs/quick-start#4-recommended-workflow-use-a-dev-branch",
     "type": "heading",
     "parentTitle": "Quick Start",
     "level": 2
   },
   {
-    "title": "5. Make Some Changes",
-    "route": "/docs/quick-start#5-make-some-changes",
+    "title": "5. (Optional) Enable AI commit messages",
+    "route": "/docs/quick-start#5-optional-enable-ai-commit-messages",
     "type": "heading",
     "parentTitle": "Quick Start",
     "level": 2
   },
   {
-    "title": "6. Monitor Status",
-    "route": "/docs/quick-start#6-monitor-status",
+    "title": "6. Start the watcher",
+    "route": "/docs/quick-start#6-start-the-watcher",
     "type": "heading",
     "parentTitle": "Quick Start",
     "level": 2
   },
   {
-    "title": "7. Stop the Watcher",
-    "route": "/docs/quick-start#7-stop-the-watcher",
+    "title": "7. Make some changes",
+    "route": "/docs/quick-start#7-make-some-changes",
     "type": "heading",
     "parentTitle": "Quick Start",
     "level": 2
   },
   {
-    "title": "Viewing Logs",
+    "title": "8. Monitor status",
+    "route": "/docs/quick-start#8-monitor-status",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "9. Stop the watcher",
+    "route": "/docs/quick-start#9-stop-the-watcher",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "Viewing logs",
     "route": "/docs/quick-start#viewing-logs",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "Next steps",
+    "route": "/docs/quick-start#next-steps",
     "type": "heading",
     "parentTitle": "Quick Start",
     "level": 2

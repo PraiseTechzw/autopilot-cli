@@ -108,8 +108,8 @@
   --radius-md: calc(var(--radius) - 1px);
   --radius-lg: var(--radius);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "SFMono-Regular", ui-monospace, "Cascadia Mono", "Segoe UI Mono", monospace;
 }
 
 body {

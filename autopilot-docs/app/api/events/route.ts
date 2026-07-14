@@ -8,6 +8,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid event payload' }, { status: 400 });
     }
     const supabase = getServerClient();
+    if (!supabase) {
+      return NextResponse.json({ success: true, skipped: true });
+    }
+
     const enriched = {
       type: body.type,
       user_id: body.userId ?? null,

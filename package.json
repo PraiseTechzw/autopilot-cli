@@ -1,6 +1,6 @@
 {
   "name": "@traisetech/autopilot",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "publishConfig": {
     "access": "public"
   },
@@ -52,6 +52,7 @@
   },
   "homepage": "https://github.com/PraiseTechzw/autopilot-cli#readme",
   "dependencies": {
+    "@traisetech/autopilot": "^2.5.1",
     "chokidar": "^3.6.0",
     "commander": "^14.0.3",
     "csv-writer": "^1.6.0",

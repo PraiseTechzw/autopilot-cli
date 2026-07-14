@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SidebarProvider } from "@/components/SidebarProvider";
@@ -7,16 +6,6 @@ import { Topbar } from "@/components/Topbar";
 import { Footer } from "@/components/Footer";
 import { VersionBadge } from "@/components/VersionBadge";
 import { MobileMenu } from "@/components/MobileMenu";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://autopilot-cli.vercel.app'),
@@ -87,9 +76,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300`}
-      >
+      <body className="antialiased min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300">
         <script
           dangerouslySetInnerHTML={{
             __html: `

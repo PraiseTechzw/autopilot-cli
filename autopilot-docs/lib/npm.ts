@@ -30,7 +30,6 @@ export async function getLatestVersion(): Promise<string | null> {
     const data = await res.json();
     return data.version;
   } catch (error) {
-    console.error('Failed to fetch package version:', error);
     return null;
   }
 }
@@ -48,7 +47,6 @@ export async function getWeeklyDownloads(): Promise<number | null> {
     const data = await res.json();
     return data.downloads;
   } catch (error) {
-    console.error('Failed to fetch package downloads:', error);
     return null;
   }
 }
@@ -71,7 +69,6 @@ export async function getTotalDownloads(): Promise<number | null> {
     }
     return 0;
   } catch (error) {
-    console.error('Failed to fetch total downloads:', error);
     return null;
   }
 }
