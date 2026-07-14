@@ -178,6 +178,27 @@
     "type": "page"
   },
   {
+    "title": "[4.0.0] - 2026-07-14",
+    "route": "/docs/changelog#400---2026-07-14",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Added",
+    "route": "/docs/changelog#added",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
     "title": "[2.2.0] - 2026-02-14",
     "route": "/docs/changelog#220---2026-02-14",
     "type": "heading",
@@ -186,7 +207,7 @@
   },
   {
     "title": "Added",
-    "route": "/docs/changelog#added",
+    "route": "/docs/changelog#added-1",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -221,7 +242,7 @@
   },
   {
     "title": "Fixed",
-    "route": "/docs/changelog#fixed",
+    "route": "/docs/changelog#fixed-1",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -235,7 +256,7 @@
   },
   {
     "title": "Added",
-    "route": "/docs/changelog#added-1",
+    "route": "/docs/changelog#added-2",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -270,7 +291,7 @@
   },
   {
     "title": "Fixed",
-    "route": "/docs/changelog#fixed-1",
+    "route": "/docs/changelog#fixed-2",
     "type": "heading",
     "parentTitle": "Changelog",
     "level": 3
@@ -698,8 +719,8 @@
     "level": 1
   },
   {
-    "title": "What's New in v2.0",
-    "route": "/docs#whats-new-in-v20",
+    "title": "What's New in v4.0.0",
+    "route": "/docs#whats-new-in-v400",
     "type": "heading",
     "parentTitle": "Introduction",
     "level": 2

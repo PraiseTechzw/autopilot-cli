@@ -9,12 +9,12 @@ description: An intelligent Git automation CLI that safely commits and pushes yo
 
 Most AI commit tools ask you to run a command every time you want a message written. Autopilot doesn't wait to be asked — it's the difference between a tool you operate and a tool that just takes care of things.
 
-## What's New in v2.0
+## What's New in v4.0.0
 
-- **OpenRouter AI Integration** — commit messages are generated automatically using a free model, selected and rotated for you. You don't choose a model or manage multiple provider keys; Autopilot picks a working one and falls back automatically if it's ever unavailable.
-- **Focus Engine** — track your productivity, active coding time, and flow states.
-- **Team Mode** — enforce team standards, prevent secret leaks, and handle large files.
-- **Safety Net** — undo accidental commits instantly with `autopilot undo`.
+- **Free Model Defaults** — Autopilot now prefers free OpenRouter models and rotates through them automatically when one is unavailable.
+- **Automatic Leaderboard Sync** — sync focus metrics while the watcher runs, with a built-in offline-safe escape hatch.
+- **Branch Rules** — define branch-specific blocking, signing, and push policies with wildcard patterns.
+- **Safety Net** — undo accidental commits instantly with `autopilot undo`, plus commit signing and offline mode for stricter workflows.
 
 It's designed for:
 

@@ -1,6 +1,42 @@
 # Changelog
 
 
+## [4.0.0] - 2026-07-14
+
+### Added (v4.0.0)
+
+- **Free Model Defaults**:
+  - Updated OpenRouter routing to prefer free models first and avoid paid-only slugs by default.
+  - Added `AUTOPILOT_OPENROUTER_MODELS` for custom model preference lists.
+- **Automatic Leaderboard Sync**:
+  - Watcher now syncs leaderboard stats automatically while running.
+  - Added configurable sync interval and offline-safe disable behavior.
+- **Branch-Specific Rules**:
+  - Added `branchRules` for wildcard branch policies, push blocking, commit blocking, and signing overrides.
+- **Offline Mode**:
+  - Added a local-only mode that disables remote push, team sync, and leaderboard sync.
+- **Commit Signing**:
+  - Added support for signed commits with `git commit -S`.
+- **Insights Export**:
+  - Added JSON export alongside CSV for automated reporting.
+- **Dashboard Reliability**:
+  - Simplified the dashboard runtime so it works cleanly in CI and non-TTY environments.
+
+### Docs
+
+- Expanded documentation for real-world usage, security, troubleshooting, benchmarks, accessibility, localization, and extensibility.
+- Added a roadmap page to separate shipped features from planned work.
+
+### Fixed
+
+- **Secret Scanning**:
+  - Tightened the pre-commit scanner so it does not flag its own regex source as a secret.
+- **OpenRouter Model Selection**:
+  - Removed the stale free-model fallback that could resolve to an unavailable paid slug.
+- **Leaderboard Sync Errors**:
+  - Improved error serialization so sync failures no longer degrade to `[object Object]`.
+
+
 ## [2.5.0] - 2026-03-28
 
 ### Added (v2.5.0)

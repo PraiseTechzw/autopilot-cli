@@ -3,6 +3,29 @@ title: Changelog
 description: Latest updates and improvements to Autopilot CLI.
 ---
 
+## [4.0.0] - 2026-07-14
+
+### Added
+
+- **Free Model Defaults**:
+  - OpenRouter now prefers free models first and supports custom model lists.
+- **Automatic Leaderboard Sync**:
+  - Watcher syncs leaderboard metrics automatically while it runs.
+- **Branch Rules**:
+  - Added wildcard branch policies for push blocking, commit blocking, and signing.
+- **Offline Mode**:
+  - Added a local-only mode for repositories that should not hit the network.
+- **Commit Signing**:
+  - Added signed commit support via `git commit -S`.
+- **Insights Export**:
+  - Added JSON export alongside CSV for reporting and automation.
+
+### Fixed
+
+- **Secret Scanning**: Tightened the detector so it no longer flags its own regex source.
+- **Dashboard Stability**: Simplified the runtime to avoid import issues in CI and non-TTY shells.
+- **Leaderboard Sync Errors**: Improved error serialization for clearer sync failures.
+
 ## [2.2.0] - 2026-02-14
 
 ### Added

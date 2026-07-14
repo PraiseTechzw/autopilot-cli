@@ -64,6 +64,16 @@ export default async function Home() {
             </a>
           </div>
 
+          <div className="flex justify-center mb-8 animate-fade-in">
+            <Link
+              href="/docs/changelog"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-sm font-semibold hover:bg-emerald-500/15 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            >
+              <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+              v4.0.0 is live
+            </Link>
+          </div>
+
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-[1.08] animate-fade-in">
             Git automation that
             <br />

@@ -6,6 +6,8 @@
 
 **An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.**
 
+**Latest release:** v4.0.0 brings free-model defaults, automatic leaderboard sync, branch-specific rules, offline mode, commit signing, and richer docs.
+
 [![npm version](https://img.shields.io/npm/v/@traisetech/autopilot?style=flat-square&color=success)](https://www.npmjs.com/package/@traisetech/autopilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=flat-square)](https://nodejs.org)
