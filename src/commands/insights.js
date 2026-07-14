@@ -227,6 +227,15 @@ async function insights(options) {
 
       await csvWriter.writeRecords(records);
       logger.success(`Exported insights to ${csvPath}`);
+    } else if (options.export === 'json') {
+      const jsonPath = path.join(repoPath, 'autopilot-insights.json');
+      const payload = {
+        generatedAt: new Date().toISOString(),
+        repository: repoPath,
+        metrics
+      };
+      await fs.writeJson(jsonPath, payload, { spaces: 2 });
+      logger.success(`Exported insights to ${jsonPath}`);
     }
 
   } catch (error) {

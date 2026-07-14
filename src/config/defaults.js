@@ -22,6 +22,9 @@ const DEFAULT_CONFIG = {
   maxRetryAttempts: 5,
   leaderboardSyncEnabled: true,
   leaderboardSyncIntervalMinutes: 10,
+  offlineMode: false,
+  signCommits: false,
+  branchRules: [],
   ignorePaths: ['.git', 'node_modules', '.autopilot/', '.autopilot-state.json', '.autopilot.log', '.autopilot-queue.json'],
   
   // Legacy/Internal

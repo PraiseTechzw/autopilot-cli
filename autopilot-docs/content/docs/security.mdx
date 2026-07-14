@@ -1,0 +1,87 @@
+---
+title: Security
+description: Secret scanning, signing, GitHub Actions, and other safety details.
+---
+
+# Security
+
+Autopilot is built to be conservative by default. The goal is to protect your code, not just move it faster.
+
+## Secret Scanning
+
+Before committing, Autopilot scans staged files for common secret patterns:
+
+- AWS access keys
+- GitHub tokens
+- Stripe secret keys
+- Google API keys
+- Generic bearer tokens
+- Private key headers
+
+If a match is found, the commit is blocked and the file is reported so you can fix it locally.
+
+## Large File Protection
+
+Autopilot can stop commits that include very large files, which helps avoid accidental binary drops and repository bloat.
+
+## Protected Branches
+
+Branches such as `main`, `master`, `production`, `prod`, and `release` are treated as protected by default.
+
+You can:
+
+- Add more protected branches.
+- Override auto-push on a per-branch basis with branch rules.
+- Disable pushing entirely on sensitive branches.
+
+## Commit Signing
+
+If you enable commit signing, Autopilot passes `git commit -S` and lets your Git configuration handle the signing key.
+
+That means:
+
+- GPG signing works if your Git environment is configured for it.
+- SSH signing works if your Git setup supports it.
+- The CLI does not store private keys.
+
+Example:
+
+```json
+{
+  "signCommits": true
+}
+```
+
+## GitHub Actions
+
+Autopilot can be validated in CI with non-interactive checks:
+
+- `autopilot doctor`
+- `autopilot status --json`
+- `autopilot insights --format json`
+
+Example workflow pattern:
+
+```yaml
+name: Autopilot Safety Check
+on: [push, pull_request]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npx autopilot doctor
+```
+
+## Recommended Practices
+
+- Keep secrets out of `.autopilotrc.json`.
+- Prefer environment variables for API keys.
+- Use protected branches for release workflows.
+- Combine secret scanning with your CI checks.
+

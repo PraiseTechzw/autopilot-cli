@@ -1,5 +1,95 @@
 [
   {
+    "title": "Advanced Usage",
+    "description": "Real-world workflows for CI/CD, monorepos, team setups, and custom automation.",
+    "route": "/docs/advanced-usage",
+    "type": "page"
+  },
+  {
+    "title": "Advanced Usage",
+    "route": "/docs/advanced-usage#advanced-usage",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 1
+  },
+  {
+    "title": "CI/CD Integration",
+    "route": "/docs/advanced-usage#cicd-integration",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "GitHub Actions",
+    "route": "/docs/advanced-usage#github-actions",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 3
+  },
+  {
+    "title": "Team Workflows",
+    "route": "/docs/advanced-usage#team-workflows",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Monorepos",
+    "route": "/docs/advanced-usage#monorepos",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Git Hooks",
+    "route": "/docs/advanced-usage#git-hooks",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Multi-Repo Setups",
+    "route": "/docs/advanced-usage#multi-repo-setups",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Offline Mode",
+    "route": "/docs/advanced-usage#offline-mode",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Custom AI Providers",
+    "route": "/docs/advanced-usage#custom-ai-providers",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Accessibility",
+    "route": "/docs/advanced-usage#accessibility",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Localization",
+    "route": "/docs/advanced-usage#localization",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Performance",
+    "route": "/docs/advanced-usage#performance",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
     "title": "Changelog",
     "description": "Latest updates and improvements to Autopilot CLI.",
     "route": "/docs/changelog",
@@ -811,6 +901,54 @@
     "level": 2
   },
   {
+    "title": "Roadmap",
+    "description": "Community roadmap, contribution entry points, and areas we want to improve next.",
+    "route": "/docs/roadmap",
+    "type": "page"
+  },
+  {
+    "title": "Roadmap",
+    "route": "/docs/roadmap#roadmap",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 1
+  },
+  {
+    "title": "What We’re Prioritizing",
+    "route": "/docs/roadmap#what-were-prioritizing",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "Good First Contributions",
+    "route": "/docs/roadmap#good-first-contributions",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "Feature Areas Under Exploration",
+    "route": "/docs/roadmap#feature-areas-under-exploration",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "How to Track Progress",
+    "route": "/docs/roadmap#how-to-track-progress",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "Contributing",
+    "route": "/docs/roadmap#contributing",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
     "title": "Safety Rails",
     "description": "How Autopilot CLI protects your code and git history.",
     "route": "/docs/safety",
@@ -937,6 +1075,34 @@
   {
     "title": "Stop or Status commands aren't working",
     "route": "/docs/troubleshooting#stop-or-status-commands-arent-working",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "AI commit generation fails with a model error",
+    "route": "/docs/troubleshooting#ai-commit-generation-fails-with-a-model-error",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Leaderboard sync returns a 500 error",
+    "route": "/docs/troubleshooting#leaderboard-sync-returns-a-500-error",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Dashboard does not launch",
+    "route": "/docs/troubleshooting#dashboard-does-not-launch",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Autopilot is too noisy in a large repo",
+    "route": "/docs/troubleshooting#autopilot-is-too-noisy-in-a-large-repo",
     "type": "heading",
     "parentTitle": "Troubleshooting",
     "level": 3

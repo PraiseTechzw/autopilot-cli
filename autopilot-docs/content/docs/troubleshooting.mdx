@@ -94,6 +94,56 @@ Manually delete the PID file to reset the state.
 rm .autopilot.pid
 ```
 
+### AI commit generation fails with a model error
+
+**Symptoms:** You see an OpenRouter error like:
+
+```text
+This model is unavailable for free
+```
+
+**Cause:** The configured model slug is no longer part of the free tier or was pinned manually.
+
+**Fix:**
+
+- Set `"model": "default"` in `.autopilotrc.json`.
+- Optionally set `AUTOPILOT_OPENROUTER_MODELS` to a comma-separated list of free model slugs.
+- Make sure `OPENROUTER_API_KEY` is set in your environment.
+
+### Leaderboard sync returns a 500 error
+
+**Symptoms:** `Failed to sync leaderboard: Server responded with 500`.
+
+**Cause:** The docs app could not write to Supabase, usually because the service key is missing or the database grants are incomplete.
+
+**Fix:**
+
+- Set `NEXT_PUBLIC_SUPABASE_URL`.
+- Set `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
+- Set `SUPABASE_SERVICE_ROLE_KEY` for server-side writes.
+- Apply the updated grants in `supabase/schema.sql`.
+
+### Dashboard does not launch
+
+**Symptoms:** `autopilot dashboard` exits immediately or fails in CI.
+
+**Cause:** The dashboard requires a TTY unless test mode is enabled.
+
+**Fix:**
+
+- Run it in an interactive terminal.
+- In tests, set `AUTOPILOT_TEST_MODE=1`.
+
+### Autopilot is too noisy in a large repo
+
+**Symptoms:** Lots of change detections and slow response on large workspaces.
+
+**Fix:**
+
+- Add generated directories to `.autopilotignore`.
+- Keep your watch path scoped to the real source tree.
+- Increase the debounce window if needed.
+
 ## Debugging Tools
 
 ### Manual Git Check

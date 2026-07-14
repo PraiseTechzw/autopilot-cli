@@ -17,6 +17,22 @@ const SECRET_PATTERNS = [
 
 const MAX_FILE_SIZE_MB = 50;
 
+function globToRegExp(pattern) {
+  const escaped = pattern
+    .replace(/[.+^${}()|[\]\\]/g, '\\$&')
+    .replace(/\*/g, '.*')
+    .replace(/\?/g, '.');
+
+  return new RegExp(`^${escaped}$`);
+}
+
+function matchesBranchPattern(branchName, pattern) {
+  if (!pattern || !branchName) return false;
+  if (pattern === branchName) return true;
+  if (!pattern.includes('*') && !pattern.includes('?')) return false;
+  return globToRegExp(pattern).test(branchName);
+}
+
 /**
  * Validate configuration
  */
@@ -216,9 +232,36 @@ const isProtectedBranch = (branchName, config) => {
   return protectedBranches.includes(branchName);
 };
 
+const getBranchPolicy = (branchName, config = {}) => {
+  const rules = Array.isArray(config.branchRules) ? config.branchRules : [];
+  const matchedRule = rules.find((rule) => matchesBranchPattern(branchName, rule.pattern));
+
+  if (matchedRule) {
+    return {
+      pattern: matchedRule.pattern,
+      blockCommit: !!matchedRule.blockCommit,
+      blockPush: matchedRule.blockPush ?? false,
+      allowPush: matchedRule.allowPush,
+      requireChecks: matchedRule.requireChecks,
+      signCommits: matchedRule.signCommits,
+    };
+  }
+
+  return {
+    pattern: null,
+    blockCommit: false,
+    blockPush: false,
+    allowPush: undefined,
+    requireChecks: undefined,
+    signCommits: undefined,
+  };
+};
+
 module.exports = {
   validateConfig,
   validateBeforeCommit,
   checkTeamStatus,
-  isProtectedBranch
+  isProtectedBranch,
+  getBranchPolicy,
+  matchesBranchPattern
 };

@@ -282,7 +282,7 @@ Displays productivity analytics for the current project.
 **Syntax:**
 
 ```bash
-autopilot insights [--export csv]
+autopilot insights [--export csv|json]
 ```
 
 **Options:**
@@ -290,6 +290,7 @@ autopilot insights [--export csv]
 | Flag | Description |
 |---|---|
 | `--export csv` | Writes the underlying data to `autopilot-insights.csv` in the project root, for use in a spreadsheet or external analytics tool. |
+| `--export json` | Writes the same data to `autopilot-insights.json` in the project root for dashboards, scripts, or CI artifacts. |
 
 **Includes:**
 

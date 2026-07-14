@@ -14,7 +14,12 @@ The `.autopilotrc.json` file in your project root controls how Autopilot monitor
 | `minInterval`     | `number`   | `300`                | Minimum time (in seconds) between automatic commits. Useful for debouncing rapid changes.                |
 | `autoPush`        | `boolean`  | `true`               | Whether to automatically push commits to the remote repository.                                          |
 | `blockedBranches` | `string[]` | `['main', 'master']` | List of branches where Autopilot is disabled to prevent accidental direct commits to protected branches. |
+| `branchRules`     | `array`    | `[]`                 | Branch-specific rules for blocking commits, blocking pushes, or requiring checks on matching branches.  |
 | `requireChecks`   | `boolean`  | `false`              | If `true`, Autopilot will wait for local checks (like pre-commit hooks) to pass before committing.       |
+| `offlineMode`     | `boolean`  | `false`              | If `true`, Autopilot stays local-only and skips remote push/leaderboard network actions.                  |
+| `signCommits`     | `boolean`  | `false`              | If `true`, Autopilot signs commits with `git commit -S` using your Git signing setup.                    |
+| `leaderboardSyncEnabled` | `boolean` | `true`         | Sync focus metrics to the leaderboard while the watcher is running.                                      |
+| `leaderboardSyncIntervalMinutes` | `number` | `10`   | How often the watcher syncs leaderboard stats while running.                                             |
 | `ignore`          | `string[]` | `[]`                 | Additional glob patterns to ignore, supplementing `.gitignore` and `.autopilotignore`.                   |
 | `ai`              | `object`   | `{}`                 | Configuration for AI features (see below).                                                               |
 | `team`            | `object`   | `{}`                 | Configuration for Team features (see below).                                                             |
@@ -55,6 +60,56 @@ If (and only if) you explicitly enable AI and provide your own API key:
 - **interactive**: If `true`, prompts you to review/edit the generated message before committing.
 
 If you want to pin your own free-model shortlist, set `AUTOPILOT_OPENROUTER_MODELS` to a comma-separated list of model slugs.
+
+### Branch Rules
+
+Use `branchRules` when you need branch-specific behavior beyond the general protected-branch list.
+
+```json
+{
+  "branchRules": [
+    {
+      "pattern": "release/*",
+      "blockPush": true,
+      "requireChecks": true
+    },
+    {
+      "pattern": "hotfix/*",
+      "signCommits": true
+    }
+  ]
+}
+```
+
+- **pattern**: Exact branch name or simple wildcard such as `release/*`.
+- **blockCommit**: Stop Autopilot from committing on matching branches.
+- **blockPush**: Allow local commits but prevent pushes.
+- **allowPush**: Explicitly enable or disable push behavior for a branch.
+- **requireChecks**: Force validation checks for matching branches.
+
+### Offline Mode
+
+Enable `offlineMode` when you want local-only commits and no network activity:
+
+```json
+{
+  "offlineMode": true,
+  "autoPush": false,
+  "leaderboardSyncEnabled": false
+}
+```
+
+### Commit Signing
+
+If your Git environment is already configured for signed commits:
+
+```json
+{
+  "signCommits": true
+}
+```
+
+This uses Git’s own signing setup, so you can rely on GPG or SSH signing as configured on your machine.
 
 ### Team Configuration
 
@@ -138,5 +193,21 @@ For rapid prototyping or personal projects where you want every change saved and
   "autoPush": true,
   "minInterval": 60,
   "blockedBranches": []
+}
+```
+
+### "Signed Release" Mode
+
+For release branches that should stay auditable:
+
+```json
+{
+  "branchRules": [
+    {
+      "pattern": "release/*",
+      "requireChecks": true,
+      "signCommits": true
+    }
+  ]
 }
 ```

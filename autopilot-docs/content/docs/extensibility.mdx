@@ -1,0 +1,45 @@
+---
+title: Extensibility
+description: Current extension points and what’s planned next.
+---
+
+# Extensibility
+
+Autopilot already exposes a few practical ways to extend it, even before a formal plugin system exists.
+
+## Current Extension Points
+
+- JSON output from commands like `status`, `doctor`, and `insights`.
+- Config-driven behavior in `.autopilotrc.json`.
+- Command chaining through scripts, CI jobs, and Git hooks.
+- Exportable analytics data in CSV or JSON.
+
+## Beyond Git Automation
+
+You can already use Autopilot as part of a larger workflow:
+
+- Pair it with CI checks.
+- Feed exported stats into dashboards.
+- Wrap commands in your own shell scripts.
+- Use the docs site as a source of command references for tools and bots.
+
+## Plugin System
+
+A formal plugin system is a roadmap item rather than a shipped feature.
+
+If you want to experiment today, the safest path is to build around:
+
+- Shell scripts.
+- JSON outputs.
+- Custom config files.
+- Git hooks.
+
+## Future Direction
+
+Likely areas for future extensibility include:
+
+- Command plugins.
+- Custom notifications.
+- External dashboard integrations.
+- Additional AI provider adapters.
+

@@ -19,7 +19,7 @@ const { loadConfig } = require('../config/loader');
 const { readIgnoreFile, createIgnoredFilter, normalizePath } = require('../config/ignore');
 const HistoryManager = require('./history');
 const StateManager = require('./state');
-const { validateBeforeCommit, checkTeamStatus, isProtectedBranch } = require('./safety');
+const { validateBeforeCommit, checkTeamStatus, isProtectedBranch, getBranchPolicy } = require('./safety');
 const { syncLeaderboard } = require('../commands/leaderboard');
 const { validateConfig } = require('./configValidator');
 const { notify } = require('./notifier');
@@ -85,6 +85,11 @@ class Watcher {
         ...this.config,
         watchPath: typeof this.config?.watchPath === 'string' ? this.config.watchPath : this.repoPath
       };
+      if (this.config.offlineMode) {
+        this.config.autoPush = false;
+        this.config.teamMode = false;
+        this.config.leaderboardSyncEnabled = false;
+      }
       
       // Validate configuration
       const validation = validateConfig(this.config);
@@ -99,6 +104,13 @@ class Watcher {
       const currentBranch = await git.getBranch(this.repoPath);
       if (currentBranch && this.config.blockedBranches?.includes(currentBranch)) {
         logger.error(`Branch '${currentBranch}' is blocked in config. Stopping.`);
+        await this.stop();
+        return;
+      }
+
+      this.branchPolicy = getBranchPolicy(currentBranch, this.config);
+      if (this.branchPolicy?.blockCommit) {
+        logger.error(`Branch '${currentBranch}' is blocked by branchRules. Stopping.`);
         await this.stop();
         return;
       }
@@ -446,7 +458,9 @@ class Watcher {
       // Add Trust/Attribution Trailers
       message = await addTrailers(message);
 
-      const commitResult = await git.commit(this.repoPath, message);
+      const commitResult = await git.commit(this.repoPath, message, {
+        signCommit: !!this.config.signCommits || !!this.branchPolicy?.signCommits
+      });
       
       if (commitResult.ok) {
         const isFirstAutopilotCommit = this.lastCommitAt === 0;
@@ -484,7 +498,9 @@ class Watcher {
       }
 
       // 7. Auto-push
-      if (this.config?.autoPush) {
+      const shouldPush = this.config?.autoPush && !this.config.offlineMode && this.branchPolicy?.blockPush !== true && this.branchPolicy?.allowPush !== false;
+
+      if (shouldPush) {
         logger.info('Pushing to remote...');
         
         // Protected branch check

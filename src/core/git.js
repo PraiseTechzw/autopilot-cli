@@ -82,9 +82,14 @@ async function addAll(root) {
  * @param {string} message - Commit message
  * @returns {Promise<{ok: boolean, stdout: string, stderr: string}>} Result object
  */
-async function commit(root, message) {
+async function commit(root, message, options = {}) {
   try {
-    const { stdout, stderr } = await execa('git', ['commit', '-m', message], { cwd: root });
+    const args = ['commit'];
+    if (options.signCommit) {
+      args.push('-S');
+    }
+    args.push('-m', message);
+    const { stdout, stderr } = await execa('git', args, { cwd: root });
     return { ok: true, stdout, stderr };
   } catch (error) {
     return { ok: false, stdout: '', stderr: error.message };

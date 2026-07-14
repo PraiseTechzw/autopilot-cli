@@ -136,6 +136,20 @@ Autopilot includes a Focus Engine that tracks your local productivity (coding ti
 
 ---
 
+## 🧭 Roadmap
+
+We keep the roadmap focused on the things that make Autopilot more useful in real projects:
+
+- Better real-world usage guides for CI/CD, team workflows, and monorepos.
+- Stronger troubleshooting coverage for AI, dashboard, and sync failures.
+- Better performance guidance for large repositories.
+- Improved accessibility and localization support.
+- A clearer extensibility story for future plugins and integrations.
+
+If you want to help, check the docs site and [Contributing](#-contributing) for the easiest places to jump in.
+
+---
+
 ## ⬇️ Installation
 
 Install Autopilot globally using npm:

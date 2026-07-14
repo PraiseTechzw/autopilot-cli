@@ -72,12 +72,60 @@ function validateConfig(config) {
     errors.push('notificationsEnabled must be a boolean');
   }
 
+  // Optional: offlineMode (boolean)
+  if (config.offlineMode !== undefined && typeof config.offlineMode !== 'boolean') {
+    errors.push('offlineMode must be a boolean');
+  }
+
+  // Optional: signCommits (boolean)
+  if (config.signCommits !== undefined && typeof config.signCommits !== 'boolean') {
+    errors.push('signCommits must be a boolean');
+  }
+
   // Optional: maxRetryAttempts (number, 1-10)
   if (config.maxRetryAttempts !== undefined) {
     if (typeof config.maxRetryAttempts !== 'number') {
       errors.push('maxRetryAttempts must be a number');
     } else if (config.maxRetryAttempts < 1 || config.maxRetryAttempts > 10) {
       errors.push('maxRetryAttempts must be between 1 and 10');
+    }
+  }
+
+  // Optional: branchRules (array of branch policy objects)
+  if (config.branchRules !== undefined) {
+    if (!Array.isArray(config.branchRules)) {
+      errors.push('branchRules must be an array');
+    } else {
+      config.branchRules.forEach((rule, index) => {
+        if (!rule || typeof rule !== 'object') {
+          errors.push(`branchRules[${index}] must be an object`);
+          return;
+        }
+
+        if (typeof rule.pattern !== 'string' || !rule.pattern.trim()) {
+          errors.push(`branchRules[${index}].pattern must be a non-empty string`);
+        }
+
+        if (rule.blockCommit !== undefined && typeof rule.blockCommit !== 'boolean') {
+          errors.push(`branchRules[${index}].blockCommit must be a boolean`);
+        }
+
+        if (rule.blockPush !== undefined && typeof rule.blockPush !== 'boolean') {
+          errors.push(`branchRules[${index}].blockPush must be a boolean`);
+        }
+
+        if (rule.allowPush !== undefined && typeof rule.allowPush !== 'boolean') {
+          errors.push(`branchRules[${index}].allowPush must be a boolean`);
+        }
+
+        if (rule.requireChecks !== undefined && typeof rule.requireChecks !== 'boolean') {
+          errors.push(`branchRules[${index}].requireChecks must be a boolean`);
+        }
+
+        if (rule.signCommits !== undefined && typeof rule.signCommits !== 'boolean') {
+          errors.push(`branchRules[${index}].signCommits must be a boolean`);
+        }
+      });
     }
   }
 
