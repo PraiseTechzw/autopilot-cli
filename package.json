@@ -1,74 +1,19 @@
 {
-  "name": "@traisetech/autopilot",
-  "version": "4.0.2",
-  "publishConfig": {
-    "access": "public"
-  },
-  "files": [
-    "bin",
-    "src",
-    "docs",
-    "README.md",
-    "LICENSE",
-    "CHANGELOG.md"
-  ],
-  "description": "An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.",
-  "keywords": [
-    "git",
-    "automation",
-    "autocommit",
-    "autopush",
-    "developer-tools",
-    "cli",
-    "productivity",
-    "git-workflow"
-  ],
-  "author": "Praise Masunga (PraiseTechzw)",
+  "name": "workspace",
+  "version": "0.0.0",
   "license": "MIT",
-  "type": "commonjs",
-  "bin": {
-    "autopilot": "bin/autopilot.js"
-  },
-  "main": "src/index.js",
   "scripts": {
-    "dev": "node bin/autopilot.js",
-    "test": "node --test --test-concurrency=1",
-    "lint": "node -c bin/autopilot.js && node -c src/index.js",
-    "verify": "node bin/autopilot.js --help && node bin/autopilot.js doctor && npm test",
-    "prepublishOnly": "npm run verify",
-    "release:patch": "npm run verify && npm version patch && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
-    "release:minor": "npm run verify && npm version minor && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
-    "release:major": "npm run verify && npm version major && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\""
+    "preinstall": "sh -c 'rm -f package-lock.json yarn.lock; case \"$npm_config_user_agent\" in pnpm/*) ;; *) echo \"Use pnpm instead\" >&2; exit 1 ;; esac'",
+    "build": "pnpm run typecheck && pnpm -r --if-present run build",
+    "typecheck:libs": "tsc --build",
+    "typecheck": "pnpm run typecheck:libs && pnpm -r --filter \"./artifacts/**\" --filter \"./scripts\" --if-present run typecheck"
   },
-  "engines": {
-    "node": ">=18.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PraiseTechzw/autopilot-cli.git"
-  },
-  "bugs": {
-    "url": "https://github.com/PraiseTechzw/autopilot-cli/issues"
-  },
-  "homepage": "https://github.com/PraiseTechzw/autopilot-cli#readme",
+  "private": true,
   "dependencies": {
-    "@traisetech/autopilot": "^2.5.1",
-    "chokidar": "^3.6.0",
-    "commander": "^14.0.3",
-    "csv-writer": "^1.6.0",
-    "execa": "^5.1.1",
-    "fs-extra": "^11.3.3",
-    "ink": "^6.6.0",
-    "ink-big-text": "^2.0.0",
-    "ink-gradient": "^4.0.0",
-    "ink-spinner": "^5.0.0",
-    "node-notifier": "^10.0.1",
-    "open": "^11.0.0",
-    "prop-types": "^15.8.1",
-    "react": "^19.2.4"
+    "@replit/connectors-sdk": "^0.4.1"
   },
-  "directories": {
-    "doc": "docs",
-    "test": "test"
+  "devDependencies": {
+    "prettier": "^3.9.5",
+    "typescript": "~5.9.3"
   }
 }
