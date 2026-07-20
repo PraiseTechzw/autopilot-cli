@@ -1,0 +1,213 @@
+---
+title: Configuration
+description: Customize Autopilot CLI behavior using configuration files.
+---
+
+Autopilot CLI is designed to be zero-config out of the box, but it also offers powerful customization options to fit your workflow. You can configure Autopilot using `.autopilotrc.json` for behavior settings and `.autopilotignore` for file exclusion.
+
+## .autopilotrc.json
+
+The `.autopilotrc.json` file in your project root controls how Autopilot monitors and commits changes.
+
+| Option            | Type       | Default              | Description                                                                                              |
+| :---------------- | :--------- | :------------------- | :------------------------------------------------------------------------------------------------------- |
+| `minInterval`     | `number`   | `300`                | Minimum time (in seconds) between automatic commits. Useful for debouncing rapid changes.                |
+| `autoPush`        | `boolean`  | `true`               | Whether to automatically push commits to the remote repository.                                          |
+| `blockedBranches` | `string[]` | `['main', 'master']` | List of branches where Autopilot is disabled to prevent accidental direct commits to protected branches. |
+| `branchRules`     | `array`    | `[]`                 | Branch-specific rules for blocking commits, blocking pushes, or requiring checks on matching branches.  |
+| `requireChecks`   | `boolean`  | `false`              | If `true`, Autopilot will wait for local checks (like pre-commit hooks) to pass before committing.       |
+| `offlineMode`     | `boolean`  | `false`              | If `true`, Autopilot stays local-only and skips remote push/leaderboard network actions.                  |
+| `signCommits`     | `boolean`  | `false`              | If `true`, Autopilot signs commits with `git commit -S` using your Git signing setup.                    |
+| `leaderboardSyncEnabled` | `boolean` | `true`         | Sync focus metrics to the leaderboard while the watcher is running.                                      |
+| `leaderboardSyncIntervalMinutes` | `number` | `10`   | How often the watcher syncs leaderboard stats while running.                                             |
+| `ignore`          | `string[]` | `[]`                 | Additional glob patterns to ignore, supplementing `.gitignore` and `.autopilotignore`.                   |
+| `ai`              | `object`   | `{}`                 | Configuration for AI features (see below).                                                               |
+| `team`            | `object`   | `{}`                 | Configuration for Team features (see below).                                                             |
+
+### AI Configuration & Privacy Disclosure
+
+Autopilot supports optional integration with **OpenRouter** to generate context-aware commit messages.
+
+> **Privacy Disclosure:** AI features are **disabled by default**. They are purely assistive and optional.
+
+#### Data Usage Transparency
+
+If (and only if) you explicitly enable AI and provide your own API key:
+
+1.  **What is sent**: Autopilot sends the **text diff** of your staged changes to the API provider to generate a summary.
+2.  **What is NOT sent**: We do not send your entire codebase, your history, or your file contents (other than the diff).
+3.  **No Training**: We do not store, proxy, or train on your code. The interaction is directly between your local machine and the AI provider.
+4.  **No Ranking Impact**: Using AI does not affect your productivity stats or leaderboard ranking.
+
+#### AI Settings
+
+```json
+{
+  "ai": {
+    "enabled": true,
+    "provider": "openrouter",
+    "apiKey": "YOUR_OPENROUTER_API_KEY",
+    "model": "default",
+    "interactive": false
+  }
+}
+```
+
+- **enabled**: Toggle AI features on/off (default: `false`).
+- **provider**: Choose between `openrouter` (default) or `none`.
+- **apiKey**: Your personal API Key.
+- **model**: Specific model to use. Set to `default` to auto-pick from Autopilot's free-model list.
+- **interactive**: If `true`, prompts you to review/edit the generated message before committing.
+
+If you want to pin your own free-model shortlist, set `AUTOPILOT_OPENROUTER_MODELS` to a comma-separated list of model slugs.
+
+### Branch Rules
+
+Use `branchRules` when you need branch-specific behavior beyond the general protected-branch list.
+
+```json
+{
+  "branchRules": [
+    {
+      "pattern": "release/*",
+      "blockPush": true,
+      "requireChecks": true
+    },
+    {
+      "pattern": "hotfix/*",
+      "signCommits": true
+    }
+  ]
+}
+```
+
+- **pattern**: Exact branch name or simple wildcard such as `release/*`.
+- **blockCommit**: Stop Autopilot from committing on matching branches.
+- **blockPush**: Allow local commits but prevent pushes.
+- **allowPush**: Explicitly enable or disable push behavior for a branch.
+- **requireChecks**: Force validation checks for matching branches.
+
+### Offline Mode
+
+Enable `offlineMode` when you want local-only commits and no network activity:
+
+```json
+{
+  "offlineMode": true,
+  "autoPush": false,
+  "leaderboardSyncEnabled": false
+}
+```
+
+### Commit Signing
+
+If your Git environment is already configured for signed commits:
+
+```json
+{
+  "signCommits": true
+}
+```
+
+This uses Git’s own signing setup, so you can rely on GPG or SSH signing as configured on your machine.
+
+### Team Configuration
+
+Settings to ensure smooth collaboration.
+
+```json
+{
+  "team": {
+    "pullBeforePush": true,
+    "preventSecrets": true,
+    "preventLargeFiles": true
+  }
+}
+```
+
+- **pullBeforePush**: Automatically runs `git pull --rebase` before pushing to avoid conflicts.
+- **preventSecrets**: Scans for AWS, Stripe, and GitHub keys before committing.
+- **preventLargeFiles**: Blocks commits containing files larger than 50MB.
+
+### Example Configuration
+
+```json
+{
+  "minInterval": 600,
+  "autoPush": true,
+  "blockedBranches": ["main", "production"],
+  "requireChecks": true,
+  "ai": {
+    "enabled": true,
+    "interactive": true
+  }
+}
+```
+
+## .autopilotignore
+
+Just like `.gitignore`, you can use an `.autopilotignore` file to tell Autopilot which files or directories to skip. This is useful for files that you want to track in Git but **don't** want Autopilot to commit automatically (e.g., specific config files, large assets, or work-in-progress drafts).
+
+The syntax is standard glob patterns:
+
+```text
+# Ignore all markdown files in the drafts folder
+docs/drafts/*.md
+
+# Ignore a specific config file
+local-config.json
+
+# Ignore all log files
+*.log
+```
+
+> **Note:** Autopilot **always** respects your `.gitignore` file. You do not need to duplicate entries from `.gitignore` into `.autopilotignore`.
+
+## Recommended Defaults
+
+For most users, we recommend the following safety settings to balance automation with control:
+
+1.  **Protect Main Branches:** Always keep `main` and `master` in `blockedBranches`. Use Autopilot on feature branches.
+2.  **Reasonable Interval:** A `minInterval` of `300` (5 minutes) is usually a good balance. It ensures you have a granular history without overwhelming your log.
+3.  **Enable Checks:** If you use pre-commit hooks (husky, etc.), set `requireChecks: true` to ensure you don't commit broken code.
+
+## Use Case Examples
+
+### "Commit Only" Mode
+
+If you want Autopilot to create local checkpoints but **never push** to remote automatically (e.g., if you have strict CI/CD that runs on push), use this config:
+
+```json
+{
+  "autoPush": false,
+  "minInterval": 300
+}
+```
+
+### "Aggressive Sync" Mode
+
+For rapid prototyping or personal projects where you want every change saved and synced immediately:
+
+```json
+{
+  "autoPush": true,
+  "minInterval": 60,
+  "blockedBranches": []
+}
+```
+
+### "Signed Release" Mode
+
+For release branches that should stay auditable:
+
+```json
+{
+  "branchRules": [
+    {
+      "pattern": "release/*",
+      "requireChecks": true,
+      "signCommits": true
+    }
+  ]
+}
+```

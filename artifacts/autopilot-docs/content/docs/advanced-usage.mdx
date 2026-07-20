@@ -1,0 +1,118 @@
+---
+title: Advanced Usage
+description: Real-world workflows for CI/CD, monorepos, team setups, and custom automation.
+---
+
+# Advanced Usage
+
+Autopilot is designed to work well in day-to-day coding, but it also fits more complex setups.
+
+## CI/CD Integration
+
+Autopilot supports structured output on several commands, which makes it easier to wire into scripts and automation.
+
+- `autopilot status --json`
+- `autopilot doctor`
+- `autopilot insights --format json`
+
+Use these in CI to check repository health, validate setup, or collect metrics without parsing terminal styling.
+
+### GitHub Actions
+
+Common CI usage patterns:
+
+- Run `autopilot doctor` in a workflow to fail fast on broken setup.
+- Run `autopilot status --json` as a health check for local runners.
+- Use `autopilot insights --export csv` or `autopilot insights --export json` to produce report artifacts for maintainers.
+
+## Team Workflows
+
+For team repos, combine the built-in safety defaults with a shared config file:
+
+```json
+{
+  "blockedBranches": ["main", "master", "production"],
+  "requireChecks": true,
+  "notificationsEnabled": true
+}
+```
+
+Recommended team practices:
+
+- Keep protected branches blocked.
+- Enable pre-commit checks for lint and tests.
+- Use the dashboard to review queue depth and recent commits.
+
+## Monorepos
+
+Autopilot works best when you scope watching to the repo root and use ignore rules for generated packages or build outputs.
+
+Tips:
+
+- Ignore package build artifacts like `dist/`, `build/`, `.next/`, and coverage folders.
+- Use `.autopilotignore` for generated workspace packages.
+- Keep workspace-level changes in separate commits when possible so AI commit messages stay focused.
+
+## Git Hooks
+
+Autopilot can be paired with your existing hooks:
+
+- `pre-commit` for lint and test checks.
+- `pre-push` for branch-specific guard rails.
+- `commit-msg` if your team enforces message format rules.
+
+If hooks take a while, increase your debounce window so Autopilot waits for them to finish cleanly.
+
+## Multi-Repo Setups
+
+When you manage several repositories:
+
+- Keep one `.autopilotrc.json` per repo.
+- Use separate terminal sessions for each watcher.
+- Avoid sharing a single log directory across repositories.
+
+## Offline Mode
+
+Autopilot can still handle local commits when network access is unavailable.
+
+- Git commits continue to work without network access.
+- AI commit generation only runs when a provider is configured and reachable.
+- Leaderboard sync and remote push actions will gracefully fail or queue depending on your configuration.
+
+## Custom AI Providers
+
+Autopilot currently supports OpenRouter, Gemini, Grok, and `none`.
+
+For OpenRouter specifically:
+
+- Set `ai.provider` to `openrouter`.
+- Use `ai.model: "default"` to auto-select a free model.
+- Optionally set `AUTOPILOT_OPENROUTER_MODELS` to pin your own approved free-model list.
+
+## Accessibility
+
+The CLI and docs are designed to stay usable in plain terminals and keyboard-driven workflows.
+
+- Keyboard shortcuts are limited and predictable.
+- JSON output is available for tooling and assistive wrappers.
+- Dashboard controls are keyboard-only and can be used without a mouse.
+
+## Localization
+
+The docs can be translated by adding localized content pages and keeping the navigation structure aligned.
+
+If you want to maintain a translation set:
+
+- Keep headings stable.
+- Avoid hard-coding locale-specific terminology into command names.
+- Prefer short sections that are easy to mirror across languages.
+
+## Performance
+
+On large repositories, performance depends on:
+
+- How much of the tree is watched.
+- How many files are ignored.
+- How often the watcher syncs status and leaderboard data.
+
+Keep generated directories excluded and prefer a smaller watch scope when possible.

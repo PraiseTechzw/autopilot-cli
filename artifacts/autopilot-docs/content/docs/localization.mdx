@@ -1,0 +1,35 @@
+---
+title: Localization
+description: Guidance for translating Autopilot docs and keeping the CLI accessible globally.
+---
+
+# Localization
+
+Autopilot currently ships in English, but the content structure is intentionally easy to translate.
+
+## Translation Strategy
+
+- Keep command names unchanged.
+- Translate descriptive text, not code examples.
+- Preserve file names and config keys exactly as written.
+- Keep headings stable so links remain predictable.
+
+## What Should Stay in English
+
+- CLI commands such as `autopilot start`.
+- Config keys such as `blockedBranches`.
+- Git terms that are standard across developer tooling.
+
+## What Can Be Localized
+
+- Descriptive paragraphs.
+- Onboarding guidance.
+- Troubleshooting explanations.
+- Roadmap commentary.
+
+## Practical Tips
+
+- Use short sections so translation diffs stay manageable.
+- Keep examples simple and language-neutral.
+- Review screenshots or callouts for text overflow in right-to-left or longer-language layouts.
+

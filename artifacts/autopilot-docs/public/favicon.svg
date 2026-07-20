@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Autopilot CLI logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#000000" />
+      <stop offset="55%" stop-color="#050816" />
+      <stop offset="100%" stop-color="#0b1220" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#b8ff1f" />
+      <stop offset="55%" stop-color="#7ae52b" />
+      <stop offset="100%" stop-color="#16a34a" />
+    </linearGradient>
+  </defs>
+
+  <rect width="64" height="64" rx="16" fill="url(#bg)" />
+  <rect x="4" y="4" width="56" height="56" rx="12" fill="none" stroke="#303747" stroke-width="1.25" opacity="0.8" />
+
+  <g transform="translate(32 32)">
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#303747" stroke-width="3" opacity="0.95" />
+    <path d="M-18 0a18 18 0 0 1 5.5-12.8" fill="none" stroke="url(#accent)" stroke-width="3" stroke-linecap="round" />
+    <circle cx="11" cy="-11" r="3" fill="url(#accent)" />
+    <path d="M-7 -2 L1 -10 L1 -5 L8 -5 L8 5 L1 5 L1 10 Z" fill="url(#accent)" />
+    <path d="M-14 15 L14 15" stroke="#b8ff1f" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+</svg>

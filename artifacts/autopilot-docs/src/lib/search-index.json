@@ -1,0 +1,1413 @@
+[
+  {
+    "title": "Accessibility",
+    "description": "How Autopilot stays usable for keyboard-first and assistive workflows.",
+    "route": "/docs/accessibility",
+    "type": "page"
+  },
+  {
+    "title": "Accessibility",
+    "route": "/docs/accessibility#accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 1
+  },
+  {
+    "title": "CLI Accessibility",
+    "route": "/docs/accessibility#cli-accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
+    "title": "Dashboard Accessibility",
+    "route": "/docs/accessibility#dashboard-accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
+    "title": "Docs Accessibility",
+    "route": "/docs/accessibility#docs-accessibility",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
+    "title": "Recommendations",
+    "route": "/docs/accessibility#recommendations",
+    "type": "heading",
+    "parentTitle": "Accessibility",
+    "level": 2
+  },
+  {
+    "title": "Advanced Usage",
+    "description": "Real-world workflows for CI/CD, monorepos, team setups, and custom automation.",
+    "route": "/docs/advanced-usage",
+    "type": "page"
+  },
+  {
+    "title": "Advanced Usage",
+    "route": "/docs/advanced-usage#advanced-usage",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 1
+  },
+  {
+    "title": "CI/CD Integration",
+    "route": "/docs/advanced-usage#cicd-integration",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "GitHub Actions",
+    "route": "/docs/advanced-usage#github-actions",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 3
+  },
+  {
+    "title": "Team Workflows",
+    "route": "/docs/advanced-usage#team-workflows",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Monorepos",
+    "route": "/docs/advanced-usage#monorepos",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Git Hooks",
+    "route": "/docs/advanced-usage#git-hooks",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Multi-Repo Setups",
+    "route": "/docs/advanced-usage#multi-repo-setups",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Offline Mode",
+    "route": "/docs/advanced-usage#offline-mode",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Custom AI Providers",
+    "route": "/docs/advanced-usage#custom-ai-providers",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Accessibility",
+    "route": "/docs/advanced-usage#accessibility",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Localization",
+    "route": "/docs/advanced-usage#localization",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Performance",
+    "route": "/docs/advanced-usage#performance",
+    "type": "heading",
+    "parentTitle": "Advanced Usage",
+    "level": 2
+  },
+  {
+    "title": "Benchmarks",
+    "description": "How to compare Autopilot with other commit assistants fairly.",
+    "route": "/docs/benchmarks",
+    "type": "page"
+  },
+  {
+    "title": "Benchmarks",
+    "route": "/docs/benchmarks#benchmarks",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 1
+  },
+  {
+    "title": "What To Measure",
+    "route": "/docs/benchmarks#what-to-measure",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 2
+  },
+  {
+    "title": "Comparing With Alternatives",
+    "route": "/docs/benchmarks#comparing-with-alternatives",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 2
+  },
+  {
+    "title": "Large Repo Checks",
+    "route": "/docs/benchmarks#large-repo-checks",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 2
+  },
+  {
+    "title": "Interpreting Results",
+    "route": "/docs/benchmarks#interpreting-results",
+    "type": "heading",
+    "parentTitle": "Benchmarks",
+    "level": 2
+  },
+  {
+    "title": "Changelog",
+    "description": "Latest updates and improvements to Autopilot CLI.",
+    "route": "/docs/changelog",
+    "type": "page"
+  },
+  {
+    "title": "[4.0.2] - 2026-07-14",
+    "route": "/docs/changelog#402---2026-07-14",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "[4.0.0] - 2026-07-14",
+    "route": "/docs/changelog#400---2026-07-14",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Added",
+    "route": "/docs/changelog#added",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed-1",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "[2.2.0] - 2026-02-14",
+    "route": "/docs/changelog#220---2026-02-14",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Added",
+    "route": "/docs/changelog#added-1",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Improved",
+    "route": "/docs/changelog#improved",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Docs/Website",
+    "route": "/docs/changelog#docswebsite",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Tests",
+    "route": "/docs/changelog#tests",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "[2.0.1] - 2026-02-05",
+    "route": "/docs/changelog#201---2026-02-05",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed-2",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "[2.0.0] - 2026-02-04",
+    "route": "/docs/changelog#200---2026-02-04",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Added",
+    "route": "/docs/changelog#added-2",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Docs/Website",
+    "route": "/docs/changelog#docswebsite-1",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "[0.1.8] - 2026-02-04",
+    "route": "/docs/changelog#018---2026-02-04",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "Reliability & Core",
+    "route": "/docs/changelog#reliability--core",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "CI/CD & Standards",
+    "route": "/docs/changelog#cicd--standards",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "Fixed",
+    "route": "/docs/changelog#fixed-3",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 3
+  },
+  {
+    "title": "v0.1.7",
+    "route": "/docs/changelog#v017",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.6",
+    "route": "/docs/changelog#v016",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.4",
+    "route": "/docs/changelog#v014",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.3",
+    "route": "/docs/changelog#v013",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.1",
+    "route": "/docs/changelog#v011",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "v0.1.0",
+    "route": "/docs/changelog#v010",
+    "type": "heading",
+    "parentTitle": "Changelog",
+    "level": 2
+  },
+  {
+    "title": "CLI Reference",
+    "description": "Complete reference for all Autopilot CLI commands.",
+    "route": "/docs/commands",
+    "type": "page"
+  },
+  {
+    "title": "CLI Reference",
+    "route": "/docs/commands#cli-reference",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 1
+  },
+  {
+    "title": "Global options",
+    "route": "/docs/commands#global-options",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot init`",
+    "route": "/docs/commands#autopilot-init",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot start`",
+    "route": "/docs/commands#autopilot-start",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot stop`",
+    "route": "/docs/commands#autopilot-stop",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot status`",
+    "route": "/docs/commands#autopilot-status",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot pause`",
+    "route": "/docs/commands#autopilot-pause",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot resume`",
+    "route": "/docs/commands#autopilot-resume",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot undo`",
+    "route": "/docs/commands#autopilot-undo",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot preset`",
+    "route": "/docs/commands#autopilot-preset",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot config`",
+    "route": "/docs/commands#autopilot-config",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot doctor`",
+    "route": "/docs/commands#autopilot-doctor",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot dashboard`",
+    "route": "/docs/commands#autopilot-dashboard",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot insights`",
+    "route": "/docs/commands#autopilot-insights",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "`autopilot leaderboard`",
+    "route": "/docs/commands#autopilot-leaderboard",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "Sync your latest stats",
+    "route": "/docs/commands#sync-your-latest-stats",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 1
+  },
+  {
+    "title": "View rankings",
+    "route": "/docs/commands#view-rankings",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 1
+  },
+  {
+    "title": "Exit codes",
+    "route": "/docs/commands#exit-codes",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "Windows notes",
+    "route": "/docs/commands#windows-notes",
+    "type": "heading",
+    "parentTitle": "CLI Reference",
+    "level": 2
+  },
+  {
+    "title": "Configuration",
+    "description": "Customize Autopilot CLI behavior using configuration files.",
+    "route": "/docs/configuration",
+    "type": "page"
+  },
+  {
+    "title": ".autopilotrc.json",
+    "route": "/docs/configuration#autopilotrcjson",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "AI Configuration & Privacy Disclosure",
+    "route": "/docs/configuration#ai-configuration--privacy-disclosure",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Branch Rules",
+    "route": "/docs/configuration#branch-rules",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Offline Mode",
+    "route": "/docs/configuration#offline-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Commit Signing",
+    "route": "/docs/configuration#commit-signing",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Team Configuration",
+    "route": "/docs/configuration#team-configuration",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Example Configuration",
+    "route": "/docs/configuration#example-configuration",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": ".autopilotignore",
+    "route": "/docs/configuration#autopilotignore",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "Ignore all markdown files in the drafts folder",
+    "route": "/docs/configuration#ignore-all-markdown-files-in-the-drafts-folder",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 1
+  },
+  {
+    "title": "Ignore a specific config file",
+    "route": "/docs/configuration#ignore-a-specific-config-file",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 1
+  },
+  {
+    "title": "Ignore all log files",
+    "route": "/docs/configuration#ignore-all-log-files",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 1
+  },
+  {
+    "title": "Recommended Defaults",
+    "route": "/docs/configuration#recommended-defaults",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "Use Case Examples",
+    "route": "/docs/configuration#use-case-examples",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 2
+  },
+  {
+    "title": "\"Commit Only\" Mode",
+    "route": "/docs/configuration#commit-only-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "\"Aggressive Sync\" Mode",
+    "route": "/docs/configuration#aggressive-sync-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "\"Signed Release\" Mode",
+    "route": "/docs/configuration#signed-release-mode",
+    "type": "heading",
+    "parentTitle": "Configuration",
+    "level": 3
+  },
+  {
+    "title": "Contributing",
+    "description": "How to set up your environment and contribute to Autopilot CLI.",
+    "route": "/docs/contributing",
+    "type": "page"
+  },
+  {
+    "title": "Development Setup",
+    "route": "/docs/contributing#development-setup",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Branch Naming & Commits",
+    "route": "/docs/contributing#branch-naming--commits",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Branch Naming",
+    "route": "/docs/contributing#branch-naming",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Commit Messages",
+    "route": "/docs/contributing#commit-messages",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Running Tests",
+    "route": "/docs/contributing#running-tests",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Unit Tests",
+    "route": "/docs/contributing#unit-tests",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Integration Tests",
+    "route": "/docs/contributing#integration-tests",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 3
+  },
+  {
+    "title": "Pull Request Checklist",
+    "route": "/docs/contributing#pull-request-checklist",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Code Style",
+    "route": "/docs/contributing#code-style",
+    "type": "heading",
+    "parentTitle": "Contributing",
+    "level": 2
+  },
+  {
+    "title": "Extensibility",
+    "description": "Current extension points and what’s planned next.",
+    "route": "/docs/extensibility",
+    "type": "page"
+  },
+  {
+    "title": "Extensibility",
+    "route": "/docs/extensibility#extensibility",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 1
+  },
+  {
+    "title": "Current Extension Points",
+    "route": "/docs/extensibility#current-extension-points",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 2
+  },
+  {
+    "title": "Beyond Git Automation",
+    "route": "/docs/extensibility#beyond-git-automation",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 2
+  },
+  {
+    "title": "Plugin System",
+    "route": "/docs/extensibility#plugin-system",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 2
+  },
+  {
+    "title": "Future Direction",
+    "route": "/docs/extensibility#future-direction",
+    "type": "heading",
+    "parentTitle": "Extensibility",
+    "level": 2
+  },
+  {
+    "title": "Introduction",
+    "description": "An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.",
+    "route": "/docs",
+    "type": "page"
+  },
+  {
+    "title": "What is Autopilot?",
+    "route": "/docs#what-is-autopilot",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 1
+  },
+  {
+    "title": "What's New in v4.0.2",
+    "route": "/docs#whats-new-in-v402",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "Requirements",
+    "route": "/docs#requirements",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "Quick Install",
+    "route": "/docs#quick-install",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "60-Second Quick Start",
+    "route": "/docs#60-second-quick-start",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "1. Initialize",
+    "route": "/docs#1-initialize",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "2. Start watching",
+    "route": "/docs#2-start-watching",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "3. Check status",
+    "route": "/docs#3-check-status",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "4. Stop",
+    "route": "/docs#4-stop",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 3
+  },
+  {
+    "title": "Explore Documentation",
+    "route": "/docs#explore-documentation",
+    "type": "heading",
+    "parentTitle": "Introduction",
+    "level": 2
+  },
+  {
+    "title": "Installation",
+    "description": "Comprehensive installation guide for Windows, macOS, and Linux.",
+    "route": "/docs/installation",
+    "type": "page"
+  },
+  {
+    "title": "Installation",
+    "route": "/docs/installation#installation",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 1
+  },
+  {
+    "title": "Prerequisites",
+    "route": "/docs/installation#prerequisites",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Windows",
+    "route": "/docs/installation#windows",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Method 1: npm (Recommended)",
+    "route": "/docs/installation#method-1-npm-recommended",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Method 2: pnpm / yarn",
+    "route": "/docs/installation#method-2-pnpm--yarn",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "pnpm",
+    "route": "/docs/installation#pnpm",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 1
+  },
+  {
+    "title": "yarn",
+    "route": "/docs/installation#yarn",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 1
+  },
+  {
+    "title": "Troubleshooting Windows",
+    "route": "/docs/installation#troubleshooting-windows",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "macOS",
+    "route": "/docs/installation#macos",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Installation via npm",
+    "route": "/docs/installation#installation-via-npm",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Verify Installation",
+    "route": "/docs/installation#verify-installation",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "Linux",
+    "route": "/docs/installation#linux",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "1. Install Node.js (if missing)",
+    "route": "/docs/installation#1-install-nodejs-if-missing",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "2. Install Autopilot",
+    "route": "/docs/installation#2-install-autopilot",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "3. Permissions Note",
+    "route": "/docs/installation#3-permissions-note",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 3
+  },
+  {
+    "title": "No-Install Usage (npx)",
+    "route": "/docs/installation#no-install-usage-npx",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Verify Installation",
+    "route": "/docs/installation#verify-installation-1",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Uninstalling",
+    "route": "/docs/installation#uninstalling",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
+    "title": "Localization",
+    "description": "Guidance for translating Autopilot docs and keeping the CLI accessible globally.",
+    "route": "/docs/localization",
+    "type": "page"
+  },
+  {
+    "title": "Localization",
+    "route": "/docs/localization#localization",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 1
+  },
+  {
+    "title": "Translation Strategy",
+    "route": "/docs/localization#translation-strategy",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 2
+  },
+  {
+    "title": "What Should Stay in English",
+    "route": "/docs/localization#what-should-stay-in-english",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 2
+  },
+  {
+    "title": "What Can Be Localized",
+    "route": "/docs/localization#what-can-be-localized",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 2
+  },
+  {
+    "title": "Practical Tips",
+    "route": "/docs/localization#practical-tips",
+    "type": "heading",
+    "parentTitle": "Localization",
+    "level": 2
+  },
+  {
+    "title": "Productivity & Leaderboard",
+    "description": "Track your focus, productivity streaks, and compete with yourself using Autopilot Insights.",
+    "route": "/docs/productivity",
+    "type": "page"
+  },
+  {
+    "title": "Productivity & Leaderboard",
+    "route": "/docs/productivity#productivity--leaderboard",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 1
+  },
+  {
+    "title": "The `insights` Command",
+    "route": "/docs/productivity#the-insights-command",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 2
+  },
+  {
+    "title": "Key Metrics",
+    "route": "/docs/productivity#key-metrics",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
+    "title": "Your Personal Leaderboard",
+    "route": "/docs/productivity#your-personal-leaderboard",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 2
+  },
+  {
+    "title": "Exporting Data",
+    "route": "/docs/productivity#exporting-data",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
+    "title": "Gamifying Your Workflow",
+    "route": "/docs/productivity#gamifying-your-workflow",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
+    "title": "Global Leaderboard (Opt-In)",
+    "route": "/docs/productivity#global-leaderboard-opt-in",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 2
+  },
+  {
+    "title": "Privacy & Trust Rules",
+    "route": "/docs/productivity#privacy--trust-rules",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 3
+  },
+  {
+    "title": "Dashboard Visualization",
+    "route": "/docs/productivity#dashboard-visualization",
+    "type": "heading",
+    "parentTitle": "Productivity & Leaderboard",
+    "level": 2
+  },
+  {
+    "title": "Quick Start",
+    "description": "Go from zero to automated commits in under 5 minutes.",
+    "route": "/docs/quick-start",
+    "type": "page"
+  },
+  {
+    "title": "Quick Start Guide",
+    "route": "/docs/quick-start#quick-start-guide",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 1
+  },
+  {
+    "title": "1. Set up a project",
+    "route": "/docs/quick-start#1-set-up-a-project",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "2. Initialize Autopilot",
+    "route": "/docs/quick-start#2-initialize-autopilot",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "3. Connect a remote repository",
+    "route": "/docs/quick-start#3-connect-a-remote-repository",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "4. Recommended workflow: use a dev branch",
+    "route": "/docs/quick-start#4-recommended-workflow-use-a-dev-branch",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "5. (Optional) Enable AI commit messages",
+    "route": "/docs/quick-start#5-optional-enable-ai-commit-messages",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "6. Start the watcher",
+    "route": "/docs/quick-start#6-start-the-watcher",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "7. Make some changes",
+    "route": "/docs/quick-start#7-make-some-changes",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "8. Monitor status",
+    "route": "/docs/quick-start#8-monitor-status",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "9. Stop the watcher",
+    "route": "/docs/quick-start#9-stop-the-watcher",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "Viewing logs",
+    "route": "/docs/quick-start#viewing-logs",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "Next steps",
+    "route": "/docs/quick-start#next-steps",
+    "type": "heading",
+    "parentTitle": "Quick Start",
+    "level": 2
+  },
+  {
+    "title": "Roadmap",
+    "description": "Community roadmap, contribution entry points, and areas we want to improve next.",
+    "route": "/docs/roadmap",
+    "type": "page"
+  },
+  {
+    "title": "Roadmap",
+    "route": "/docs/roadmap#roadmap",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 1
+  },
+  {
+    "title": "What We’re Prioritizing",
+    "route": "/docs/roadmap#what-were-prioritizing",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "Good First Contributions",
+    "route": "/docs/roadmap#good-first-contributions",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "Feature Areas Under Exploration",
+    "route": "/docs/roadmap#feature-areas-under-exploration",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "How to Track Progress",
+    "route": "/docs/roadmap#how-to-track-progress",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "Contributing",
+    "route": "/docs/roadmap#contributing",
+    "type": "heading",
+    "parentTitle": "Roadmap",
+    "level": 2
+  },
+  {
+    "title": "Safety Rails",
+    "description": "How Autopilot CLI protects your code and git history.",
+    "route": "/docs/safety",
+    "type": "page"
+  },
+  {
+    "title": "Non-Negotiable Guarantees",
+    "route": "/docs/safety#non-negotiable-guarantees",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Why Safety Rails Exist",
+    "route": "/docs/safety#why-safety-rails-exist",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Blocked Branches",
+    "route": "/docs/safety#blocked-branches",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Remote Sync Checks",
+    "route": "/docs/safety#remote-sync-checks",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "No Empty Commits",
+    "route": "/docs/safety#no-empty-commits",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Ignored Noise Files",
+    "route": "/docs/safety#ignored-noise-files",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "Best Practices",
+    "route": "/docs/safety#best-practices",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 2
+  },
+  {
+    "title": "1. Use Feature Branches",
+    "route": "/docs/safety#1-use-feature-branches",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 3
+  },
+  {
+    "title": "2. Keep Commits Small",
+    "route": "/docs/safety#2-keep-commits-small",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 3
+  },
+  {
+    "title": "3. Review Before Merge",
+    "route": "/docs/safety#3-review-before-merge",
+    "type": "heading",
+    "parentTitle": "Safety Rails",
+    "level": 3
+  },
+  {
+    "title": "Security",
+    "description": "Secret scanning, signing, GitHub Actions, and other safety details.",
+    "route": "/docs/security",
+    "type": "page"
+  },
+  {
+    "title": "Security",
+    "route": "/docs/security#security",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 1
+  },
+  {
+    "title": "Secret Scanning",
+    "route": "/docs/security#secret-scanning",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Large File Protection",
+    "route": "/docs/security#large-file-protection",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Protected Branches",
+    "route": "/docs/security#protected-branches",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Commit Signing",
+    "route": "/docs/security#commit-signing",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "GitHub Actions",
+    "route": "/docs/security#github-actions",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Recommended Practices",
+    "route": "/docs/security#recommended-practices",
+    "type": "heading",
+    "parentTitle": "Security",
+    "level": 2
+  },
+  {
+    "title": "Troubleshooting",
+    "description": "Solutions for common issues and debugging steps for Autopilot CLI.",
+    "route": "/docs/troubleshooting",
+    "type": "page"
+  },
+  {
+    "title": "First Steps: The Doctor",
+    "route": "/docs/troubleshooting#first-steps-the-doctor",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 2
+  },
+  {
+    "title": "Common Issues",
+    "route": "/docs/troubleshooting#common-issues",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 2
+  },
+  {
+    "title": "Autopilot detects changes but never commits",
+    "route": "/docs/troubleshooting#autopilot-detects-changes-but-never-commits",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Push fails or \"Authentication failed\"",
+    "route": "/docs/troubleshooting#push-fails-or-authentication-failed",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Autopilot start crashes immediately",
+    "route": "/docs/troubleshooting#autopilot-start-crashes-immediately",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Should be v18.0.0 or higher",
+    "route": "/docs/troubleshooting#should-be-v1800-or-higher",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 1
+  },
+  {
+    "title": "Stop or Status commands aren't working",
+    "route": "/docs/troubleshooting#stop-or-status-commands-arent-working",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "AI commit generation fails with a model error",
+    "route": "/docs/troubleshooting#ai-commit-generation-fails-with-a-model-error",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Leaderboard sync returns a 500 error",
+    "route": "/docs/troubleshooting#leaderboard-sync-returns-a-500-error",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Dashboard does not launch",
+    "route": "/docs/troubleshooting#dashboard-does-not-launch",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Autopilot is too noisy in a large repo",
+    "route": "/docs/troubleshooting#autopilot-is-too-noisy-in-a-large-repo",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Debugging Tools",
+    "route": "/docs/troubleshooting#debugging-tools",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 2
+  },
+  {
+    "title": "Manual Git Check",
+    "route": "/docs/troubleshooting#manual-git-check",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  },
+  {
+    "title": "Log Files",
+    "route": "/docs/troubleshooting#log-files",
+    "type": "heading",
+    "parentTitle": "Troubleshooting",
+    "level": 3
+  }
+]

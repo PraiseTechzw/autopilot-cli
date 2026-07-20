@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "Autopilot CLI Docs"
+version = "1.0.0"
+id = "artifacts/autopilot-docs"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25912
+
+[services.development]
+run = "pnpm --filter @workspace/autopilot-docs run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/autopilot-docs", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/autopilot-docs/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25912"
+BASE_PATH = "/"

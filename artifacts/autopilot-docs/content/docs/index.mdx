@@ -1,0 +1,194 @@
+---
+title: Introduction
+description: An intelligent Git automation CLI that safely commits and pushes your code so you can focus on building.
+---
+
+# What is Autopilot?
+
+**Autopilot CLI** is an intelligent Git automation tool that safely commits and pushes your code so you can focus on building. It runs quietly in the background, watching your project files and handling Git operations for you — batching related changes, writing conventional commit messages, and syncing with your remote, all without interrupting your flow.
+
+Most AI commit tools ask you to run a command every time you want a message written. Autopilot doesn't wait to be asked — it's the difference between a tool you operate and a tool that just takes care of things.
+
+## What's New in v4.0.2
+
+- **Free Model Defaults** — Autopilot now prefers free OpenRouter models and rotates through them automatically when one is unavailable.
+- **Automatic Leaderboard Sync** — sync focus metrics while the watcher runs, with a built-in offline-safe escape hatch.
+- **Branch Rules** — define branch-specific blocking, signing, and push policies with wildcard patterns.
+- **Safety Net** — undo accidental commits instantly with `autopilot undo`, plus commit signing and offline mode for stricter workflows.
+
+It's designed for:
+
+- 🚀 **Solo developers** who want to focus on coding, not committing.
+- 🌱 **Beginners** who are still learning Git and want safe defaults instead of a learning curve.
+- 👥 **Teams** who want to standardize commit quality and enforce safety checks.
+- 🛡️ **Safety-conscious users** who never want to lose work.
+- ⚡ **Rapid prototyping**, where speed matters more than granular commit history.
+
+---
+
+## Requirements
+
+- Node.js 18 or later
+- Git installed and available on your `PATH`
+- Works on Windows, macOS, and Linux
+
+---
+
+## Quick Install
+
+Install Autopilot globally using npm:
+
+```bash
+npm install -g @traisetech/autopilot
+```
+
+---
+
+## 60-Second Quick Start
+
+Follow these four commands to get up and running:
+
+### 1. Initialize
+
+Navigate to your project root and generate the configuration file. If you're starting from an empty folder, Autopilot will offer to set up Git for you too.
+
+```bash
+autopilot init
+```
+
+### 2. Start watching
+
+Start the background daemon. Autopilot will now monitor your files and sync changes automatically.
+
+```bash
+autopilot start
+```
+
+> **Heads up:** by default, Autopilot won't push directly to `main` or `master` — this is a safety default, not a bug. See [Configuration](/docs/configuration) to change it once you're comfortable, or use `autopilot preset solo-speed` if you'd rather move fast on a personal project.
+
+### 3. Check status
+
+Verify that the watcher is running and see recent activity:
+
+```bash
+autopilot status
+```
+
+### 4. Stop
+
+When you're done for the day, or need to switch branches manually:
+
+```bash
+autopilot stop
+```
+
+---
+
+## Explore Documentation
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mt-8">
+  <a
+    href="/docs/installation"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Installation
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Detailed installation guides for all platforms.
+    </p>
+  </a>
+  <a
+    href="/docs/configuration"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Configuration
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Customize debounce timers, ignored files, and more.
+    </p>
+  </a>
+  <a
+    href="/docs/commands"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      CLI Reference
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Full list of commands and flags.
+    </p>
+  </a>
+  <a
+    href="/docs/troubleshooting"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Troubleshooting
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      Common issues and how to resolve them.
+    </p>
+  </a>
+  <a
+    href="/docs/advanced-usage"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Advanced Usage
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      CI/CD, team workflows, monorepos, hooks, and scaling tips.
+    </p>
+  </a>
+  <a
+    href="/docs/roadmap"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">
+      Roadmap
+    </h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      What’s next, how to contribute, and features under exploration.
+    </p>
+  </a>
+</div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4 not-prose mt-4">
+  <a
+    href="/docs/security"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Security</h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">Secret scanning, commit signing, and GitHub Actions guidance.</p>
+  </a>
+  <a
+    href="/docs/benchmarks"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Benchmarks</h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">How to compare Autopilot fairly against other commit tools.</p>
+  </a>
+  <a
+    href="/docs/localization"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Localization</h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">Guidance for translations and global adoption.</p>
+  </a>
+  <a
+    href="/docs/accessibility"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Accessibility</h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">Keyboard-first usage and assistive workflow guidance.</p>
+  </a>
+  <a
+    href="/docs/extensibility"
+    className="block p-6 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-gray-900"
+  >
+    <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-gray-100">Extensibility</h3>
+    <p className="text-sm text-gray-500 dark:text-gray-400">Current extension points and roadmap ideas for plugins.</p>
+  </a>
+</div>

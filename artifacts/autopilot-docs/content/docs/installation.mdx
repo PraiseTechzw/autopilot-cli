@@ -1,0 +1,164 @@
+---
+title: Installation
+description: Comprehensive installation guide for Windows, macOS, and Linux.
+---
+
+# Installation
+
+Getting started with Autopilot CLI is simple. It runs on any operating system that supports Node.js.
+
+## Prerequisites
+
+Before installing, ensure you have the following requirements:
+
+- **Node.js**: Version **18.0.0** or higher.
+- **Git**: Installed and available in your terminal path.
+
+Check your versions:
+
+```bash
+node --version
+git --version
+```
+
+---
+
+## Windows
+
+### Method 1: npm (Recommended)
+
+Open **Command Prompt** or **PowerShell** as Administrator and run:
+
+```bash
+npm install -g @traisetech/autopilot
+```
+
+### Method 2: pnpm / yarn
+
+If you use other package managers:
+
+```bash
+# pnpm
+pnpm add -g @traisetech/autopilot
+
+# yarn
+yarn global add @traisetech/autopilot
+```
+
+### Troubleshooting Windows
+
+**"Command not recognized" Error**
+If `autopilot` isn't found after installation, your npm folder is likely missing from your system `PATH`.
+
+1. Search for **"Edit the system environment variables"** in Start menu.
+2. Click **Environment Variables**.
+3. Under **User variables**, select `Path` and click **Edit**.
+4. Click **New** and add: `%APPDATA%\npm`
+5. Click **OK** and restart your terminal.
+
+---
+
+## macOS
+
+### Installation via npm
+
+We recommend using a Node version manager like `nvm` to avoid permission issues.
+
+```bash
+npm install -g @traisetech/autopilot
+```
+
+If you get an `EACCES` permission error, try using `sudo`:
+
+```bash
+sudo npm install -g @traisetech/autopilot
+```
+
+### Verify Installation
+
+```bash
+autopilot --version
+```
+
+---
+
+## Linux
+
+Autopilot works on any distribution (Ubuntu, Fedora, Arch, etc.) with a compatible Node.js runtime.
+
+### 1. Install Node.js (if missing)
+
+We recommend using `nvm` (Node Version Manager) or your distro's package manager.
+
+**Ubuntu/Debian:**
+```bash
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt-get install -y nodejs
+```
+
+### 2. Install Autopilot
+
+```bash
+npm install -g @traisetech/autopilot
+```
+
+### 3. Permissions Note
+
+If you installed Node.js via the system package manager (`apt`, `pacman`, etc.), you might need `sudo` for global installs:
+
+```bash
+sudo npm install -g @traisetech/autopilot
+```
+
+---
+
+## No-Install Usage (npx)
+
+You can run Autopilot without installing it globally using `npx`. This ensures you always use the latest version.
+
+```bash
+npx @traisetech/autopilot start
+```
+
+*Note: For the best experience with the file watcher, a global installation is recommended.*
+
+---
+
+## Verify Installation
+
+Check that Autopilot is correctly installed by viewing the help menu:
+
+```bash
+autopilot --help
+```
+
+You should see:
+
+```text
+Usage: autopilot [options] [command]
+
+Intelligent Git automation that commits and pushes your code
+
+Options:
+  -V, --version   output the version number
+  -h, --help      display help for command
+
+Commands:
+  init            Initialize Autopilot in the current directory
+  start           Start the file watcher
+  status          Check the status of the Autopilot daemon
+  stop            Stop the Autopilot daemon
+  help [command]  display help for command
+```
+
+---
+
+## Uninstalling
+
+If you need to remove Autopilot CLI from your system:
+
+```bash
+npm uninstall -g @traisetech/autopilot
+```
+
+This will remove the global binary but will **not** delete any `.autopilotrc.json` configuration files you created in your projects. You can safely delete those manually if desired.

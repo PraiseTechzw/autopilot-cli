@@ -1,0 +1,50 @@
+---
+title: Benchmarks
+description: How to compare Autopilot with other commit assistants fairly.
+---
+
+# Benchmarks
+
+We don’t want fake leaderboard numbers or cherry-picked comparisons. The most useful benchmark is one you can reproduce on your own machine.
+
+## What To Measure
+
+- Time to first useful commit message.
+- CPU and memory overhead while the watcher is running.
+- Responsiveness on a large repository.
+- Accuracy of the generated commit summary.
+- Usability: how many manual steps are required.
+
+## Comparing With Alternatives
+
+If you want to compare Autopilot with tools like `aicommits` or `opencommit`, use the same repository and the same staged diff:
+
+1. Start from identical changes.
+2. Measure how long it takes to get a commit message.
+3. Compare whether the message matches the actual scope of the change.
+4. Check whether the tool keeps running in the background or requires repeated manual prompts.
+
+## Large Repo Checks
+
+On big repositories, the biggest variables are:
+
+- How much of the tree is watched.
+- Whether generated directories are ignored.
+- How often the watcher syncs status or leaderboard data.
+
+Recommended checks:
+
+- Run with a narrow watch path.
+- Ignore build directories.
+- Turn off AI if you don’t need it for the benchmark.
+
+## Interpreting Results
+
+Autopilot’s strengths are:
+
+- Background automation.
+- Safer defaults.
+- Fewer manual prompts.
+
+Its tradeoff is that it is intentionally more conservative than simple on-demand commit generators.
+
