@@ -1,0 +1,13 @@
+diff --git a/docs/intro.md b/docs/intro.md
+index 1111111..2222222 100644
+--- a/docs/intro.md
++++ b/docs/intro.md
+@@ -5,4 +5,6 @@
+ Welcome to Autopilot!
+ 
+-To get started, run `npm install`.
++To get started, run `npm install -g autopilot-cli`.
++
++## Quick Start
++
++Run `autopilot init` to set up your project.

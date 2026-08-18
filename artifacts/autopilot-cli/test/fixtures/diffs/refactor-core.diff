@@ -1,0 +1,20 @@
+diff --git a/src/utils/helpers.js b/src/utils/helpers.js
+index 5555555..6666666 100644
+--- a/src/utils/helpers.js
++++ b/src/utils/helpers.js
+@@ -1,10 +1,5 @@
+-function formatDate(date) {
+-  return new Date(date).toISOString();
+-}
+-
+-function log(msg) {
+-  console.log(msg);
+-}
++const logger = require('./logger');
++const { formatISO } = require('date-fns');
+ 
+-module.exports = { formatDate, log };
++module.exports = { 
++  formatDate: formatISO, 
++  log: logger.info 
++};

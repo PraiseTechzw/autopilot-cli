@@ -1,0 +1,12 @@
+diff --git a/src/components/Button.tsx b/src/components/Button.tsx
+index 1234567..89abcdef 100644
+--- a/src/components/Button.tsx
++++ b/src/components/Button.tsx
+@@ -10,7 +10,7 @@
+   return (
+     <button
+-      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
++      className="bg-primary hover:bg-primary-hover text-white font-bold py-2 px-4 rounded transition-colors"
++      style={{ color: 'var(--text-primary)' }}
+     >
+       {children}

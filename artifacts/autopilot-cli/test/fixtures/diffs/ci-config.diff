@@ -1,0 +1,11 @@
+diff --git a/.github/workflows/main.yml b/.github/workflows/main.yml
+index ddddddd..eeeeeee 100644
+--- a/.github/workflows/main.yml
++++ b/.github/workflows/main.yml
+@@ -10,4 +10,5 @@ jobs:
+     steps:
+       - uses: actions/checkout@v2
+       - uses: actions/setup-node@v2
+-      - run: npm test
++      - run: npm ci
++      - run: npm run test:coverage

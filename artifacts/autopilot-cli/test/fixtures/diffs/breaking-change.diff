@@ -1,0 +1,11 @@
+diff --git a/src/api/client.js b/src/api/client.js
+index 7777777..8888888 100644
+--- a/src/api/client.js
++++ b/src/api/client.js
+@@ -10,3 +10,3 @@ class APIClient {
+-  connect(url, timeout) {
+-    this.url = url;
+-    this.timeout = timeout;
++  connect({ url, timeout, retries }) {
++    this.config = { url, timeout, retries };
+   }

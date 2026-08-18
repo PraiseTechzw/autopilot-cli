@@ -1,0 +1,13 @@
+diff --git a/test/parser.test.js b/test/parser.test.js
+index 9999999..aaaaaaa 100644
+--- a/test/parser.test.js
++++ b/test/parser.test.js
+@@ -20,3 +20,7 @@ describe('Parser', () => {
+   it('should handle valid JSON', () => {
+     assert.deepEqual(parse('{"a":1}'), {a: 1});
+   });
++
++  it('should return null for empty input', () => {
++    assert.strictEqual(parse(''), null);
++  });
+ });

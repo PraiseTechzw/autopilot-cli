@@ -1,0 +1,14 @@
+diff --git a/src/styles/theme.css b/src/styles/theme.css
+index abcdef1..1234567 100644
+--- a/src/styles/theme.css
++++ b/src/styles/theme.css
+@@ -1,5 +1,8 @@
+ :root {
+-  --primary: #007bff;
+-  --secondary: #6c757d;
++  --primary: #3b82f6;
++  --primary-hover: #2563eb;
++  --secondary: #64748b;
++  --text-primary: #1e293b;
++  --bg-surface: #ffffff;
+ }

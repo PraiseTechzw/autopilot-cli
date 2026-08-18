@@ -1,0 +1,11 @@
+diff --git a/src/core/parser.js b/src/core/parser.js
+index 3333333..4444444 100644
+--- a/src/core/parser.js
++++ b/src/core/parser.js
+@@ -15,7 +15,7 @@ function parseInput(input) {
+   if (!input) {
+-    throw new Error('Input undefined');
++    return null; // Fix crash on empty input
+   }
+   
+   return JSON.parse(input);
