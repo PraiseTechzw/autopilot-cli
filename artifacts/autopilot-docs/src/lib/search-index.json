@@ -1,5 +1,11 @@
 [
   {
+    "title": "Interactive Web Tool & Simulator",
+    "description": "Simulate Autopilot CLI watcher, test commands, edit mock files, and inspect live AI commits.",
+    "route": "/playground",
+    "type": "page"
+  },
+  {
     "title": "Accessibility",
     "description": "How Autopilot stays usable for keyboard-first and assistive workflows.",
     "route": "/docs/accessibility",

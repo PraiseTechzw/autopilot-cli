@@ -12,6 +12,9 @@ export default function NotFound() {
         <Link href="/" className="px-6 py-3 bg-link text-black font-semibold rounded-xl hover:bg-link-hover transition-colors">
           Go Home
         </Link>
+        <Link href="/playground" className="px-6 py-3 bg-link/10 text-link border border-link/30 font-semibold rounded-xl hover:bg-link/20 transition-colors">
+          Web Tool
+        </Link>
         <Link href="/docs" className="px-6 py-3 bg-card border border-border text-foreground font-semibold rounded-xl hover:bg-muted transition-colors">
           Documentation
         </Link>

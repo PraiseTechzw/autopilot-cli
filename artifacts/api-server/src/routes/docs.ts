@@ -3,13 +3,24 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 // Content lives at artifacts/autopilot-docs/content/docs/
-// process.cwd() is artifacts/api-server/ when the server starts
-const DOCS_PATH = path.resolve(process.cwd(), "..", "autopilot-docs", "content", "docs");
+const possiblePaths = [
+  path.resolve(process.cwd(), "..", "autopilot-docs", "content", "docs"),
+  path.resolve(process.cwd(), "artifacts", "autopilot-docs", "content", "docs"),
+  path.resolve(__dirname, "..", "..", "..", "autopilot-docs", "content", "docs"),
+];
+
+function getDocsPath(): string {
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return possiblePaths[0];
+}
 
 const router = Router();
 
 router.get("/docs", (_req, res) => {
   try {
+    const DOCS_PATH = getDocsPath();
     if (!fs.existsSync(DOCS_PATH)) {
       res.json([]);
       return;
@@ -35,28 +46,28 @@ router.get("/docs", (_req, res) => {
   }
 });
 
-router.get("/docs/{*slug}", (req, res) => {
+const handleDocBySlug = (req: any, res: any) => {
   try {
-    const rawSlug = (req.params as any).slug;
+    const rawSlug = req.params.slug;
     const slugStr = Array.isArray(rawSlug) ? rawSlug.join("/") : (rawSlug || "index");
     const slug = slugStr.replace(/\/$/, "") || "index";
     // Sanitize: strip leading slashes/dots and reject traversal sequences
     const safeName = slug.replace(/^[./]+/, "").replace(/\.\./g, "");
-    if (!safeName || safeName.includes("/")) {
+    if (!safeName || safeName.includes("..")) {
       res.status(400).json({ error: "Invalid slug" });
       return;
     }
 
+    const DOCS_PATH = getDocsPath();
     const candidates = [
       path.join(DOCS_PATH, `${safeName}.mdx`),
       path.join(DOCS_PATH, `${safeName}.md`),
+      path.join(DOCS_PATH, `${safeName}/index.mdx`),
       path.join(DOCS_PATH, "index.mdx"),
     ];
 
     let filePath: string | null = null;
     for (const c of candidates) {
-      // Hard check: resolved path must stay inside DOCS_PATH
-      if (!path.resolve(c).startsWith(path.resolve(DOCS_PATH))) continue;
       if (fs.existsSync(c)) { filePath = c; break; }
     }
 
@@ -81,6 +92,9 @@ router.get("/docs/{*slug}", (req, res) => {
   } catch (err) {
     res.status(500).json({ error: "Failed to load doc" });
   }
-});
+};
+
+router.get("/docs/:slug(*)", handleDocBySlug);
+router.get("/docs/:slug", handleDocBySlug);
 
 export default router;

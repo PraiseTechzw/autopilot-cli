@@ -8,12 +8,17 @@ import { VersionBadge } from '@/components/VersionBadge';
 import HomePage from '@/pages/Home';
 import DocsPage from '@/pages/Docs';
 import LeaderboardPage from '@/pages/Leaderboard';
+import PlaygroundPage from '@/pages/Playground';
 import NotFound from '@/pages/NotFound';
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
+      <Route path="/playground" component={PlaygroundPage} />
+      <Route path="/tool" component={PlaygroundPage} />
+      <Route path="/terminal" component={PlaygroundPage} />
+      <Route path="/simulator" component={PlaygroundPage} />
       <Route path="/docs" component={DocsPage} />
       <Route path="/docs/:slug*" component={DocsPage} />
       <Route path="/leaderboard" component={LeaderboardPage} />

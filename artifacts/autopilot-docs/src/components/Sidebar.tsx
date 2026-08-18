@@ -40,6 +40,11 @@ function SidebarGroup({ section, pathname, onLinkClick }: { section: NavSection;
             >
               {isActive && <div className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-6 bg-link shadow-[0_0_8px] shadow-link/50 rounded-full" />}
               <span className="relative z-10">{item.title}</span>
+              {item.badge && (
+                <span className="ml-auto px-1.5 py-0.5 text-[9px] font-bold rounded-full bg-link/20 text-link border border-link/30 uppercase tracking-wider">
+                  {item.badge}
+                </span>
+              )}
               {item.external && <ExternalLink className="h-3 w-3 opacity-30 group-hover:opacity-100 transition-opacity ml-auto" />}
             </Link>
           );

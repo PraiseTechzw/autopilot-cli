@@ -30,8 +30,15 @@ export function MobileMenu() {
               <Link href="/" onClick={close} className="flex items-center gap-3 px-4 py-3 text-base font-medium text-foreground hover:bg-muted/50 rounded-lg transition-colors">
                 <FileText className="h-5 w-5 text-muted-foreground" />Home
               </Link>
+              <Link href="/playground" onClick={close} className="flex items-center gap-3 px-4 py-3 text-base font-bold text-link bg-link/10 rounded-lg transition-colors border border-link/20">
+                <Terminal className="h-5 w-5 text-link" />
+                <span>Web Tool</span>
+                <span className="ml-auto px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full bg-link/20 text-link">
+                  Live
+                </span>
+              </Link>
               <Link href="/leaderboard" onClick={close} className="flex items-center gap-3 px-4 py-3 text-base font-medium text-foreground hover:bg-muted/50 rounded-lg transition-colors">
-                <Trophy className="h-5 w-5 text-link" />Leaderboard
+                <Trophy className="h-5 w-5 text-muted-foreground" />Leaderboard
               </Link>
               <Link href="/docs" onClick={close} className="flex items-center gap-3 px-4 py-3 text-base font-medium text-foreground hover:bg-muted/50 rounded-lg transition-colors">
                 <FileText className="h-5 w-5 text-muted-foreground" />Documentation
