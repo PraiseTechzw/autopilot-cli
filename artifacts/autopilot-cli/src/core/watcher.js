@@ -144,6 +144,10 @@ class Watcher {
       });
 
       this.isWatching = true;
+      this.bridgeClient.emitEvent('status_update', {
+        status: 'watching',
+        branch: currentBranch,
+      }, this.repoPath);
       logger.success(`Autopilot is watching ${this.repoPath}`);
       logger.info(`Logs: ${this.logFilePath}`);
       this.startLeaderboardSyncLoop();
@@ -217,6 +221,7 @@ class Watcher {
       }
       
       this.isWatching = false;
+      this.bridgeClient.emitEvent('status_update', { status: 'stopped' }, this.repoPath);
       logger.info('Watcher stopped');
     } catch (error) {
       logger.error(`Error stopping watcher: ${error.message}`);

@@ -5,6 +5,7 @@ import leaderboardRouter from "./leaderboard";
 import eventsRouter from "./events";
 import npmRouter from "./npm";
 import bridgeRouter from "./bridge";
+import githubRouter from "./github";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(leaderboardRouter);
 router.use(eventsRouter);
 router.use(npmRouter);
 router.use(bridgeRouter);
+router.use(githubRouter);
 
 export default router;

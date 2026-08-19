@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'wouter';
-import { X, Github, Trophy, FileText } from 'lucide-react';
+import { X, Github, Trophy, FileText, Terminal } from 'lucide-react';
 import { useSidebar } from './SidebarProvider';
 import { REPO_URL } from '@/lib/constants';
 

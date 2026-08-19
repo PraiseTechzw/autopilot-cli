@@ -1,0 +1,17 @@
+name: Bug report
+description: Report a reproducible problem
+labels: [bug]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: Include command, OS, Node version, and sanitized logs. Never include tokens.
+    validations:
+      required: true

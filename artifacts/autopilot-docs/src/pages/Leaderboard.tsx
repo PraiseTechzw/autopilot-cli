@@ -17,90 +17,23 @@ interface UserStats {
   trend?: 'up' | 'down' | 'same';
 }
 
-const DEFAULT_USERS: UserStats[] = [
-  {
-    id: '47c15b2d27ee',
-    username: 'Praise Masunga',
-    name: 'Praise Masunga',
-    score: 9850,
-    commits: 48,
-    focusMinutes: 1420,
-    streak: 12,
-    lastActive: new Date().toISOString(),
-    avatar: 'PM',
-    focusTime: '23h 40m',
-    trend: 'up',
-  },
-  {
-    id: '8a2b3c4d5e6f',
-    username: 'alex_dev',
-    name: 'Alex Rivera',
-    score: 8420,
-    commits: 36,
-    focusMinutes: 1180,
-    streak: 8,
-    lastActive: new Date().toISOString(),
-    avatar: 'AR',
-    focusTime: '19h 40m',
-    trend: 'up',
-  },
-  {
-    id: '1b2c3d4e5f6a',
-    username: 'sarah_code',
-    name: 'Sarah Chen',
-    score: 7910,
-    commits: 31,
-    focusMinutes: 990,
-    streak: 7,
-    lastActive: new Date().toISOString(),
-    avatar: 'SC',
-    focusTime: '16h 30m',
-    trend: 'same',
-  },
-  {
-    id: '9f8e7d6c5b4a',
-    username: 'marcus_ts',
-    name: 'Marcus Vance',
-    score: 6540,
-    commits: 24,
-    focusMinutes: 840,
-    streak: 5,
-    lastActive: new Date().toISOString(),
-    avatar: 'MV',
-    focusTime: '14h 00m',
-    trend: 'down',
-  },
-  {
-    id: '2c3d4e5f6a7b',
-    username: 'elena_rust',
-    name: 'Elena Rostova',
-    score: 5980,
-    commits: 19,
-    focusMinutes: 720,
-    streak: 4,
-    lastActive: new Date().toISOString(),
-    avatar: 'ER',
-    focusTime: '12h 00m',
-    trend: 'up',
-  },
-];
-
 export default function LeaderboardPage() {
-  const [users, setUsers] = useState<UserStats[]>(DEFAULT_USERS);
-  const [loading, setLoading] = useState(false);
+  const [users, setUsers] = useState<UserStats[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [stats, setStats] = useState({
-    totalCommits: 158,
-    totalFocusMinutes: 5150,
-    activeStreaks: 5,
+    totalCommits: 0,
+    totalFocusMinutes: 0,
+    activeStreaks: 0,
   });
 
   const fetchLeaderboard = async () => {
+    setLoading(true);
     try {
       const res = await fetch('/api/leaderboard');
-      if (!res.ok) return;
+      if (!res.ok) throw new Error('Failed to fetch leaderboard');
       const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
+      if (Array.isArray(data)) {
         const formattedUsers = data.map((u: UserStats) => ({
           ...u,
           name: u.username,
@@ -116,7 +49,9 @@ export default function LeaderboardPage() {
         });
       }
     } catch {
-      // Keep default data
+      setUsers([]);
+    } finally {
+      setLoading(false);
     }
   };
 

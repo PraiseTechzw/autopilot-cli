@@ -94,7 +94,8 @@ const handleDocBySlug = (req: any, res: any) => {
   }
 };
 
-router.get("/docs/:slug(*)", handleDocBySlug);
-router.get("/docs/:slug", handleDocBySlug);
+// Express 5 uses path-to-regexp v8, where a named wildcard is written as
+// `*slug` rather than the legacy `:slug(*)` syntax.
+router.get("/docs/*slug", handleDocBySlug);
 
 export default router;
