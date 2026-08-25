@@ -15,6 +15,7 @@ const presetCommand = require('../src/commands/preset');
 const configCommand = require('../src/commands/config');
 const interactiveCommand = require('../src/commands/interactive');
 const guideCommand = require('../src/commands/guide');
+const telemetryCommand = require('../src/commands/telemetry');
 const pkg = require('../package.json');
 const logger = require('../src/utils/logger');
 const { checkForUpdate } = require('../src/utils/update-check');
@@ -34,7 +35,8 @@ const commands = {
   preset: presetCommand,
   config: configCommand,
   interactive: interactiveCommand,
-  guide: guideCommand
+  guide: guideCommand,
+  telemetry: telemetryCommand
 };
 
 // Runtime assertion to prevent wiring errors
@@ -140,6 +142,13 @@ program
   .command('guide')
   .description('Interactive guide to using Autopilot')
   .action(guideCommand);
+
+program
+  .command('telemetry [action]')
+  .description('Export Supabase telemetry events')
+  .option('-f, --format <type>', 'Export format (json, csv)', 'json')
+  .option('-o, --output <path>', 'Output file path')
+  .action(telemetryCommand);
 
 program
   .command('version')

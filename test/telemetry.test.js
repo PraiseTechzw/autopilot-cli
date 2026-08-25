@@ -1,7 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { buildMetrics, getSupabaseUrl, createTelemetryClient } = require('../src/core/telemetry');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
+const { buildMetrics, getSupabaseUrl, createTelemetryClient, exportTelemetryEvents } = require('../src/core/telemetry');
 
 test('telemetry metrics are derived from recent Supabase events', () => {
   const now = Date.now();
@@ -22,6 +25,21 @@ test('telemetry normalizes a Supabase REST URL to its project URL', () => {
   assert.equal(getSupabaseUrl(), 'https://example.supabase.co');
   if (original === undefined) delete process.env.SUPABASE_URL;
   else process.env.SUPABASE_URL = original;
+});
+
+test('telemetry exports exact event snapshots as JSON and CSV', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'autopilot-telemetry-export-'));
+  const events = [{ id: 1, type: 'commit', receivedAt: '2026-08-25T12:00:00.000Z', commitHash: 'abc123' }];
+  const jsonPath = path.join(dir, 'events.json');
+  const csvPath = path.join(dir, 'events.csv');
+
+  await exportTelemetryEvents(jsonPath, events, 'json');
+  await exportTelemetryEvents(csvPath, events, 'csv');
+
+  assert.deepEqual(JSON.parse(await fs.readFile(jsonPath, 'utf8')), events);
+  assert.match(await fs.readFile(csvPath, 'utf8'), /id,type,received_at,commit_hash/);
+  assert.match(await fs.readFile(csvPath, 'utf8'), /1,commit,2026-08-25T12:00:00\.000Z,abc123/);
+  await fs.rm(dir, { recursive: true, force: true });
 });
 
 test('telemetry reports an explicit unconfigured state without synthetic metrics', async () => {

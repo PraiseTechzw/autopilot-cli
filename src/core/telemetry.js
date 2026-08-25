@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs-extra');
 
 const WINDOW_MS = 5 * 60 * 1000;
 const MAX_EVENTS = 200;
@@ -18,6 +19,25 @@ function normalizeEvent(row) {
     receivedAt: row.received_at || (row.timestamp ? new Date(Number(row.timestamp)).toISOString() : null),
     commitHash: row.commit_hash || null,
   };
+}
+
+function csvEscape(value) {
+  const text = value == null ? '' : String(value);
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
+
+function formatTelemetryCsv(events) {
+  const headers = ['id', 'type', 'received_at', 'commit_hash'];
+  return [headers.join(','), ...events.map((event) => [event.id, event.type, event.receivedAt, event.commitHash].map(csvEscape).join(','))].join('\n') + '\n';
+}
+
+async function exportTelemetryEvents(filePath, events, format = 'json') {
+  const output = format.toLowerCase() === 'csv'
+    ? formatTelemetryCsv(events)
+    : JSON.stringify(events, null, 2) + '\n';
+  await fs.ensureFile(filePath);
+  await fs.writeFile(filePath, output, 'utf8');
+  return { filePath, format: format.toLowerCase() === 'csv' ? 'csv' : 'json', count: events.length };
 }
 
 function buildMetrics(events, now = Date.now()) {
@@ -41,7 +61,8 @@ function buildMetrics(events, now = Date.now()) {
 }
 
 class TelemetryClient {
-  constructor() {
+  constructor(clientFactory = createClient) {
+    this.clientFactory = clientFactory;
     this.client = null;
     this.channel = null;
     this.events = [];
@@ -74,7 +95,7 @@ class TelemetryClient {
       return;
     }
 
-    this.client = createClient(getSupabaseUrl(), getSupabaseKey(), {
+    this.client = this.clientFactory(getSupabaseUrl(), getSupabaseKey(), {
       auth: { persistSession: false, autoRefreshToken: false },
       realtime: { params: { eventsPerSecond: 10 } },
     });
@@ -114,6 +135,10 @@ class TelemetryClient {
       });
   }
 
+  async exportSnapshot(filePath, format = 'json') {
+    return exportTelemetryEvents(filePath, this.events, format);
+  }
+
   async stop() {
     if (this.client && this.channel) {
       await this.client.removeChannel(this.channel);
@@ -123,8 +148,8 @@ class TelemetryClient {
   }
 }
 
-function createTelemetryClient() {
-  return new TelemetryClient();
+function createTelemetryClient(clientFactory) {
+  return new TelemetryClient(clientFactory);
 }
 
-module.exports = { TelemetryClient, createTelemetryClient, buildMetrics, getSupabaseUrl };
+module.exports = { TelemetryClient, createTelemetryClient, buildMetrics, getSupabaseUrl, exportTelemetryEvents, formatTelemetryCsv };

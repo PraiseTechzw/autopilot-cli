@@ -38,7 +38,8 @@
     "prepublishOnly": "npm run verify",
     "release:patch": "npm run verify && npm version patch && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
     "release:minor": "npm run verify && npm version minor && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
-    "release:major": "npm run verify && npm version major && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\""
+    "release:major": "npm run verify && npm version major && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
+    "supabase:migrate:events": "bash scripts/apply-supabase-events-migration.sh"
   },
   "engines": {
     "node": ">=18.0.0"
