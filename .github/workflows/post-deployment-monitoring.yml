@@ -1,0 +1,40 @@
+name: Post-deployment monitoring
+
+on:
+  workflow_dispatch:
+    inputs:
+      site_url:
+        description: Public website URL to check
+        required: false
+        default: https://autopilot-cli.vercel.app
+  schedule:
+    - cron: '17 */6 * * *'
+  workflow_run:
+    workflows: ["Release", "Publish VS Code Extension"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  health-check:
+    name: Website and extension health check
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Check public deployment and extension manifest
+        env:
+          SITE_URL: ${{ inputs.site_url || vars.SITE_URL || 'https://autopilot-cli.vercel.app' }}
+        run: node scripts/check-deployment.mjs
+      - name: Package extension smoke test
+        working-directory: vscode-extension
+        run: |
+          npm install --global @vscode/vsce
+          npm run check
+          npm run package
