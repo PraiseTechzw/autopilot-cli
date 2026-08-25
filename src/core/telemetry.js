@@ -1,0 +1,130 @@
+const { createClient } = require('@supabase/supabase-js');
+
+const WINDOW_MS = 5 * 60 * 1000;
+const MAX_EVENTS = 200;
+
+function getSupabaseKey() {
+  return process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || '';
+}
+
+function getSupabaseUrl() {
+  return String(process.env.SUPABASE_URL || '').replace(/\/rest\/v1\/?$/, '');
+}
+
+function normalizeEvent(row) {
+  return {
+    id: row.id,
+    type: row.type || 'unknown',
+    receivedAt: row.received_at || (row.timestamp ? new Date(Number(row.timestamp)).toISOString() : null),
+    commitHash: row.commit_hash || null,
+  };
+}
+
+function buildMetrics(events, now = Date.now()) {
+  const recent = events.filter((event) => {
+    const timestamp = Date.parse(event.receivedAt || '');
+    return Number.isFinite(timestamp) && now - timestamp <= WINDOW_MS;
+  });
+
+  const byType = recent.reduce((result, event) => {
+    result[event.type] = (result[event.type] || 0) + 1;
+    return result;
+  }, {});
+
+  return {
+    totalEvents: recent.length,
+    eventsPerMinute: Number((recent.length / 5).toFixed(1)),
+    latestEvent: recent[0] || null,
+    byType,
+    windowMinutes: 5,
+  };
+}
+
+class TelemetryClient {
+  constructor() {
+    this.client = null;
+    this.channel = null;
+    this.events = [];
+    this.onUpdate = null;
+    this.state = {
+      status: 'not_configured',
+      metrics: null,
+      error: null,
+      source: 'Supabase Realtime / public.events',
+    };
+  }
+
+  isConfigured() {
+    return Boolean(getSupabaseUrl() && getSupabaseKey());
+  }
+
+  emit() {
+    if (this.onUpdate) this.onUpdate({ ...this.state });
+  }
+
+  setState(patch) {
+    this.state = { ...this.state, ...patch };
+    this.emit();
+  }
+
+  async start(onUpdate) {
+    this.onUpdate = onUpdate;
+    if (!this.isConfigured()) {
+      this.setState({ status: 'not_configured', metrics: null, error: 'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY, or SUPABASE_KEY are required' });
+      return;
+    }
+
+    this.client = createClient(getSupabaseUrl(), getSupabaseKey(), {
+      auth: { persistSession: false, autoRefreshToken: false },
+      realtime: { params: { eventsPerSecond: 10 } },
+    });
+
+    this.setState({ status: 'connecting', error: null });
+
+    const since = new Date(Date.now() - WINDOW_MS).toISOString();
+    const { data, error } = await this.client
+      .from('events')
+      .select('id,type,received_at,timestamp,commit_hash')
+      .gte('received_at', since)
+      .order('received_at', { ascending: false })
+      .limit(MAX_EVENTS);
+
+    if (error) {
+      this.setState({ status: 'error', metrics: null, error: `Supabase query failed: ${error.message}` });
+      return;
+    }
+
+    this.events = (data || []).map(normalizeEvent);
+    this.setState({ status: 'connected', metrics: buildMetrics(this.events), error: null });
+
+    this.channel = this.client
+      .channel('autopilot-dashboard-telemetry')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'events' }, (payload) => {
+        this.events = [normalizeEvent(payload.new), ...this.events].slice(0, MAX_EVENTS);
+        this.setState({ status: 'live', metrics: buildMetrics(this.events), error: null });
+      })
+      .subscribe((status, errorObject) => {
+        if (status === 'SUBSCRIBED') {
+          this.setState({ status: 'live', error: null });
+        } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          this.setState({ status: 'error', error: `Supabase Realtime ${status.toLowerCase().replace('_', ' ')}` });
+        } else if (errorObject) {
+          this.setState({ status: 'error', error: errorObject.message || String(errorObject) });
+        }
+      });
+  }
+
+  async stop() {
+    if (this.client && this.channel) {
+      await this.client.removeChannel(this.channel);
+    }
+    this.channel = null;
+    this.client = null;
+  }
+}
+
+function createTelemetryClient() {
+  return new TelemetryClient();
+}
+
+module.exports = { TelemetryClient, createTelemetryClient, buildMetrics, getSupabaseUrl };

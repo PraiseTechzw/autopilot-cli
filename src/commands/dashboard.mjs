@@ -4,9 +4,11 @@ import StateManager from '../core/state.js';
 import git from '../core/git.js';
 import HistoryManager from '../core/history.js';
 import configModule from '../config/loader.js';
+import telemetryModule from '../core/telemetry.js';
 import processUtils from '../utils/process.js';
 
 const { loadConfig, saveConfig } = configModule;
+const { createTelemetryClient } = telemetryModule;
 
 const { getRunningPid } = processUtils;
 const e = React.createElement;
@@ -83,6 +85,33 @@ function setByPath(object, key, value) {
   target[leaf] = value;
 }
 
+function TelemetryPanel({ telemetry }) {
+  const live = telemetry?.status === 'live';
+  const connected = telemetry?.status === 'connected';
+  const metrics = telemetry?.metrics;
+  const statusColor = live ? 'green' : connected ? 'cyan' : telemetry?.status === 'error' ? 'red' : 'yellow';
+  const statusLabel = live ? 'LIVE' : connected ? 'CONNECTED' : telemetry?.status === 'connecting' ? 'CONNECTING' : telemetry?.status === 'not_configured' ? 'NOT CONFIGURED' : 'ERROR';
+  const eventSummary = metrics ? `${metrics.totalEvents} events / ${metrics.windowMinutes}m` : 'No live data';
+  const latest = metrics?.latestEvent;
+
+  return e(
+    Box,
+    { flexDirection: 'column', borderStyle: 'round', borderColor: live ? 'green' : PANEL, paddingX: 2, paddingY: 1, marginBottom: 1 },
+    e(SectionTitle, { right: e(Text, { color: statusColor, bold: true }, `● ${statusLabel}`) }, 'SUPABASE TELEMETRY'),
+    e(Text, { color: MUTED, dimColor: true }, telemetry?.source || 'Supabase Realtime / public.events'),
+    telemetry?.error
+      ? e(Text, { color: statusColor }, `! ${truncate(telemetry.error, 78)}`)
+      : e(
+          Box,
+          { marginTop: 1 },
+          e(StatCard, { label: 'Events', value: eventSummary, detail: 'rolling window', color: live ? 'green' : 'cyan' }),
+          e(StatCard, { label: 'Rate', value: metrics ? `${metrics.eventsPerMinute}/min` : '—', detail: 'live event rate', color: live ? LIME : 'white' }),
+          e(StatCard, { label: 'Latest', value: latest?.type || '—', detail: latest?.receivedAt ? formatTime(latest.receivedAt) : 'waiting for event', color: latest ? 'cyan' : MUTED }),
+          e(StatCard, { label: 'Stream', value: live ? 'Realtime' : statusLabel, detail: 'database source', color: statusColor })
+        )
+  );
+}
+
 function SettingsPanel({ config, selected }) {
   return e(
     Box,
@@ -145,6 +174,7 @@ function Dashboard() {
   const [config, setConfig] = useState({});
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedSetting, setSelectedSetting] = useState(0);
+  const [telemetry, setTelemetry] = useState({ status: 'connecting', metrics: null, error: null, source: 'Supabase Realtime / public.events' });
 
   const refresh = async () => {
     const errors = [];
@@ -228,6 +258,16 @@ function Dashboard() {
     return () => clearInterval(timer);
   }, [root]);
 
+  useEffect(() => {
+    const telemetryClient = createTelemetryClient();
+    void telemetryClient.start(setTelemetry).catch((error) => {
+      setTelemetry((current) => ({ ...current, status: 'error', error: error.message || 'Supabase telemetry failed' }));
+    });
+    return () => {
+      void telemetryClient.stop();
+    };
+  }, []);
+
   const effectiveStatus = lastError && status === 'loading' ? 'error' : status;
   const statusDetail = status === 'paused'
     ? `Reason: ${truncate(pausedState?.reason || 'manual pause', 34)}`
@@ -280,6 +320,7 @@ function Dashboard() {
           )
         : e(Text, { color: MUTED, dimColor: true }, 'No automated commits recorded yet.')
     ),
+    settingsOpen ? null : e(TelemetryPanel, { telemetry }),
     settingsOpen ? null : e(
       Box,
       { flexDirection: 'column', borderStyle: 'round', borderColor: PANEL, paddingX: 2, paddingY: 1, marginBottom: 1 },

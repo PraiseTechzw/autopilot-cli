@@ -44,3 +44,12 @@ insert to service_role with check (true);
 create policy "events_select_service" on public.events for
 select to service_role using (true);
 grant insert, select on public.events to service_role;
+
+-- Required by the CLI dashboard's Supabase Realtime subscription.
+do $$
+begin
+  alter publication supabase_realtime add table public.events;
+exception
+  when duplicate_object then null;
+end;
+$$;
