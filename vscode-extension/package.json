@@ -1,0 +1,59 @@
+{
+  "name": "autopilot-vscode",
+  "displayName": "Autopilot — Git Automation",
+  "description": "Monitor and control Autopilot directly from VS Code.",
+  "version": "0.1.0",
+  "publisher": "PraiseTechzw",
+  "license": "MIT",
+  "engines": { "vscode": "^1.85.0" },
+  "categories": ["Other", "SCM Providers"],
+  "keywords": ["autopilot", "git", "automation", "autocommit", "developer tools"],
+  "main": "./extension.js",
+  "activationEvents": ["onStartupFinished", "onView:autopilot.dashboard"],
+  "repository": { "type": "git", "url": "https://github.com/PraiseTechzw/autopilot-cli" },
+  "scripts": {
+    "check": "node --check extension.js"
+  },
+  "contributes": {
+    "commands": [
+      { "command": "autopilot.refresh", "title": "Autopilot: Refresh Dashboard" },
+      { "command": "autopilot.start", "title": "Autopilot: Start Watcher" },
+      { "command": "autopilot.stop", "title": "Autopilot: Stop Watcher" },
+      { "command": "autopilot.pause", "title": "Autopilot: Pause Watcher" },
+      { "command": "autopilot.resume", "title": "Autopilot: Resume Watcher" },
+      { "command": "autopilot.undo", "title": "Autopilot: Undo Last Commit" },
+      { "command": "autopilot.settings", "title": "Autopilot: Open Settings" },
+      { "command": "autopilot.logs", "title": "Autopilot: Show Logs" }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        { "id": "autopilot", "title": "Autopilot", "icon": "media/autopilot.svg" }
+      ]
+    },
+    "views": {
+      "autopilot": [
+        { "type": "webview", "id": "autopilot.dashboard", "name": "Dashboard", "when": "workspaceFolderCount > 0" }
+      ]
+    },
+    "configuration": {
+      "title": "Autopilot",
+      "properties": {
+        "autopilot.cliPath": { "type": "string", "default": "autopilot", "description": "Command or absolute path used to invoke Autopilot." },
+        "autopilot.refreshIntervalMs": { "type": "number", "default": 5000, "minimum": 1000, "description": "Dashboard refresh interval in milliseconds." },
+        "autopilot.useWorkspaceCli": { "type": "boolean", "default": true, "description": "Use bin/autopilot.js from the opened workspace when available." }
+      }
+    },
+    "menus": {
+      "commandPalette": [
+        { "command": "autopilot.refresh" },
+        { "command": "autopilot.start" },
+        { "command": "autopilot.stop" },
+        { "command": "autopilot.pause" },
+        { "command": "autopilot.resume" },
+        { "command": "autopilot.undo" },
+        { "command": "autopilot.settings" },
+        { "command": "autopilot.logs" }
+      ]
+    }
+  }
+}
