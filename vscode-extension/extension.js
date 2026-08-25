@@ -139,7 +139,7 @@ class AutopilotController {
   }
 
   async refreshTelemetry() {
-    const outputFile = path.join(require('node:os').tmpdir(), `autopilot-vscode-telemetry-${process.pid}.json`);
+    const outputFile = path.join(require('node:os').tmpdir(), `praisetechzw-autopilot-telemetry-${process.pid}.json`);
     try {
       await this.runCli(['telemetry', 'export', '--format', 'json', '--output', outputFile]);
       const events = JSON.parse(await fs.readFile(outputFile, 'utf8'));

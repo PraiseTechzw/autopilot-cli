@@ -1,6 +1,6 @@
 # Release and publication guide
 
-This repository has two related publication surfaces: the Autopilot CLI package and the Autopilot VS Code extension. The CLI package is published to npm under `@traisetech/autopilot`; the extension is packaged as a VSIX and published to the Visual Studio Marketplace under publisher `PraiseTechzw` and extension ID `PraiseTechzw.autopilot-vscode`.
+This repository has two related publication surfaces: the Autopilot CLI package and the Autopilot VS Code extension. The CLI package is published to npm under `@traisetech/autopilot`; the extension is packaged as a VSIX and published to the Visual Studio Marketplace under publisher `PraiseTechzw` and extension ID `PraiseTechzw.praisetechzw-autopilot`.
 
 ## VS Code Marketplace
 
