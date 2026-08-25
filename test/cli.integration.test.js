@@ -69,7 +69,9 @@ test('CLI Integration', async (t) => {
       debounceSeconds: 0.2,
       minSecondsBetweenCommits: 0,
       autoPush: false,
-      blockedBranches: [] // allow commits on default branch
+      blockedBranches: [], // allow commits on default branch
+      ai: { enabled: false },
+      commitMessageMode: 'smart'
     });
 
     // Create initial commit

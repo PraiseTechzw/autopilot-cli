@@ -11,7 +11,7 @@ const resumeCommand = require('./commands/resume');
 const { leaderboard } = require('./commands/leaderboard');
 const pkg = require('../package.json');
 
-function run() {
+function run(argv = process.argv) {
   const program = new Command();
 
   program
@@ -79,6 +79,11 @@ function run() {
     .action(doctor);
 
   program
+    .command('version')
+    .description('Show CLI version')
+    .action(() => console.log(pkg.version));
+
+  program
     .command('insights')
     .description('View productivity insights and focus analytics')
     .option('-f, --format <type>', 'Output format (json, text)', 'text')
@@ -90,7 +95,7 @@ function run() {
     .addHelpCommand(true, 'Show help for command')
     .showHelpAfterError('(add --help for command information)');
 
-  program.parse(process.argv);
+  program.parse(argv);
 }
 
 module.exports = { run };

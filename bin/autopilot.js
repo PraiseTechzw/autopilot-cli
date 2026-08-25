@@ -98,9 +98,10 @@ program
   .action(async () => {
     try {
       const { default: runDashboard } = await import('../src/commands/dashboard.mjs');
-      runDashboard();
+      await runDashboard();
     } catch (error) {
-      console.error('Failed to launch dashboard:', error);
+      console.error('Failed to launch dashboard:', error.message || error);
+      process.exitCode = 1;
     }
   });
 
@@ -169,7 +170,13 @@ program
   .addHelpCommand(true, 'Show help for command')
   .showHelpAfterError('(add --help for command information)');
 
-(async () => {
+async function main() {
   await checkForUpdate();
   await program.parseAsync(process.argv);
-})();
+}
+
+main().catch((error) => {
+  const message = error && error.stack ? error.stack : String(error);
+  console.error(`Autopilot failed: ${message}`);
+  process.exitCode = 1;
+});
