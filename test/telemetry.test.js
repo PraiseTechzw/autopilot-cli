@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
-const { buildMetrics, getSupabaseUrl, createTelemetryClient, exportTelemetryEvents } = require('../src/core/telemetry');
+const { buildMetrics, evaluateAlerts, getSupabaseUrl, createTelemetryClient, exportTelemetryEvents } = require('../src/core/telemetry');
 
 test('telemetry metrics are derived from recent Supabase events', () => {
   const now = Date.now();
@@ -25,6 +25,12 @@ test('telemetry normalizes a Supabase REST URL to its project URL', () => {
   assert.equal(getSupabaseUrl(), 'https://example.supabase.co');
   if (original === undefined) delete process.env.SUPABASE_URL;
   else process.env.SUPABASE_URL = original;
+});
+
+test('telemetry raises alerts only when configured thresholds are exceeded', () => {
+  const metrics = { totalEvents: 12, eventsPerMinute: 3, windowMinutes: 5 };
+  assert.deepEqual(evaluateAlerts(metrics, { totalEvents: 10, eventsPerMinute: 2 }).map((alert) => alert.key), ['eventsPerMinute', 'totalEvents']);
+  assert.deepEqual(evaluateAlerts(metrics, { totalEvents: 20, eventsPerMinute: 5 }), []);
 });
 
 test('telemetry exports exact event snapshots as JSON and CSV', async () => {

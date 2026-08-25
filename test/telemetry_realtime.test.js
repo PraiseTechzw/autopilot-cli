@@ -35,8 +35,9 @@ test('Supabase Realtime INSERT events update dashboard telemetry metrics', async
 
   try {
     const updates = [];
+    const payloads = [];
     const client = new TelemetryClient(fakeClientFactory);
-    await client.start((state) => updates.push(state));
+    await client.start((state) => updates.push(state), (payload) => payloads.push(payload));
     await new Promise((resolve) => setImmediate(resolve));
 
     assert.equal(client.state.status, 'live');
@@ -55,6 +56,8 @@ test('Supabase Realtime INSERT events update dashboard telemetry metrics', async
     assert.equal(client.state.metrics.totalEvents, 1);
     assert.equal(client.state.metrics.byType.commit, 1);
     assert.equal(client.state.metrics.latestEvent.commitHash, 'abc123');
+    assert.equal(payloads.length, 1);
+    assert.deepEqual(Object.keys(payloads[0]).sort(), ['commit_hash', 'id', 'received_at', 'type']);
     assert.ok(updates.some((state) => state.status === 'live'));
     await client.stop();
   } finally {

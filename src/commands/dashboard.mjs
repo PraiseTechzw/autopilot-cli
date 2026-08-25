@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { render, Box, Text, useInput } from 'ink';
 import StateManager from '../core/state.js';
 import git from '../core/git.js';
 import HistoryManager from '../core/history.js';
 import configModule from '../config/loader.js';
 import telemetryModule from '../core/telemetry.js';
+import notifierModule from '../core/notifier.js';
 import processUtils from '../utils/process.js';
 
 const { loadConfig, saveConfig } = configModule;
 const { createTelemetryClient } = telemetryModule;
+const { notify } = notifierModule;
 
 const { getRunningPid } = processUtils;
 const e = React.createElement;
@@ -67,6 +69,9 @@ const SETTING_ROWS = [
   { key: 'teamMode', label: 'Team mode', description: 'Pull before push and use stricter checks', type: 'boolean' },
   { key: 'notificationsEnabled', label: 'Notifications', description: 'Show desktop watcher notifications', type: 'boolean' },
   { key: 'preCommitChecks.secrets', label: 'Secret scanning', description: 'Block likely credentials before commit', type: 'boolean' },
+  { key: 'telemetryAlerts.enabled', label: 'Telemetry alerts', description: 'Notify when live metrics exceed thresholds', type: 'boolean' },
+  { key: 'telemetryAlerts.eventsPerMinute', label: 'Events/min threshold', description: 'Alert above this rolling event rate', type: 'number', suffix: '/min' },
+  { key: 'telemetryAlerts.totalEvents', label: 'Event count threshold', description: 'Alert above this five-minute event count', type: 'number' },
   { key: 'debounceMs', label: 'Debounce delay', description: 'Quiet period before processing changes', type: 'number', suffix: ' ms' },
   { key: 'minSecondsBetweenCommits', label: 'Commit cooldown', description: 'Minimum time between automated commits', type: 'number', suffix: ' s' },
 ];
@@ -101,7 +106,13 @@ function TelemetryPanel({ telemetry }) {
     e(Text, { color: MUTED, dimColor: true }, telemetry?.source || 'Supabase Realtime / public.events'),
     telemetry?.error
       ? e(Text, { color: statusColor }, `! ${truncate(telemetry.error, 78)}`)
-      : e(
+      : telemetry?.alerts?.length
+        ? e(
+            Box,
+            { flexDirection: 'column', marginTop: 1 },
+            telemetry.alerts.map((alert) => e(Text, { key: alert.key, color: 'red', bold: true }, `⚠ ${alert.message}`))
+          )
+        : e(
           Box,
           { marginTop: 1 },
           e(StatCard, { label: 'Events', value: eventSummary, detail: 'rolling window', color: live ? 'green' : 'cyan' }),
@@ -174,7 +185,8 @@ function Dashboard() {
   const [config, setConfig] = useState({});
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [selectedSetting, setSelectedSetting] = useState(0);
-  const [telemetry, setTelemetry] = useState({ status: 'connecting', metrics: null, error: null, source: 'Supabase Realtime / public.events' });
+  const [telemetry, setTelemetry] = useState({ status: 'connecting', metrics: null, alerts: [], error: null, source: 'Supabase Realtime / public.events' });
+  const notifiedAlerts = useRef(new Set());
 
   const refresh = async () => {
     const errors = [];
@@ -259,14 +271,26 @@ function Dashboard() {
   }, [root]);
 
   useEffect(() => {
-    const telemetryClient = createTelemetryClient();
-    void telemetryClient.start(setTelemetry).catch((error) => {
+    const telemetryClient = createTelemetryClient(undefined, config.telemetryAlerts);
+    const handleTelemetry = (state) => {
+      setTelemetry(state);
+      if (config.telemetryAlerts?.enabled !== false) {
+        for (const alert of state.alerts || []) {
+          if (!notifiedAlerts.current.has(alert.key)) {
+            notifiedAlerts.current.add(alert.key);
+            notify('telemetry_alert', { title: 'Autopilot telemetry alert', message: alert.message }, config.notificationsEnabled !== false);
+          }
+        }
+      }
+      if (!state.alerts?.length) notifiedAlerts.current.clear();
+    };
+    void telemetryClient.start(handleTelemetry).catch((error) => {
       setTelemetry((current) => ({ ...current, status: 'error', error: error.message || 'Supabase telemetry failed' }));
     });
     return () => {
       void telemetryClient.stop();
     };
-  }, []);
+  }, [config.telemetryAlerts, config.notificationsEnabled]);
 
   const effectiveStatus = lastError && status === 'loading' ? 'error' : status;
   const statusDetail = status === 'paused'

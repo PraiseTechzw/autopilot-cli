@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 
 const WINDOW_MS = 5 * 60 * 1000;
 const MAX_EVENTS = 200;
+const DEFAULT_ALERT_THRESHOLDS = { eventsPerMinute: 20, totalEvents: 100 };
 
 function getSupabaseKey() {
   return process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_KEY || '';
@@ -40,6 +41,17 @@ async function exportTelemetryEvents(filePath, events, format = 'json') {
   return { filePath, format: format.toLowerCase() === 'csv' ? 'csv' : 'json', count: events.length };
 }
 
+function evaluateAlerts(metrics, thresholds = DEFAULT_ALERT_THRESHOLDS) {
+  const alerts = [];
+  if (Number.isFinite(Number(thresholds.eventsPerMinute)) && metrics.eventsPerMinute > Number(thresholds.eventsPerMinute)) {
+    alerts.push({ key: 'eventsPerMinute', message: `Event rate ${metrics.eventsPerMinute}/min exceeds ${thresholds.eventsPerMinute}/min` });
+  }
+  if (Number.isFinite(Number(thresholds.totalEvents)) && metrics.totalEvents > Number(thresholds.totalEvents)) {
+    alerts.push({ key: 'totalEvents', message: `${metrics.totalEvents} events in ${metrics.windowMinutes}m exceeds ${thresholds.totalEvents}` });
+  }
+  return alerts;
+}
+
 function buildMetrics(events, now = Date.now()) {
   const recent = events.filter((event) => {
     const timestamp = Date.parse(event.receivedAt || '');
@@ -61,15 +73,18 @@ function buildMetrics(events, now = Date.now()) {
 }
 
 class TelemetryClient {
-  constructor(clientFactory = createClient) {
+  constructor(clientFactory = createClient, thresholds = DEFAULT_ALERT_THRESHOLDS) {
     this.clientFactory = clientFactory;
+    this.thresholds = { ...DEFAULT_ALERT_THRESHOLDS, ...(thresholds || {}) };
     this.client = null;
     this.channel = null;
     this.events = [];
     this.onUpdate = null;
+    this.onEvent = null;
     this.state = {
       status: 'not_configured',
       metrics: null,
+      alerts: [],
       error: null,
       source: 'Supabase Realtime / public.events',
     };
@@ -88,10 +103,11 @@ class TelemetryClient {
     this.emit();
   }
 
-  async start(onUpdate) {
+  async start(onUpdate, onEvent) {
     this.onUpdate = onUpdate;
+    this.onEvent = onEvent;
     if (!this.isConfigured()) {
-      this.setState({ status: 'not_configured', metrics: null, error: 'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY, or SUPABASE_KEY are required' });
+      this.setState({ status: 'not_configured', metrics: null, alerts: [], error: 'SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY, or SUPABASE_KEY are required' });
       return;
     }
 
@@ -111,18 +127,21 @@ class TelemetryClient {
       .limit(MAX_EVENTS);
 
     if (error) {
-      this.setState({ status: 'error', metrics: null, error: `Supabase query failed: ${error.message}` });
+      this.setState({ status: 'error', metrics: null, alerts: [], error: `Supabase query failed: ${error.message}` });
       return;
     }
 
     this.events = (data || []).map(normalizeEvent);
-    this.setState({ status: 'connected', metrics: buildMetrics(this.events), error: null });
+    const metrics = buildMetrics(this.events);
+    this.setState({ status: 'connected', metrics, alerts: evaluateAlerts(metrics, this.thresholds), error: null });
 
     this.channel = this.client
       .channel('autopilot-dashboard-telemetry')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'events' }, (payload) => {
+        if (this.onEvent) this.onEvent(payload.new);
         this.events = [normalizeEvent(payload.new), ...this.events].slice(0, MAX_EVENTS);
-        this.setState({ status: 'live', metrics: buildMetrics(this.events), error: null });
+        const metrics = buildMetrics(this.events);
+        this.setState({ status: 'live', metrics, alerts: evaluateAlerts(metrics, this.thresholds), error: null });
       })
       .subscribe((status, errorObject) => {
         if (status === 'SUBSCRIBED') {
@@ -148,8 +167,8 @@ class TelemetryClient {
   }
 }
 
-function createTelemetryClient(clientFactory) {
-  return new TelemetryClient(clientFactory);
+function createTelemetryClient(clientFactory, thresholds) {
+  return new TelemetryClient(clientFactory, thresholds);
 }
 
-module.exports = { TelemetryClient, createTelemetryClient, buildMetrics, getSupabaseUrl, exportTelemetryEvents, formatTelemetryCsv };
+module.exports = { TelemetryClient, createTelemetryClient, buildMetrics, evaluateAlerts, getSupabaseUrl, exportTelemetryEvents, formatTelemetryCsv, DEFAULT_ALERT_THRESHOLDS };

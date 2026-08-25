@@ -19,6 +19,11 @@ const DEFAULT_CONFIG = {
   protectedBranches: ['main', 'master', 'production', 'prod', 'release'],
   allowPushToProtected: false,
   notificationsEnabled: true,
+  telemetryAlerts: {
+    enabled: true,
+    eventsPerMinute: 20,
+    totalEvents: 100
+  },
   maxRetryAttempts: 5,
   leaderboardSyncEnabled: true,
   leaderboardSyncIntervalMinutes: 10,
