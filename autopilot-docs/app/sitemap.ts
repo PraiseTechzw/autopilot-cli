@@ -1,12 +1,12 @@
 import { MetadataRoute } from 'next';
 import { getAllDocs } from '@/lib/mdx';
 
-const BASE_URL = 'https://autopilot-cli.vercel.app';
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://autopilot-cli.vercel.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const docs = getAllDocs();
 
-  const docUrls = docs.map((doc) => ({
+  const docUrls = docs.filter((doc) => doc.route !== '/docs').map((doc) => ({
     url: `${BASE_URL}${doc.route}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
@@ -25,6 +25,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/leaderboard`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.7,
     },
     ...docUrls,
   ];
