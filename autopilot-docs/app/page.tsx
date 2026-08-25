@@ -24,6 +24,9 @@ export default async function Home() {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: 'Autopilot CLI',
+    url: 'https://autopilot-cli.vercel.app',
+    downloadUrl: NPM_URL,
+    codeRepository: REPO_URL,
     operatingSystem: 'Windows, macOS, Linux',
     applicationCategory: 'DeveloperApplication',
     offers: {
@@ -36,6 +39,12 @@ export default async function Home() {
     author: {
       '@type': 'Person',
       name: 'Praise Masunga',
+      url: 'https://github.com/PraiseTechzw',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'PraiseTechzw',
+      url: 'https://github.com/PraiseTechzw',
     },
   };
 
@@ -125,6 +134,39 @@ export default async function Home() {
             <span className="text-link">●</span> privacy-focused &nbsp;
             <span className="text-link">●</span> developer-trust-first
           </p>
+        </div>
+      </section>
+
+      {/* Extension and ecosystem */}
+      <section className="py-16 px-4 bg-background">
+        <div className="container mx-auto max-w-6xl">
+          <div className="rounded-3xl border border-link/20 bg-gradient-to-br from-link/10 via-card to-background p-8 md:p-12 shadow-xl shadow-link/5">
+            <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+              <div>
+                <p className="mb-3 font-mono text-xs font-semibold uppercase tracking-[0.2em] text-link">One workflow, every surface</p>
+                <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">Bring Autopilot into your editor</h2>
+                <p className="max-w-2xl text-lg leading-relaxed text-muted-foreground">
+                  Monitor the watcher, review telemetry, manage settings, and trigger safe Git actions without leaving VS Code. The extension shares the CLI’s safety model and keeps failures visible.
+                </p>
+                <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+                  <Link href="/docs/installation#vs-code-extension" className="inline-flex items-center justify-center gap-2 rounded-full bg-link px-6 py-3 font-bold text-white transition hover:bg-link-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                    Install the extension <ArrowRight className="h-4 w-4" />
+                  </Link>
+                  <Link href="/docs/extensibility" className="inline-flex items-center justify-center rounded-full border border-border px-6 py-3 font-bold transition hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+                    Read the docs
+                  </Link>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 font-mono text-sm">
+                {['Live sidebar', 'Quick actions', 'Telemetry alerts', 'Settings UI'].map((item) => (
+                  <div key={item} className="rounded-2xl border border-border bg-background/70 p-4 text-foreground shadow-sm">
+                    <span className="mb-3 block h-2 w-2 rounded-full bg-link shadow-[0_0_14px_var(--link)]" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

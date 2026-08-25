@@ -10,6 +10,8 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
 import remarkGfm from 'remark-gfm';
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://autopilot-cli.vercel.app';
+
 export async function generateStaticParams() {
   const files = getDocSlugs();
   return files.map((file) => {
@@ -35,9 +37,26 @@ export async function generateMetadata({
     };
   }
 
+  const route = slug === 'index' ? '/docs' : `/docs/${slug}`;
+  const canonical = `${SITE_URL}${route}`;
   return {
     title: `${doc.metadata.title} - Autopilot CLI`,
     description: doc.metadata.description,
+    alternates: { canonical },
+    openGraph: {
+      type: 'article',
+      url: canonical,
+      title: `${doc.metadata.title} - Autopilot CLI`,
+      description: doc.metadata.description,
+      siteName: 'Autopilot CLI',
+      images: [{ url: '/og-image.svg', width: 1200, height: 630, alt: 'Autopilot CLI documentation' }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${doc.metadata.title} - Autopilot CLI`,
+      description: doc.metadata.description,
+      images: ['/og-image.svg'],
+    },
   };
 }
 
@@ -59,8 +78,21 @@ export default async function DocPage({
   const issueBody = encodeURIComponent(`\n\n**Route**: /docs/${slug}\n**What happened?**\n\n**Expected behavior?**\n\n**Screenshots?**`);
   const issueUrl = `${ISSUES_URL}/new?title=${issueTitle}&body=${issueBody}`;
 
+  const route = slug === 'index' ? '/docs' : `/docs/${slug}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'TechArticle',
+    headline: doc.metadata.title,
+    description: doc.metadata.description,
+    url: `${SITE_URL}${route}`,
+    author: { '@type': 'Person', name: 'Praise Masunga' },
+    publisher: { '@type': 'Organization', name: 'PraiseTechzw' },
+    isPartOf: { '@type': 'WebSite', name: 'Autopilot CLI', url: SITE_URL },
+  };
+
   return (
     <article className="prose max-w-none">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <h1>{doc.metadata.title}</h1>
       {doc.metadata.description && (
         <p className="lead text-xl text-muted-foreground">

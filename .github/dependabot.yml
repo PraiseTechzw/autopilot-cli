@@ -1,0 +1,32 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      production-dependencies:
+        dependency-type: production
+      development-dependencies:
+        dependency-type: development
+
+  - package-ecosystem: npm
+    directory: "/autopilot-docs"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      website-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: npm
+    directory: "/vscode-extension"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      extension-dependencies:
+        patterns:
+          - "*"

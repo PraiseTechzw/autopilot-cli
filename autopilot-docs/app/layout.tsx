@@ -7,8 +7,10 @@ import { Footer } from "@/components/Footer";
 import { VersionBadge } from "@/components/VersionBadge";
 import { MobileMenu } from "@/components/MobileMenu";
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://autopilot-cli.vercel.app';
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://autopilot-cli.vercel.app'),
+  metadataBase: new URL(SITE_URL),
   title: {
     template: '%s | Autopilot CLI',
     default: 'Autopilot CLI - Intelligent Git Automation',
@@ -56,6 +58,8 @@ export const metadata: Metadata = {
     apple: '/favicon.svg',
   },
   manifest: '/manifest.webmanifest',
+  generator: 'Next.js',
+  referrer: 'origin-when-cross-origin',
   robots: {
     index: true,
     follow: true,
@@ -102,6 +106,30 @@ export default function RootLayout({
           }}
         />
         <ThemeProvider defaultTheme="system" storageKey="autopilot-theme">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                '@context': 'https://schema.org',
+                '@graph': [
+                  {
+                    '@type': 'Organization',
+                    name: 'PraiseTechzw',
+                    url: SITE_URL,
+                    founder: { '@type': 'Person', name: 'Praise Masunga' },
+                    sameAs: ['https://github.com/PraiseTechzw'],
+                  },
+                  {
+                    '@type': 'WebSite',
+                    name: 'Autopilot CLI',
+                    url: SITE_URL,
+                    description: 'Intelligent Git automation for developers.',
+                    publisher: { '@type': 'Organization', name: 'PraiseTechzw' },
+                  },
+                ],
+              }),
+            }}
+          />
           <SidebarProvider>
             <Topbar versionBadge={<VersionBadge />} />
             <MobileMenu />

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { REPO_URL, ISSUES_URL, RELEASES_URL } from '@/lib/constants';
+import { REPO_URL, ISSUES_URL, RELEASES_URL, NPM_URL } from '@/lib/constants';
 
 export function Footer() {
   return (
@@ -20,7 +20,7 @@ export function Footer() {
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-link transition-colors">GitHub</a>
             <a href={RELEASES_URL} target="_blank" rel="noopener noreferrer" className="hover:text-link transition-colors">Releases</a>
             <a href={ISSUES_URL} target="_blank" rel="noopener noreferrer" className="hover:text-link transition-colors">Issues</a>
-            <a href="https://www.npmjs.com/package/autopilot-cli" target="_blank" rel="noopener noreferrer" className="hover:text-link transition-colors">NPM</a>
+            <a href={NPM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-link transition-colors">NPM</a>
           </div>
         </div>
         
