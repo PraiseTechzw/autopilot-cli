@@ -241,7 +241,7 @@ Then open the generated `.vsix` file in VS Code and choose **Install Extension f
 | `autopilot doctor` | Diagnose configuration and environment issues. |
 | `autopilot guide` | Interactive, beginner-friendly walkthrough. |
 
-Full flag-by-flag reference: [CLI Reference](docs/commands.md)
+Full flag-by-flag reference: [CLI Reference](autopilot-docs/content/docs/commands.mdx)
 
 <details>
 <summary><strong>Platform integration notes (click to expand)</strong></summary>
