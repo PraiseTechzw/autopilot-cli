@@ -2,7 +2,8 @@
   "name": "autopilot-vscode",
   "displayName": "Autopilot — Git Automation",
   "description": "Monitor and control Autopilot directly from VS Code.",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "icon": "media/autopilot.png",
   "publisher": "PraiseTechzw",
   "license": "MIT",
   "engines": { "vscode": "^1.85.0" },
@@ -12,7 +13,9 @@
   "activationEvents": ["onStartupFinished", "onView:autopilot.dashboard"],
   "repository": { "type": "git", "url": "https://github.com/PraiseTechzw/autopilot-cli" },
   "scripts": {
-    "check": "node --check extension.js"
+    "check": "node --check extension.js",
+    "package": "vsce package --no-dependencies",
+    "publish": "vsce publish --no-dependencies"
   },
   "contributes": {
     "commands": [
