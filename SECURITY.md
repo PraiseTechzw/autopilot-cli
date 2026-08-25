@@ -1,5 +1,11 @@
-# Security policy
+# Security Policy
 
-Please do not report vulnerabilities in public issues. Report them privately to the repository owner with a description, impact, reproduction steps, and a safe proof of concept. Do not include secrets in the report.
+## Reporting a Vulnerability
 
-Autopilot is designed to avoid committing common credentials, but users must still keep `.env` files and tokens out of Git.
+We take security seriously. If you discover a security vulnerability within Autopilot CLI, please report it to us immediately.
+
+**DO NOT** create a public GitHub issue for security vulnerabilities.
+
+Instead, please report vulnerabilities by emailing **praise@praisetech.zw** (or the current maintainer).
+
+We will acknowledge receipt of your report within 48 hours and will provide a timeline for addressing the vulnerability.

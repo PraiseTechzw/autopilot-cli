@@ -1,17 +1,43 @@
-name: Bug report
-description: Report a reproducible problem
-labels: [bug]
+name: Bug Report
+description: Create a report to help us improve Autopilot CLI
+title: "[Bug]: "
+labels: ["bug", "triage"]
 body:
-  - type: textarea
-    id: problem
+  - type: markdown
     attributes:
-      label: What happened?
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Autopilot fails to commit when...
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
-      label: Steps to reproduce
-      placeholder: Include command, OS, Node version, and sanitized logs. Never include tokens.
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Run 'autopilot init'
+        2. Edit 'foo.js'
+        3. Wait 10 seconds
+        4. See error...
     validations:
       required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Node version, and Autopilot version.
+      placeholder: Windows 11, Node v20.10.0, Autopilot v0.1.7
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output
+      description: Please copy and paste any relevant logs from autopilot.log or the terminal.
+      render: shell

@@ -2,27 +2,36 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [ "main" ]
   pull_request:
-
-permissions:
-  contents: read
+    branches: [ "main" ]
 
 jobs:
-  verify:
-    runs-on: ubuntu-latest
+  build:
+    name: Build & Verify
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: [18.x, 20.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run typecheck
-      - run: pnpm --filter @traisetech/autopilot run lint
-      - run: pnpm --filter @traisetech/autopilot run test
-      - run: pnpm --filter @workspace/autopilot-docs run build
-      - run: pnpm --filter @workspace/api-server run build
+    - uses: actions/checkout@v4
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    # Run the full verification suite (Lint + Doctor + Tests)
+    # This ensures "npm run verify" is the single source of truth for quality
+    - name: Verify (Lint, Doctor, Tests)
+      run: npm run verify
+      env:
+        CI: true
+        AUTOPILOT_TEST_MODE: "1"
