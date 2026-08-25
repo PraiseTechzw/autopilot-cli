@@ -3,7 +3,10 @@ import { render, Box, Text, useInput } from 'ink';
 import StateManager from '../core/state.js';
 import git from '../core/git.js';
 import HistoryManager from '../core/history.js';
+import configModule from '../config/loader.js';
 import processUtils from '../utils/process.js';
+
+const { loadConfig, saveConfig } = configModule;
 
 const { getRunningPid } = processUtils;
 const e = React.createElement;
@@ -57,10 +60,63 @@ function SectionTitle({ children, right }) {
   );
 }
 
-function DashboardHotkeys({ root, enabled, onError }) {
-  useInput((input) => {
+const SETTING_ROWS = [
+  { key: 'autoPush', label: 'Auto push', description: 'Push after each successful commit', type: 'boolean' },
+  { key: 'teamMode', label: 'Team mode', description: 'Pull before push and use stricter checks', type: 'boolean' },
+  { key: 'notificationsEnabled', label: 'Notifications', description: 'Show desktop watcher notifications', type: 'boolean' },
+  { key: 'preCommitChecks.secrets', label: 'Secret scanning', description: 'Block likely credentials before commit', type: 'boolean' },
+  { key: 'debounceMs', label: 'Debounce delay', description: 'Quiet period before processing changes', type: 'number', suffix: ' ms' },
+  { key: 'minSecondsBetweenCommits', label: 'Commit cooldown', description: 'Minimum time between automated commits', type: 'number', suffix: ' s' },
+];
+
+function getByPath(object, key) {
+  return key.split('.').reduce((value, part) => value?.[part], object);
+}
+
+function setByPath(object, key, value) {
+  const parts = key.split('.');
+  const leaf = parts.pop();
+  const target = parts.reduce((value, part) => {
+    if (!value[part] || typeof value[part] !== 'object') value[part] = {};
+    return value[part];
+  }, object);
+  target[leaf] = value;
+}
+
+function SettingsPanel({ config, selected }) {
+  return e(
+    Box,
+    { flexDirection: 'column', borderStyle: 'round', borderColor: LIME, paddingX: 2, paddingY: 1, marginBottom: 1 },
+    e(SectionTitle, { right: 'local .autopilotrc.json' }, 'SETTINGS'),
+    e(Text, { color: MUTED, dimColor: true }, 'Use ↑/↓ to select · Enter/←/→ to change · s to close'),
+    e(Box, { flexDirection: 'column', marginTop: 1 }, SETTING_ROWS.map((row, index) => {
+      const value = getByPath(config, row.key);
+      const display = row.type === 'boolean' ? (value ? 'ON' : 'OFF') : `${value ?? 0}${row.suffix || ''}`;
+      return e(
+        Box,
+        { key: row.key, flexDirection: 'column', paddingY: 1 },
+        e(
+          Box,
+          { justifyContent: 'space-between' },
+          e(Text, { color: index === selected ? LIME : 'white', bold: index === selected }, `${index === selected ? '❯' : ' '} ${row.label}`),
+          e(Text, { color: row.type === 'boolean' ? (value ? 'green' : 'yellow') : 'cyan', bold: true }, display)
+        ),
+        e(Text, { color: MUTED, dimColor: true }, `    ${row.description}`)
+      );
+    }))
+  );
+}
+
+function DashboardHotkeys({ root, enabled, onError, onSettings, onMove, onChange }) {
+  useInput((input, key) => {
     try {
       if (input === 'q') process.exit(0);
+      if (input === 's') onSettings();
+      if (key.up) onMove(-1);
+      if (key.down) onMove(1);
+      if (key.return || key.left || key.right) {
+        void onChange(key.left ? 'left' : key.right ? 'right' : 'return');
+      }
       if (input === 'p') {
         const stateManager = new StateManager(root);
         if (stateManager.isPaused()) stateManager.resume();
@@ -86,6 +142,9 @@ function Dashboard() {
   const [pausedState, setPausedState] = useState(null);
   const [lastError, setLastError] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(null);
+  const [config, setConfig] = useState({});
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [selectedSetting, setSelectedSetting] = useState(0);
 
   const refresh = async () => {
     const errors = [];
@@ -138,8 +197,33 @@ function Dashboard() {
     setLastError(errors.length ? errors[0]?.message || 'Some dashboard data is unavailable' : null);
   };
 
+  const refreshConfig = async () => {
+    try {
+      setConfig(await loadConfig(root));
+    } catch (error) {
+      setLastError(error.message || 'Unable to load configuration');
+    }
+  };
+
+  const changeSetting = async (direction) => {
+    const row = SETTING_ROWS[selectedSetting];
+    if (!row) return;
+    const nextConfig = JSON.parse(JSON.stringify(config));
+    const current = getByPath(nextConfig, row.key);
+    let nextValue;
+    if (row.type === 'boolean') nextValue = !current;
+    else {
+      const step = row.key === 'debounceMs' ? 5000 : 30;
+      nextValue = Math.max(0, Number(current || 0) + (direction === 'left' ? -step : step));
+    }
+    setByPath(nextConfig, row.key, nextValue);
+    setConfig(nextConfig);
+    await saveConfig(root, nextConfig);
+  };
+
   useEffect(() => {
     void refresh();
+    void refreshConfig();
     const timer = setInterval(() => void refresh(), 5000);
     return () => clearInterval(timer);
   }, [root]);
@@ -181,7 +265,9 @@ function Dashboard() {
       e(StatCard, { label: 'Pending', value: String(pendingFiles.length), detail: pendingFiles.length ? 'files waiting' : 'working tree clean', color: pendingFiles.length ? 'yellow' : 'green' }),
       e(StatCard, { label: 'Today', value: String(todayCommits), detail: 'automated commits', color: LIME })
     ),
-    e(
+    settingsOpen
+      ? e(SettingsPanel, { config, selected: selectedSetting })
+      : e(
       Box,
       { flexDirection: 'column', borderStyle: 'round', borderColor: PANEL, paddingX: 2, paddingY: 1, marginBottom: 1 },
       e(SectionTitle, { right: lastRefresh ? `refreshed ${formatTime(lastRefresh)}` : 'initializing' }, 'ACTIVITY'),
@@ -194,7 +280,7 @@ function Dashboard() {
           )
         : e(Text, { color: MUTED, dimColor: true }, 'No automated commits recorded yet.')
     ),
-    e(
+    settingsOpen ? null : e(
       Box,
       { flexDirection: 'column', borderStyle: 'round', borderColor: PANEL, paddingX: 2, paddingY: 1, marginBottom: 1 },
       e(SectionTitle, { right: `${pendingFiles.length} total` }, 'PENDING CHANGES'),
@@ -212,10 +298,17 @@ function Dashboard() {
     e(
       Box,
       { justifyContent: 'space-between', paddingX: 1 },
-      e(Text, { color: MUTED, dimColor: true }, isInteractive ? "[p] pause/resume   [q] quit" : 'Non-interactive preview mode'),
+      e(Text, { color: MUTED, dimColor: true }, isInteractive ? (settingsOpen ? '[↑/↓] navigate   [enter] toggle   [s] close' : '[p] pause/resume   [s] settings   [q] quit') : 'Non-interactive preview mode'),
       e(Text, { color: LIME, dimColor: true }, 'Autopilot v4')
     ),
-    isInteractive ? e(DashboardHotkeys, { root, enabled: true, onError: (error) => setLastError(error.message) }) : null
+    isInteractive ? e(DashboardHotkeys, {
+      root,
+      enabled: true,
+      onError: (error) => setLastError(error.message),
+      onSettings: () => setSettingsOpen((open) => !open),
+      onMove: (delta) => setSelectedSetting((value) => (value + delta + SETTING_ROWS.length) % SETTING_ROWS.length),
+      onChange: (input) => settingsOpen ? changeSetting(input) : Promise.resolve(),
+    }) : null
   );
 }
 
