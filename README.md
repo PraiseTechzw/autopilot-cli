@@ -303,10 +303,10 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the full reference.
 
 ## 📈 Star History
 
-<a href="https://star-history.com/#PraiseTechzw/autopilot-cli&Date">
+<a href="https://www.star-history.com/#PraiseTechzw/autopilot-cli&amp;Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&type=Date&theme=dark" />
-    <img src="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&type=Date" alt="Star History Chart" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&amp;type=Date&amp;theme=dark" />
+    <img src="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&amp;type=Date" alt="Star History Chart" />
   </picture>
 </a>
 
