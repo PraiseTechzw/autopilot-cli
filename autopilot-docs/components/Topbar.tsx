@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Github, Menu } from 'lucide-react';
+import { GitFork, Menu } from 'lucide-react';
 import { Search } from './Search';
 import { ThemeToggle } from './ThemeToggle';
 import { useSidebar } from './SidebarProvider';
@@ -54,7 +54,7 @@ export function Topbar({ versionBadge }: TopbarProps) {
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-muted-foreground bg-muted/50 hover:bg-muted hover:text-foreground rounded-full transition-colors border border-border mr-2"
           >
-            <Github className="h-4 w-4" />
+            <GitFork className="h-4 w-4" />
             <span className="hidden lg:inline">Star on GitHub</span>
           </Link>
           

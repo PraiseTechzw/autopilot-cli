@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
-import { X, Github, Trophy, FileText } from 'lucide-react';
+import { X, GitFork, Trophy, FileText } from 'lucide-react';
 import { useSidebar } from './SidebarProvider';
 import { REPO_URL } from '@/lib/constants';
 
@@ -89,7 +89,7 @@ export function MobileMenu() {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-3 px-4 py-3 text-base font-medium text-foreground hover:bg-muted/50 rounded-lg transition-colors"
                             >
-                                <Github className="h-5 w-5 text-muted-foreground" />
+                                <GitFork className="h-5 w-5 text-muted-foreground" />
                                 <span>Star on GitHub</span>
                                 <svg className="ml-auto h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
