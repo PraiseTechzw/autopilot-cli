@@ -241,7 +241,7 @@ Then open the generated `.vsix` file in VS Code and choose **Install Extension f
 | `autopilot doctor` | Diagnose configuration and environment issues. |
 | `autopilot guide` | Interactive, beginner-friendly walkthrough. |
 
-Full flag-by-flag reference: [CLI Reference](docs/commands.md)
+Full flag-by-flag reference: [CLI Reference](autopilot-docs/content/docs/commands.mdx)
 
 <details>
 <summary><strong>Platform integration notes (click to expand)</strong></summary>
@@ -303,10 +303,10 @@ See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the full reference.
 
 ## 📈 Star History
 
-<a href="https://star-history.com/#PraiseTechzw/autopilot-cli&Date">
+<a href="https://www.star-history.com/#PraiseTechzw/autopilot-cli&amp;Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&type=Date&theme=dark" />
-    <img src="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&type=Date" alt="Star History Chart" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&amp;type=Date&amp;theme=dark" />
+    <img src="https://api.star-history.com/svg?repos=PraiseTechzw/autopilot-cli&amp;type=Date" alt="Star History Chart" />
   </picture>
 </a>
 
