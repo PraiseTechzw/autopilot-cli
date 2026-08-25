@@ -211,7 +211,14 @@ Prefer a GUI? Use the official **Autopilot VS Code Extension**:
 - **Quick actions** — start, stop, pause, and undo with a single click from the status bar.
 - **Settings UI** — form-based configuration of your `.autopilotrc.json`.
 
-**[Install from the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=praisetechzw.autopilot-vscode)**
+**Install locally from the repository:**
+
+```bash
+cd vscode-extension
+npx --yes @vscode/vsce package --no-dependencies
+```
+
+Then open the generated `.vsix` file in VS Code and choose **Install Extension from VSIX**. The extension source and development instructions are in [`vscode-extension/README.md`](vscode-extension/README.md). A Marketplace listing can be added after publisher verification.
 
 ---
 

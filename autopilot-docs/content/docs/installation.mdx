@@ -124,6 +124,20 @@ npx @traisetech/autopilot start
 
 ---
 
+## VS Code Extension
+
+Autopilot also includes a VS Code extension with a live sidebar, integrated logs, quick actions, Supabase-backed telemetry metrics, threshold alerts, and a form-based `.autopilotrc.json` settings editor.
+
+The Marketplace listing becomes the preferred installation route after the first successful publication. Until then, install the release artifact from a GitHub release or build it locally from the repository:
+
+```bash
+cd vscode-extension
+npx --yes @vscode/vsce package --no-dependencies
+```
+
+In VS Code, open the Extensions view, select the **...** menu, choose **Install from VSIX**, and select the generated `autopilot-vscode-*.vsix` file. The extension never embeds API keys; Supabase-backed telemetry uses the CLI’s configured environment and reports connection errors explicitly.
+
+---
 ## Verify Installation
 
 Check that Autopilot is correctly installed by viewing the help menu:

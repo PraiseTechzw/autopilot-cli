@@ -914,6 +914,13 @@
     "level": 2
   },
   {
+    "title": "VS Code Extension",
+    "route": "/docs/installation#vs-code-extension",
+    "type": "heading",
+    "parentTitle": "Installation",
+    "level": 2
+  },
+  {
     "title": "Verify Installation",
     "route": "/docs/installation#verify-installation-1",
     "type": "heading",

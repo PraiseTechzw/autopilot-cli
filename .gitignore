@@ -47,3 +47,6 @@ autopilot.log
 .autopilot-state.json
 test-repo-sync/
 test/temp-test-repo/
+
+# VS Code extension artifacts
+*.vsix
