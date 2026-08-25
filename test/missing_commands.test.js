@@ -190,6 +190,8 @@ test('Missing Commands Integration', async (t) => {
       console.warn('Warning: Dashboard produced no output (likely due to non-TTY environment).');
     } else {
       assert.match(output, /Autopilot|Loading|Status/);
+      assert.match(output, /ACTIVITY/);
+      assert.match(output, /PENDING CHANGES/);
     }
   });
 

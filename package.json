@@ -38,7 +38,8 @@
     "prepublishOnly": "npm run verify",
     "release:patch": "npm run verify && npm version patch && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
     "release:minor": "npm run verify && npm version minor && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
-    "release:major": "npm run verify && npm version major && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\""
+    "release:major": "npm run verify && npm version major && git push --follow-tags && echo \"\n🚀 Release initiated! GitHub Action will publish to NPM.\"",
+    "supabase:migrate:events": "bash scripts/apply-supabase-events-migration.sh"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -52,6 +53,7 @@
   },
   "homepage": "https://github.com/PraiseTechzw/autopilot-cli#readme",
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.4",
     "@traisetech/autopilot": "^2.5.1",
     "chokidar": "^3.6.0",
     "commander": "^14.0.3",
