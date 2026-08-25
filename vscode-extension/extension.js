@@ -28,12 +28,40 @@ function escapeHtml(value) {
   return String(value ?? '').replace(/[&<>"']/g, (character) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[character]));
 }
 
+function buildTelemetryMetrics(events, now = Date.now()) {
+  const recent = events.filter((event) => {
+    const timestamp = Date.parse(event.receivedAt || '');
+    return Number.isFinite(timestamp) && now - timestamp <= 5 * 60 * 1000;
+  });
+  const byType = recent.reduce((result, event) => {
+    result[event.type] = (result[event.type] || 0) + 1;
+    return result;
+  }, {});
+  return {
+    totalEvents: recent.length,
+    eventsPerMinute: Number((recent.length / 5).toFixed(1)),
+    latestEvent: recent[0] || null,
+    byType,
+    windowMinutes: 5,
+  };
+}
+
+function evaluateTelemetryAlerts(metrics, configuration) {
+  if (!metrics || configuration.get('telemetryAlertsEnabled', true) === false) return [];
+  const alerts = [];
+  const rateThreshold = configuration.get('telemetryEventsPerMinute', 20);
+  const countThreshold = configuration.get('telemetryTotalEvents', 100);
+  if (metrics.eventsPerMinute > rateThreshold) alerts.push(`Event rate ${metrics.eventsPerMinute}/min exceeds ${rateThreshold}/min`);
+  if (metrics.totalEvents > countThreshold) alerts.push(`${metrics.totalEvents} events in ${metrics.windowMinutes}m exceeds ${countThreshold}`);
+  return alerts;
+}
+
 class AutopilotController {
   constructor(context) {
     this.context = context;
     this.output = vscode.window.createOutputChannel('Autopilot');
     this.view = null;
-    this.status = { state: 'loading', branch: '—', pending: 0, message: 'Connecting to Autopilot…' };
+    this.status = { state: 'loading', branch: '—', pending: 0, message: 'Connecting to Autopilot…', telemetry: { state: 'connecting', metrics: null, alerts: [], error: null } };
     this.timer = null;
     this.statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
     this.statusBar.command = 'autopilot.refresh';
@@ -101,12 +129,31 @@ class AutopilotController {
         pending: data?.pendingFiles?.length ?? data?.pending ?? 0,
         message: data?.message || 'Repository status updated',
       };
+      await this.refreshTelemetry();
     } catch (error) {
       this.status = { ...this.status, state: 'error', message: error.message };
       this.output.appendLine(`[refresh] ${error.message}`);
     }
     this.updateStatusBar();
     this.postState();
+  }
+
+  async refreshTelemetry() {
+    const outputFile = path.join(require('node:os').tmpdir(), `autopilot-vscode-telemetry-${process.pid}.json`);
+    try {
+      await this.runCli(['telemetry', 'export', '--format', 'json', '--output', outputFile]);
+      const events = JSON.parse(await fs.readFile(outputFile, 'utf8'));
+      const configuration = vscode.workspace.getConfiguration('autopilot');
+      const metrics = buildTelemetryMetrics(events);
+      const alerts = evaluateTelemetryAlerts(metrics, configuration);
+      this.status.telemetry = { state: 'live', metrics, alerts, error: null };
+      if (alerts.length && configuration.get('telemetryAlertsEnabled', true)) vscode.window.showWarningMessage(`Autopilot telemetry alert: ${alerts[0]}`);
+    } catch (error) {
+      this.status.telemetry = { state: 'error', metrics: null, alerts: [], error: error.message };
+      this.output.appendLine(`[telemetry] ${error.message}`);
+    } finally {
+      await fs.rm(outputFile, { force: true }).catch(() => {});
+    }
   }
 
   async runAction(action) {
@@ -150,9 +197,9 @@ class AutopilotController {
       :root{--accent:#b8ff1f;--muted:var(--vscode-descriptionForeground);--card:var(--vscode-textBlockQuote-background);}
       body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);padding:14px;line-height:1.4}.brand{color:var(--accent);font-weight:700;letter-spacing:1.5px}.sub{color:var(--muted);font-size:11px}.hero{border:1px solid var(--accent);border-radius:8px;padding:12px;margin-bottom:12px}.row{display:flex;justify-content:space-between;align-items:center}.state{font-weight:700;text-transform:uppercase}.running{color:#73c991}.paused{color:#e5c07b}.stopped,.error{color:#f48771}.grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:12px}.card{background:var(--card);border-radius:6px;padding:9px}.label{color:var(--muted);font-size:10px;text-transform:uppercase}.value{font-size:16px;font-weight:700;margin-top:3px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}button{font:inherit;color:var(--vscode-button-foreground);background:var(--vscode-button-background);border:0;border-radius:4px;padding:6px;cursor:pointer}button:hover{background:var(--vscode-button-hoverBackground)}.wide{grid-column:span 2}</style></head><body>
       <div class="hero"><div class="brand">AUTOPILOT</div><div class="sub">GIT AUTOMATION CONTROL CENTER</div><div class="row" style="margin-top:12px"><strong>Repository Dashboard</strong><span id="state" class="state">LOADING</span></div><div id="message" class="sub">Connecting…</div></div>
-      <div class="grid"><div class="card"><div class="label">Branch</div><div id="branch" class="value">—</div></div><div class="card"><div class="label">Pending changes</div><div id="pending" class="value">—</div></div></div>
+      <div class="grid"><div class="card"><div class="label">Branch</div><div id="branch" class="value">—</div></div><div class="card"><div class="label">Pending changes</div><div id="pending" class="value">—</div></div><div class="card"><div class="label">Supabase events / 5m</div><div id="events" class="value">—</div></div><div class="card"><div class="label">Event rate</div><div id="rate" class="value">—</div></div><div class="card wide"><div class="label">Telemetry stream</div><div id="telemetry" class="value">CONNECTING</div><div id="alert" class="sub"></div></div></div>
       <div class="actions"><button data-action="start">Start</button><button data-action="stop">Stop</button><button data-action="pause">Pause</button><button data-action="resume">Resume</button><button data-action="undo">Undo last commit</button><button data-action="refresh">Refresh</button><button class="wide" data-action="settings">Open Settings</button></div>
-      <script nonce="${nonce}">const vscode=acquireVsCodeApi();document.querySelectorAll('button').forEach((button)=>button.addEventListener('click',()=>vscode.postMessage({command:button.dataset.action})));window.addEventListener('message',(event)=>{const s=event.data.status||{};const state=document.getElementById('state');state.textContent=(s.state||'loading').toUpperCase();state.className='state '+(s.state||'');document.getElementById('branch').textContent=s.branch||'—';document.getElementById('pending').textContent=String(s.pending??'—');document.getElementById('message').textContent=s.message||'';});</script>
+      <script nonce="${nonce}">const vscode=acquireVsCodeApi();document.querySelectorAll('button').forEach((button)=>button.addEventListener('click',()=>vscode.postMessage({command:button.dataset.action})));window.addEventListener('message',(event)=>{const s=event.data.status||{};const state=document.getElementById('state');state.textContent=(s.state||'loading').toUpperCase();state.className='state '+(s.state||'');document.getElementById('branch').textContent=s.branch||'—';document.getElementById('pending').textContent=String(s.pending??'—');document.getElementById('message').textContent=s.message||'';const t=s.telemetry||{};const m=t.metrics||{};document.getElementById('events').textContent=m.totalEvents==null?'—':m.totalEvents;document.getElementById('rate').textContent=m.eventsPerMinute==null?'—':m.eventsPerMinute+'/min';const telemetry=document.getElementById('telemetry');telemetry.textContent=(t.state||'connecting').toUpperCase();telemetry.className='value '+(t.state==='live'?'running':t.state==='error'?'error':'');document.getElementById('alert').textContent=(t.alerts||[]).join(' · ')||t.error||'';});</script>
     </body></html>`;
   }
 

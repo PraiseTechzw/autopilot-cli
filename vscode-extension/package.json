@@ -40,7 +40,10 @@
       "properties": {
         "autopilot.cliPath": { "type": "string", "default": "autopilot", "description": "Command or absolute path used to invoke Autopilot." },
         "autopilot.refreshIntervalMs": { "type": "number", "default": 5000, "minimum": 1000, "description": "Dashboard refresh interval in milliseconds." },
-        "autopilot.useWorkspaceCli": { "type": "boolean", "default": true, "description": "Use bin/autopilot.js from the opened workspace when available." }
+        "autopilot.useWorkspaceCli": { "type": "boolean", "default": true, "description": "Use bin/autopilot.js from the opened workspace when available." },
+        "autopilot.telemetryAlertsEnabled": { "type": "boolean", "default": true, "description": "Show warnings when Supabase telemetry exceeds thresholds." },
+        "autopilot.telemetryEventsPerMinute": { "type": "number", "default": 20, "minimum": 0, "description": "Alert threshold for Supabase events per minute." },
+        "autopilot.telemetryTotalEvents": { "type": "number", "default": 100, "minimum": 0, "description": "Alert threshold for Supabase events in the five-minute window." }
       }
     },
     "menus": {
