@@ -35,5 +35,13 @@
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@eslint/eslintrc": {
+      "js-yaml": "4.3.1"
+    },
+    "gray-matter": {
+      "js-yaml": "3.15.1"
+    }
   }
 }
