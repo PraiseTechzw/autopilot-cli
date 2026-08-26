@@ -92,16 +92,29 @@ async function addAll(root, paths = null) {
  */
 async function addAllExcept(root, excludePaths = []) {
   try {
-    const args = ['add', '-A', '--', '.'];
-    for (const excluded of excludePaths) {
-      if (!excluded) continue;
-      const normalized = excluded.replace(/\\/g, '/').replace(/\/+$/, '');
-      args.push(`:!${normalized}`);
-      args.push(`:!${normalized}/**`);
+    const excluded = excludePaths
+      .filter(Boolean)
+      .map((entry) => entry.replace(/\\/g, '/').replace(/\/+$/, ''));
+    const isExcluded = (file) => excluded.some((entry) => file === entry || file.startsWith(`${entry}/`));
+
+    // Update tracked files first. This never explicitly names ignored paths.
+    const updated = await execa('git', ['add', '-u', '--', '.'], { cwd: root });
+    const { stdout: untrackedOutput } = await execa(
+      'git',
+      ['ls-files', '--others', '--exclude-standard', '-z'],
+      { cwd: root }
+    );
+    const untracked = untrackedOutput
+      .split('\0')
+      .filter(Boolean)
+      .filter((file) => !isExcluded(file));
+
+    if (untracked.length > 0) {
+      const added = await execa('git', ['add', '--', ...untracked], { cwd: root });
+      return { ok: true, stdout: `${updated.stdout}${added.stdout}`, stderr: `${updated.stderr}${added.stderr}` };
     }
 
-    const { stdout, stderr } = await execa('git', args, { cwd: root });
-    return { ok: true, stdout, stderr };
+    return { ok: true, stdout: updated.stdout, stderr: updated.stderr };
   } catch (error) {
     return { ok: false, stdout: '', stderr: error.message };
   }
