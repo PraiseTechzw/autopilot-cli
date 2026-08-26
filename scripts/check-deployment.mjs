@@ -27,6 +27,24 @@ for (const check of checks) {
   }
 }
 
+const syncUrl = `${siteUrl}/api/leaderboard/sync`;
+try {
+  // An empty payload must be rejected by the route; 404 means the route is not deployed.
+  const response = await fetch(syncUrl, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: '{}',
+    signal: AbortSignal.timeout(15000),
+  });
+  const body = await response.text();
+  const passed = response.status === 400 && body.includes('Missing required fields');
+  results.push({ url: syncUrl, status: response.status, passed });
+  if (!passed) failures.push(`${syncUrl} returned ${response.status} or did not validate an empty payload`);
+} catch (error) {
+  results.push({ url: syncUrl, passed: false, error: error.message });
+  failures.push(`${syncUrl} failed: ${error.message}`);
+}
+
 const packagePath = path.resolve('vscode-extension/package.json');
 try {
   const manifest = JSON.parse(await fs.readFile(packagePath, 'utf8'));

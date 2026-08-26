@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { updateUserStats, UserStats } from '@/lib/leaderboard';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 function describeError(error: unknown): string {
   if (error instanceof Error) return error.message;
   if (typeof error === 'string') return error;
