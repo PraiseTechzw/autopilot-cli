@@ -1,8 +1,9 @@
 from pathlib import Path
 
-from autopilot.config import config_template, initialize_project_config, load_config
+from autopilot.config import config_template, initialize_project_config, load_config, load_env_file
 from autopilot.doctor import run_checks
 from autopilot.observability import EventLogger, safe
+from autopilot.providers import ProviderConfig
 
 
 def test_project_config_and_environment_override(tmp_path: Path, monkeypatch):
@@ -12,6 +13,39 @@ def test_project_config_and_environment_override(tmp_path: Path, monkeypatch):
     config = load_config(tmp_path)
     assert config.ai_model == "test/free"
     assert "OPENROUTER_API_KEY" not in config_template()
+
+
+def test_supported_environment_aliases_are_loaded(monkeypatch):
+    monkeypatch.setenv("AUTOPILOT_DEFAULT_BASE_BRANCH", "release")
+    monkeypatch.setenv("AUTOPILOT_COMMAND_TIMEOUT_SECONDS", "25")
+    monkeypatch.setenv("AUTOPILOT_WATCH_INTERVAL_SECONDS", "12")
+    monkeypatch.setenv("AI_API_KEY", "provider-secret")
+    monkeypatch.setenv("AI_APP_TITLE", "autopilot-test")
+    monkeypatch.setenv("AI_HTTP_REFERER", "https://example.com")
+    monkeypatch.setenv("AI_TIMEOUT", "90")
+
+    config = load_config()
+    provider = ProviderConfig.from_env()
+
+    assert config.default_base_branch == "release"
+    assert config.command_timeout_seconds == 25.0
+    assert config.watch_interval_seconds == 12.0
+    assert provider is not None
+    assert provider.api_key == "provider-secret"
+    assert provider.app_title == "autopilot-test"
+    assert provider.referer == "https://example.com"
+    assert provider.timeout == 90.0
+
+
+def test_dotenv_file_is_loaded_from_project_root(tmp_path: Path, monkeypatch):
+    monkeypatch.delenv("AI_MODEL", raising=False)
+    (tmp_path / ".env").write_text("AI_MODEL=project/free\nGITHUB_TOKEN=project-token\n", encoding="utf-8")
+
+    load_env_file(tmp_path)
+    config = load_config(tmp_path)
+
+    assert config.ai_model == "project/free"
+    assert os.getenv("GITHUB_TOKEN") == "project-token"
 
 
 def test_observability_redacts_secrets(tmp_path: Path):
