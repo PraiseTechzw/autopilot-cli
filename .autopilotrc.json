@@ -10,14 +10,8 @@
     "interactive": true,
     "model": "default"
   },
-  "protectedBranches": [
-    "main",
-    "master",
-    "production",
-    "prod",
-    "release"
-  ],
-  "allowPushToProtected": false ,
+  "protectedBranches": [],
+  "allowPushToProtected": false,
   "notificationsEnabled": true,
   "maxRetryAttempts": 5,
   "leaderboardSyncEnabled": true,
