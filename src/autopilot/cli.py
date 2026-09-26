@@ -118,7 +118,7 @@ def events(path: Path = typer.Option(Path("."), "--path", "-p"), limit: int = ty
 
 
 @app.command()
-def status(path: Path = typer.Option(Path("."), "--path", "-p")) -> None:
+def status(path: Path = typer.Option(Path("."), "--path", "-p"), json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON.")) -> None:
     """Show a concise project and Git status."""
     try:
         git = engine(path)
@@ -127,6 +127,9 @@ def status(path: Path = typer.Option(Path("."), "--path", "-p")) -> None:
         typer.echo(f"Error: {exc}", err=True)
         raise typer.Exit(code=1)
     state = "clean" if current.clean else f"{len(current.entries)} change(s)"
+    if json_output:
+        typer.echo(json.dumps({"repository": str(git.path), "branch": current.branch, "clean": current.clean, "changes": current.entries}, indent=2))
+        return
     typer.echo(f"Repository: {git.path}")
     typer.echo(f"Branch: {current.branch}")
     typer.echo(f"Working tree: {state}")
@@ -207,6 +210,17 @@ def apply_fix(patch_file: Path, path: Path = typer.Option(Path("."), "--path", "
     except (OSError, PatchError, PermissionError) as exc:
         typer.echo(f"Error: {exc}", err=True)
         raise typer.Exit(code=1)
+
+
+@app.command("undo")
+def undo(path: Path = typer.Option(Path("."), "--path", "-p"), patch_id: str | None = typer.Option(None, "--patch-id")) -> None:
+    """Reverse the latest applied AI patch, or a selected patch ID."""
+    try:
+        recovered = PatchApplier(path).rollback_last(patch_id)
+    except (PatchError, GitError) as exc:
+        typer.echo(f"Error: {exc}", err=True)
+        raise typer.Exit(code=1)
+    typer.echo(f"Rolled back AI patch {recovered}")
 
 
 @app.command("debug")

@@ -55,3 +55,13 @@ def test_debugging_loop_rolls_back_failed_patch(tmp_path: Path):
     results = DebuggingLoop(tmp_path, max_iterations=1).run(lambda _: proposal, allow_medium=True)
     assert results[0].rolled_back
     assert (tmp_path / "app.py").read_text() == "value = 1\n"
+
+
+def test_applied_patch_can_be_recovered_later(tmp_path: Path):
+    init_repo(tmp_path)
+    proposal = FixProposal("fix", "test", ("app.py",), patch(), Risk.MEDIUM)
+    applier = PatchApplier(tmp_path)
+    result = applier.apply(proposal, allow_medium=True, approve=True)
+    assert result.patch_id
+    assert applier.rollback_last(result.patch_id) == result.patch_id
+    assert (tmp_path / "app.py").read_text() == "value = 1\n"

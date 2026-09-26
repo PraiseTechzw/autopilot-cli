@@ -1,6 +1,6 @@
 # Autopilot
 
-Autopilot is a Python CLI foundation for a safe, inspectable developer workflow agent.
+Autopilot is a production-ready Python CLI for bounded, inspectable AI-assisted software development. **v1.0.0 is the first stable release.**
 
 ## Development setup
 
@@ -16,6 +16,7 @@ pytest
 
 ```bash
 autopilot --help
+python -m autopilot --help
 autopilot status
 autopilot git status
 autopilot analyze
@@ -108,6 +109,8 @@ autopilot-dot workflow --owner OWNER --repo REPO --allow-medium --allow-high
 ```
 
 `autopilot events` displays structured local observability events. External tokens and token-like values are redacted before they are persisted. Git and subprocess operations have bounded timeouts and normalized errors.
+
+For CI and scripts, prefer `autopilot status --json`, `autopilot verify`, and exit codes over parsing human-readable output. The stable package also provides `autopilot-cli`, `autopilot-dot`, and `python -m autopilot` entry points.
 
 ## Intelligence and verification
 

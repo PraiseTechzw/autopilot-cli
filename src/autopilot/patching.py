@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 import tempfile
+import hashlib
+import json
+from datetime import datetime, timezone
 
 from .autonomous import FixProposal
 from .checkpoints import CheckpointManager, FlightRecorder
@@ -21,6 +24,7 @@ class PatchResult:
     files: tuple[str, ...]
     checkpoint: str
     applied: bool
+    patch_id: str = ""
 
 
 class PatchApplier:
@@ -85,13 +89,40 @@ class PatchApplier:
             raise PatchError(f"patch was not safely applied: {exc}") from exc
         finally:
             patch_file.unlink(missing_ok=True)
-        self.recorder.record("ai_patch_applied", files=",".join(paths), checkpoint=checkpoint.commit, risk=proposal.risk.value)
-        return PatchResult(paths, checkpoint.commit, True)
+        patch_id = self._save_history(proposal.patch, paths, checkpoint.commit, proposal.title)
+        self.recorder.record("ai_patch_applied", files=",".join(paths), checkpoint=checkpoint.commit, risk=proposal.risk.value, patch_id=patch_id)
+        return PatchResult(paths, checkpoint.commit, True, patch_id)
 
     def rollback(self, patch: str) -> None:
         self.validate(FixProposal("rollback", "", self._paths(patch), patch, Risk.MEDIUM))
         self._reverse(patch)
         self.recorder.record("ai_patch_rolled_back", files=",".join(self._paths(patch)))
+
+    def rollback_last(self, patch_id: str | None = None) -> str:
+        history = self.root / ".autopilot" / "patch-history.jsonl"
+        if not history.exists():
+            raise PatchError("no applied AI patches found")
+        rows = [json.loads(line) for line in history.read_text().splitlines() if line.strip()]
+        candidates = [row for row in rows if not row.get("rolled_back")]
+        if patch_id:
+            candidates = [row for row in candidates if row.get("patch_id") == patch_id]
+        if not candidates:
+            raise PatchError("requested applied patch was not found or was already rolled back")
+        row = candidates[-1]
+        self._reverse(row["patch"])
+        row["rolled_back"] = True
+        history.write_text("\n".join(json.dumps(item, sort_keys=True) for item in rows) + "\n")
+        self.recorder.record("ai_patch_recovered", patch_id=row["patch_id"], files=",".join(row["files"]))
+        return str(row["patch_id"])
+
+    def _save_history(self, patch: str, paths: tuple[str, ...], checkpoint: str, title: str) -> str:
+        patch_id = hashlib.sha256(patch.encode()).hexdigest()[:16]
+        history = self.root / ".autopilot" / "patch-history.jsonl"
+        history.parent.mkdir(parents=True, exist_ok=True)
+        row = {"patch_id": patch_id, "timestamp": datetime.now(timezone.utc).isoformat(), "files": list(paths), "checkpoint": checkpoint, "title": title[:120], "patch": patch, "rolled_back": False}
+        with history.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(row, sort_keys=True) + "\n")
+        return patch_id
 
     def _write_patch(self, patch: str) -> Path:
         self.root.joinpath(".autopilot").mkdir(parents=True, exist_ok=True)

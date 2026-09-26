@@ -44,7 +44,7 @@ class GitEngine:
 
     def status(self) -> GitStatus:
         self.require_repository()
-        result = self._git("status", "--short")
+        result = self._git("status", "--porcelain=v1")
         entries = tuple(line for line in result.stdout.splitlines() if line)
         return GitStatus(branch=self.branch(), clean=not entries, entries=entries)
 
