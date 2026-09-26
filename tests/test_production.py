@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 from autopilot.config import config_template, initialize_project_config, load_config, load_env_file
 from autopilot.doctor import run_checks
@@ -39,6 +40,7 @@ def test_supported_environment_aliases_are_loaded(monkeypatch):
 
 def test_dotenv_file_is_loaded_from_project_root(tmp_path: Path, monkeypatch):
     monkeypatch.delenv("AI_MODEL", raising=False)
+    monkeypatch.delenv("GITHUB_TOKEN", raising=False)
     (tmp_path / ".env").write_text("AI_MODEL=project/free\nGITHUB_TOKEN=project-token\n", encoding="utf-8")
 
     load_env_file(tmp_path)

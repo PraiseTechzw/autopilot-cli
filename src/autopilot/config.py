@@ -71,6 +71,33 @@ def save_user_auth(data: dict[str, str]) -> None:
     path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
 
 
+def load_env_file(root: str | Path = ".") -> Path | None:
+    """Load simple KEY=VALUE entries from a project .env without overriding the process."""
+    path = Path(root).expanduser().resolve() / ".env"
+    if not path.exists():
+        return None
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError as exc:
+        raise ConfigError(f"cannot read environment file {path}: {exc}") from exc
+    for line in lines:
+        value = line.strip()
+        if not value or value.startswith("#"):
+            continue
+        if value.startswith("export "):
+            value = value[7:].lstrip()
+        if "=" not in value:
+            continue
+        key, raw = value.split("=", 1)
+        key, raw = key.strip(), raw.strip()
+        if not key or not key.replace("_", "").isalnum():
+            continue
+        if len(raw) >= 2 and raw[0] == raw[-1] and raw[0] in {"'", '"'}:
+            raw = raw[1:-1]
+        os.environ.setdefault(key, raw)
+    return path
+
+
 def project_config_path(root: str | Path = ".") -> Path:
     return Path(root).expanduser().resolve() / ".autopilot" / "config.toml"
 
