@@ -1,8 +1,0 @@
-**/*.map
-**/*.ts
-node_modules/**
-test/**
-.vscode/**
-.git/**
-
-media/*.svg
