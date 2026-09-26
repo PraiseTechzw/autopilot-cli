@@ -32,18 +32,26 @@ class ProviderConfig:
     referer: str | None = None
     timeout: float = 45.0
 
+    @staticmethod
+    def _env(*names: str) -> str | None:
+        for name in names:
+            value = os.getenv(name)
+            if value is not None and value != "":
+                return value
+        return None
+
     @classmethod
     def from_env(cls) -> "ProviderConfig | None":
-        key = os.getenv("OPENROUTER_API_KEY") or os.getenv("AI_API_KEY")
+        key = cls._env("OPENROUTER_API_KEY", "AI_API_KEY", "AUTOPILOT_AI_API_KEY")
         if not key:
             return None
         return cls(
             api_key=key,
-            base_url=os.getenv("AI_BASE_URL", "https://openrouter.ai/api/v1").rstrip("/"),
-            model=os.getenv("AI_MODEL", "openrouter/free"),
-            app_title=os.getenv("AI_APP_TITLE", "Autopilot"),
-            referer=os.getenv("AI_HTTP_REFERER"),
-            timeout=float(os.getenv("AI_TIMEOUT", "45")),
+            base_url=cls._env("AI_BASE_URL", "AUTOPILOT_AI_BASE_URL", "OPENAI_BASE_URL") or "https://openrouter.ai/api/v1",
+            model=cls._env("AI_MODEL", "AUTOPILOT_AI_MODEL") or "openrouter/free",
+            app_title=cls._env("AI_APP_TITLE", "AUTOPILOT_AI_APP_TITLE") or "Autopilot",
+            referer=cls._env("AI_HTTP_REFERER", "AUTOPILOT_AI_HTTP_REFERER"),
+            timeout=float(cls._env("AI_TIMEOUT", "AUTOPILOT_AI_TIMEOUT") or "45"),
         )
 
 

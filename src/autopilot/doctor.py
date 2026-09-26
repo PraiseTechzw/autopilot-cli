@@ -30,11 +30,13 @@ def run_checks(root: str | Path = ".") -> tuple[Check, ...]:
     repo_ok = False
     if git_ok:
         repo_ok = GitEngine(path).is_repository()
+    ai_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("AI_API_KEY") or os.getenv("AUTOPILOT_AI_API_KEY")
+    github_token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN") or os.getenv("AUTOPILOT_GITHUB_TOKEN")
     return (
         Check("python", sys.version_info >= (3, 11), platform.python_version()),
         Check("git executable", git_ok, shutil.which("git") or "not found"),
         Check("repository", repo_ok, str(path), required=False),
         config_check,
-        Check("AI provider", bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("AI_API_KEY")), "configured" if (os.getenv("OPENROUTER_API_KEY") or os.getenv("AI_API_KEY")) else "not configured", required=False),
-        Check("GitHub token", bool(os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")), "configured" if (os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")) else "not configured", required=False),
+        Check("AI provider", bool(ai_key), "configured" if ai_key else "not configured", required=False),
+        Check("GitHub token", bool(github_token), "configured" if github_token else "not configured", required=False),
     )

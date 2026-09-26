@@ -2,9 +2,11 @@
 
 from pathlib import Path
 import os
+import sys
 
 import typer
 
+from .config import load_user_auth, save_user_auth
 from .github import GitHubClient
 from .git_engine import GitEngine
 from .permissions import PermissionPolicy, Risk
@@ -34,18 +36,23 @@ def provider_for(path: Path, use_ai: bool):
         return None
     provider = configured_provider()
     if provider is None:
-        typer.echo("Error: --ai requires OPENROUTER_API_KEY or AI_API_KEY", err=True)
+        typer.echo("Error: --ai requires OPENROUTER_API_KEY, AI_API_KEY, or AUTOPILOT_AI_API_KEY", err=True)
         raise typer.Exit(code=1)
     return provider
 
 
 def github_client() -> GitHubClient:
-    """Build the GitHub service from the configured environment token."""
-    token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN")
+    """Build the GitHub service from a user-local auth store or environment override."""
+    token = os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN") or os.getenv("AUTOPILOT_GITHUB_TOKEN") or load_user_auth().get("github_token")
     if not token:
-        typer.echo("Error: set GITHUB_TOKEN or GH_TOKEN before using GitHub commands", err=True)
-        raise typer.Exit(code=1)
-    return GitHubClient(token, os.getenv("GITHUB_API_URL", "https://api.github.com"))
+        if sys.stdin.isatty():
+            token = typer.prompt("GitHub token", hide_input=True, confirmation_prompt=False).strip()
+            if token:
+                save_user_auth({**load_user_auth(), "github_token": token})
+        if not token:
+            typer.echo("Error: set GITHUB_TOKEN, GH_TOKEN, AUTOPILOT_GITHUB_TOKEN, or authenticate with the interactive GitHub login flow before using GitHub commands", err=True)
+            raise typer.Exit(code=1)
+    return GitHubClient(token, os.getenv("GITHUB_API_URL") or os.getenv("AUTOPILOT_GITHUB_API_URL") or "https://api.github.com")
 
 
 def require_high_permission(allow_high: bool, action: str) -> None:

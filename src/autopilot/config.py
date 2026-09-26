@@ -1,6 +1,7 @@
 """Layered Autopilot configuration with no secret persistence by default."""
 
 from dataclasses import asdict, dataclass
+import json
 import os
 from pathlib import Path
 import sys
@@ -42,6 +43,34 @@ def user_config_path() -> Path:
     return config_dir() / "config.toml"
 
 
+def user_auth_path() -> Path:
+    return config_dir() / "auth.json"
+
+
+def load_user_auth() -> dict[str, str]:
+    path = user_auth_path()
+    if not path.exists():
+        return {}
+    try:
+        with path.open("r", encoding="utf-8") as stream:
+            data = json.load(stream)
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(data, dict):
+        return {}
+    cleaned: dict[str, str] = {}
+    for key, value in data.items():
+        if isinstance(key, str) and isinstance(value, str):
+            cleaned[key] = value
+    return cleaned
+
+
+def save_user_auth(data: dict[str, str]) -> None:
+    path = user_auth_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
+
+
 def project_config_path(root: str | Path = ".") -> Path:
     return Path(root).expanduser().resolve() / ".autopilot" / "config.toml"
 
@@ -68,9 +97,18 @@ def load_config(root: str | Path = ".") -> AppConfig:
             source = str(path)
             values.update(data.get("autopilot", data))
     env_map: dict[str, tuple[str, type]] = {
-        "AI_BASE_URL": ("ai_base_url", str), "AI_MODEL": ("ai_model", str), "GITHUB_API_URL": ("github_api_url", str),
-        "AUTOPILOT_DEFAULT_BASE": ("default_base_branch", str), "AUTOPILOT_COMMAND_TIMEOUT": ("command_timeout_seconds", float),
+        "AI_BASE_URL": ("ai_base_url", str),
+        "AUTOPILOT_AI_BASE_URL": ("ai_base_url", str),
+        "AI_MODEL": ("ai_model", str),
+        "AUTOPILOT_AI_MODEL": ("ai_model", str),
+        "GITHUB_API_URL": ("github_api_url", str),
+        "AUTOPILOT_GITHUB_API_URL": ("github_api_url", str),
+        "AUTOPILOT_DEFAULT_BASE": ("default_base_branch", str),
+        "AUTOPILOT_DEFAULT_BASE_BRANCH": ("default_base_branch", str),
+        "AUTOPILOT_COMMAND_TIMEOUT": ("command_timeout_seconds", float),
+        "AUTOPILOT_COMMAND_TIMEOUT_SECONDS": ("command_timeout_seconds", float),
         "AUTOPILOT_WATCH_INTERVAL": ("watch_interval_seconds", float),
+        "AUTOPILOT_WATCH_INTERVAL_SECONDS": ("watch_interval_seconds", float),
     }
     for env_name, (field, converter) in env_map.items():
         if env_name in os.environ:
@@ -78,8 +116,8 @@ def load_config(root: str | Path = ".") -> AppConfig:
                 values[field] = converter(os.environ[env_name])
             except ValueError as exc:
                 raise ConfigError(f"invalid {env_name}") from exc
-    values["ai_configured"] = bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("AI_API_KEY"))
-    values["github_configured"] = bool(os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN"))
+    values["ai_configured"] = bool(os.getenv("OPENROUTER_API_KEY") or os.getenv("AI_API_KEY") or os.getenv("AUTOPILOT_AI_API_KEY"))
+    values["github_configured"] = bool(os.getenv("GITHUB_TOKEN") or os.getenv("GH_TOKEN") or os.getenv("AUTOPILOT_GITHUB_TOKEN"))
     values["source"] = source
     allowed = {field.name for field in AppConfig.__dataclass_fields__.values()}
     clean = {key: value for key, value in values.items() if key in allowed}
