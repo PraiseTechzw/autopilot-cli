@@ -1,0 +1,6 @@
+typer>=0.12
+
+[ai]
+
+[test]
+pytest>=8.0
