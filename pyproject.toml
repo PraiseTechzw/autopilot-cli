@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autopilot-dev"
+version = "0.9.0"
+description = "AI operating layer for software development"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["typer>=0.12"]
+
+[project.optional-dependencies]
+test = ["pytest>=8.0"]
+ai = []
+
+[project.scripts]
+autopilot = "autopilot.cli:app"
+autopilot-dot = "autopilot.cli:app"
+dot = "autopilot.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
