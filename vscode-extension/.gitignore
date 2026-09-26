@@ -1,4 +1,3 @@
 node_modules/
 out/
 *.vsix
-!autopilot-dev-1.0.0.vsix

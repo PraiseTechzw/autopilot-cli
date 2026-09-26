@@ -1,6 +1,6 @@
 # Autopilot
 
-Autopilot is a production-ready Python CLI for bounded, inspectable AI-assisted software development. **v1.0.0 is the first stable release.**
+Autopilot is a production-ready Python CLI for bounded, inspectable AI-assisted software development. **v1.1.0 is the current stable release.**
 
 ## Development setup
 

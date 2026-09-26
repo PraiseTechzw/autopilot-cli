@@ -1,5 +1,0 @@
-[console_scripts]
-autopilot = autopilot.cli:app
-autopilot-cli = autopilot.cli:app
-autopilot-dot = autopilot.cli:app
-dot = autopilot.cli:app

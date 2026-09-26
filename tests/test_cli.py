@@ -10,7 +10,7 @@ runner = CliRunner()
 def test_version() -> None:
     result = runner.invoke(app, ["version"])
     assert result.exit_code == 0
-    assert result.stdout.strip() == "1.0.0"
+    assert result.stdout.strip() == "1.1.0"
 
 
 def test_help() -> None:

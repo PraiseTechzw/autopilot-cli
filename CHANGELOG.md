@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 — Release hardening
+
+- Added the VS Code dashboard as a supported interface to the Python CLI.
+- Added per-user GitHub authentication fallback and expanded environment-variable compatibility.
+- Extended bounded task execution, CI diagnosis, and workflow integrations.
+- Added a tagged GitHub Release workflow that tests the Python CLI and VS Code extension before publishing.
+- Release builds now attach the Python wheel, source distribution, and VSIX as downloadable assets instead of tracking generated binaries in Git.
+- Consolidated the Python package version on `autopilot.__version__` and aligned the extension compatibility floor.
+- Hardened repository ignores for local secrets and build output.
+
 ## 1.0.0 — Stable
 
 Autopilot 1.0.0 is the first stable release of the bounded AI development agent.

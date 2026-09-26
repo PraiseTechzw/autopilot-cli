@@ -54,7 +54,7 @@ export class AutopilotCli {
 
   async assertCompatible(): Promise<void> {
     const actual = await this.version();
-    const minimum = vscode.workspace.getConfiguration('autopilot').get<string>('minimumVersion', '1.0.0');
+    const minimum = vscode.workspace.getConfiguration('autopilot').get<string>('minimumVersion', '1.1.0');
     if (!versionAtLeast(actual, minimum)) {
       throw new AutopilotCliError(`Autopilot ${minimum}+ is required; found ${actual}`, 'version');
     }

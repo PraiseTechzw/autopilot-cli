@@ -5,7 +5,7 @@ A thin VS Code UI over the **Autopilot Python CLI**. The extension does not reim
 ## Requirements
 
 - VS Code 1.85 or newer
-- Autopilot CLI 1.0.0 or newer installed and available as `autopilot`
+- Autopilot CLI 1.1.0 or newer installed and available as `autopilot`
 - A Git repository opened as the VS Code workspace
 - Configure `OPENROUTER_API_KEY`/`AI_API_KEY` only when provider-backed AI actions are needed
 
@@ -13,7 +13,7 @@ A thin VS Code UI over the **Autopilot Python CLI**. The extension does not reim
 
 1. Build the Python project and install Autopilot (`python -m pip install -e .`).
 2. From this directory run `npm install` and `npm run package`.
-3. In VS Code use **Extensions: Install from VSIX...** and select the generated `autopilot-dev-1.0.0.vsix`.
+3. In VS Code use **Extensions: Install from VSIX...** and select the generated `autopilot-dev-1.1.0.vsix`.
 4. Open a Git repository and select the Autopilot icon in the Activity Bar.
 
 Set `autopilot.command` when the CLI is not on PATH. Use **Autopilot: Configure** to open extension settings.

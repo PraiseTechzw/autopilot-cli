@@ -1,0 +1,71 @@
+name: Release
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ["v1.*"]
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install --upgrade pip && python -m pip install -e '.[test]'
+      - run: python -m pytest
+
+  extension-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: vscode-extension/package-lock.json
+      - run: npm ci
+        working-directory: vscode-extension
+      - run: npm test
+        working-directory: vscode-extension
+
+  publish-release:
+    if: startsWith(github.ref, 'refs/tags/v1.')
+    needs: [python-tests, extension-tests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: vscode-extension/package-lock.json
+      - run: python -m pip install --upgrade build
+      - run: python -m build
+      - run: npm ci
+        working-directory: vscode-extension
+      - run: npm run package
+        working-directory: vscode-extension
+      - name: Create GitHub Release with package assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME"
+          dist/*
+          vscode-extension/*.vsix
+          --title "Autopilot $GITHUB_REF_NAME"
+          --generate-notes
