@@ -1,6 +1,7 @@
 """Explicit GitHub side-effect and read-only CI commands."""
 
 from pathlib import Path
+import json
 
 import typer
 
@@ -73,10 +74,13 @@ def pr_create(owner: str = typer.Option(..., "--owner"), repo: str = typer.Optio
         raise typer.Exit(code=1)
 
 
-def ci_status(owner: str = typer.Option(..., "--owner"), repo: str = typer.Option(..., "--repo"), branch: str | None = typer.Option(None, "--branch"), head_sha: str | None = typer.Option(None, "--head-sha"), per_page: int = typer.Option(10, "--per-page", min=1, max=100)) -> None:
+def ci_status(owner: str = typer.Option(..., "--owner"), repo: str = typer.Option(..., "--repo"), branch: str | None = typer.Option(None, "--branch"), head_sha: str | None = typer.Option(None, "--head-sha"), per_page: int = typer.Option(10, "--per-page", min=1, max=100), json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON.")) -> None:
     """Read recent GitHub Actions workflow statuses without modifying anything."""
     try:
         runs = _deps.github_client().workflow_runs(owner, repo, branch=branch, head_sha=head_sha, per_page=per_page)
+        if json_output:
+            typer.echo(json.dumps({"runs": [run.__dict__ for run in runs]}, default=str, indent=2))
+            return
         if not runs:
             typer.echo("No workflow runs found.")
             return

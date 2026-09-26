@@ -110,7 +110,7 @@ def status(path: Path = typer.Option(Path("."), "--path", "-p"), json_output: bo
     typer.echo(f"Working tree: {state}")
 
 
-def analyze(path: Path = typer.Option(Path("."), "--path", "-p")) -> None:
+def analyze(path: Path = typer.Option(Path("."), "--path", "-p"), json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON.")) -> None:
     """Analyze the repository without executing project code."""
     typer.echo(json.dumps(ProjectAnalyzer(path).analyze().__dict__, default=str, indent=2))
 
@@ -132,10 +132,12 @@ def changes(path: Path = typer.Option(Path("."), "--path", "-p"), staged: bool =
             typer.echo(f"  - {file}")
 
 
-def verify(path: Path = typer.Option(Path("."), "--path", "-p")) -> None:
+def verify(path: Path = typer.Option(Path("."), "--path", "-p"), json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON.")) -> None:
     """Run security, tests, and available lint/type checks."""
     result = VerificationEngine(path).run()
-    for check in result.checks:
+    if json_output:
+        typer.echo(json.dumps({"passed": result.passed, "checks": [{"name": item.name, "passed": item.passed, "required": item.required, "detail": item.detail} for item in result.checks]}, indent=2))
+    for check in result.checks if not json_output else ():
         marker = "PASS" if check.passed else "FAIL"
         typer.echo(f"[{marker}] {check.name}: {check.detail}")
     if not result.passed:
@@ -181,7 +183,7 @@ def commit_message(path: Path = typer.Option(Path("."), "--path", "-p"), staged:
         raise typer.Exit(code=1)
 
 
-def review(path: Path = typer.Option(Path("."), "--path", "-p"), staged: bool = typer.Option(False, "--staged"), use_ai: bool = typer.Option(False, "--ai", help="Use the configured AI provider.")) -> None:
+def review(path: Path = typer.Option(Path("."), "--path", "-p"), staged: bool = typer.Option(False, "--staged"), use_ai: bool = typer.Option(False, "--ai", help="Use the configured AI provider."), json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON.")) -> None:
     """Run conservative local review checks against a diff."""
     try:
         diff = _deps.engine(path).diff(staged=staged)
@@ -194,6 +196,9 @@ def review(path: Path = typer.Option(Path("."), "--path", "-p"), staged: bool = 
     except AIProviderError as exc:
         typer.echo(f"AI error: {exc}", err=True)
         raise typer.Exit(code=1)
+    if json_output:
+        typer.echo(json.dumps({"findings": [finding.__dict__ for finding in findings], "high_risk": any(finding.severity == "HIGH" for finding in findings)}, default=str, indent=2))
+        return
     if not findings:
         typer.echo("No local review findings.")
         return

@@ -1,0 +1,55 @@
+{
+  "name": "autopilot-dev",
+  "displayName": "Autopilot Developer Agent",
+  "description": "A thin, safety-first VS Code UI for the Autopilot Python development agent.",
+  "version": "1.0.0",
+  "publisher": "praisetechzw",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "https://github.com/PraiseTechzw/autopilot-cli.git" },
+  "engines": { "vscode": ">=1.85.0" },
+  "categories": ["Other", "SCM Providers"],
+  "keywords": ["ai", "developer agent", "git", "autopilot", "code review"],
+  "activationEvents": ["onView:autopilot.dashboard"],
+  "main": "./out/src/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [{ "id": "autopilot", "title": "Autopilot", "icon": "media/autopilot.svg" }]
+    },
+    "views": {
+      "autopilot": [{ "type": "webview", "id": "autopilot.dashboard", "name": "Developer Agent" }]
+    },
+    "commands": [
+      { "command": "autopilot.refresh", "title": "Autopilot: Refresh" },
+      { "command": "autopilot.verify", "title": "Autopilot: Verify Project" },
+      { "command": "autopilot.review", "title": "Autopilot: Review Changes" },
+      { "command": "autopilot.resume", "title": "Autopilot: Resume Context" },
+      { "command": "autopilot.executeTask", "title": "Autopilot: Execute Task" },
+      { "command": "autopilot.proposeFix", "title": "Autopilot: Propose CI Fix" },
+      { "command": "autopilot.ciStatus", "title": "Autopilot: Check CI Status" },
+      { "command": "autopilot.checkpoint", "title": "Autopilot: Create Checkpoint" },
+      { "command": "autopilot.restore", "title": "Autopilot: Restore Last Patch" },
+      { "command": "autopilot.history", "title": "Autopilot: Open Audit History" },
+      { "command": "autopilot.configure", "title": "Autopilot: Configure" }
+    ],
+    "configuration": {
+      "title": "Autopilot",
+      "properties": {
+        "autopilot.command": { "type": "string", "default": "autopilot", "description": "Autopilot CLI executable or absolute path." },
+        "autopilot.minimumVersion": { "type": "string", "default": "1.0.0", "description": "Minimum compatible Autopilot CLI version." },
+        "autopilot.aiEnabled": { "type": "boolean", "default": false, "description": "Allow the extension to request provider-backed AI operations." },
+        "autopilot.defaultMaxIterations": { "type": "number", "default": 3, "minimum": 1, "maximum": 10, "description": "Bound for iterative verification and task execution." }
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test out/test/*.test.js",
+    "package": "npm run build && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.1",
+    "typescript": "^5.6.0"
+  }
+}

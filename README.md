@@ -137,3 +137,9 @@ AI patches require both an explicit `--approve` and the matching risk permission
 ## End-to-end task execution
 
 `autopilot execute-task` requires a clean repository, builds a bounded codebase context from architecture, entrypoints, dependencies, important files, relevant memory, and task-related files, then asks the provider for a multi-file unified patch. The patch is applied through the same checkpointed, secret-scanned, reversible patch engine. Required verification runs immediately; if it fails, bounded debugging proposals may be attempted. Add `--commit` only when the verified task should be committed; commit still requires `--approve` and the medium-risk permission gate.
+
+## VS Code extension
+
+The `vscode-extension/` package is a thin UI over this Python core. It provides an Autopilot Activity Bar dashboard for branch and change status, project analysis, verification, review, resume, bounded task execution, CI/PR status, checkpoints, restore, and audit history. It invokes the CLI with structured JSON where available and never bypasses Python permission, checkpoint, secret-scanning, provider, or rollback controls.
+
+For local installation, build the VSIX from the extension directory with `npm install && npm run package`, then use **Extensions: Install from VSIX...** in VS Code. See [`vscode-extension/README.md`](vscode-extension/README.md) for requirements, settings, and development tests.

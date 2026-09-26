@@ -137,7 +137,7 @@ def execute_task(task: str, path: Path = typer.Option(Path("."), "--path", "-p")
         raise typer.Exit(code=1)
 
 
-def resume(path: Path = typer.Option(Path("."), "--path", "-p")) -> None:
+def resume(path: Path = typer.Option(Path("."), "--path", "-p"), json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON.")) -> None:
     """Recover project context and the last recorded workflow state."""
     try:
         context = ContextRecovery(path).recover()
