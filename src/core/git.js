@@ -40,21 +40,33 @@ async function hasChanges(root) {
  */
 async function getPorcelainStatus(root) {
   try {
-    const { stdout } = await execa('git', ['status', '--porcelain'], { cwd: root });
-    const raw = stdout.trim();
+    const { stdout } = await execa('git', ['status', '--porcelain=v1', '-z', '--untracked-files=all'], { cwd: root });
+    const raw = stdout;
 
-    if (!raw) {
+    if (raw.length === 0) {
       return { ok: true, files: [], raw: '' };
     }
 
-    const files = raw
-      .split(/\r?\n/)
-      .filter(line => line.trim().length > 0)
-      .map(line => {
-        const status = line.slice(0, 2).trim();
-        const file = line.slice(3).trim();
-        return { status, file };
-      });
+    const records = raw.split('\0');
+    const files = [];
+
+    for (let index = 0; index < records.length; index++) {
+      const record = records[index];
+      if (!record) continue;
+
+      const indexStatus = record[0];
+      const worktreeStatus = record[1];
+      const status = `${indexStatus}${worktreeStatus}`.trim();
+      const file = record.slice(3);
+
+      files.push({ status, indexStatus, worktreeStatus, file });
+
+      // With -z, rename/copy records contain the destination followed by the
+      // original path. Staging the destination lets Git detect the rename.
+      if (indexStatus === 'R' || indexStatus === 'C' || worktreeStatus === 'R' || worktreeStatus === 'C') {
+        index++;
+      }
+    }
 
     return { ok: true, files, raw };
   } catch (error) {
@@ -98,6 +110,34 @@ async function addAllExcept(root, excludePaths = []) {
       const normalized = excluded.replace(/\\/g, '/').replace(/\/+$/, '');
       args.push(`:!${normalized}`);
       args.push(`:!${normalized}/**`);
+    }
+
+    async function addPaths(root, paths) {
+      if (!Array.isArray(paths) || paths.length === 0) {
+        return { ok: true, stdout: '', stderr: '' };
+      }
+
+      try {
+        const literalPaths = paths.map(file => `:(literal)${file}`);
+        const { stdout, stderr } = await execa('git', ['add', '-A', '--', ...literalPaths], { cwd: root });
+        return { ok: true, stdout, stderr };
+      } catch (error) {
+        return { ok: false, stdout: '', stderr: error.message };
+      }
+    }
+
+    async function unstagePaths(root, paths) {
+      if (!Array.isArray(paths) || paths.length === 0) {
+        return { ok: true, stdout: '', stderr: '' };
+      }
+
+      try {
+        const literalPaths = paths.map(file => `:(literal)${file}`);
+        const { stdout, stderr } = await execa('git', ['restore', '--staged', '--', ...literalPaths], { cwd: root });
+        return { ok: true, stdout, stderr };
+      } catch (error) {
+        return { ok: false, stdout: '', stderr: error.message };
+      }
     }
 
     const { stdout, stderr } = await execa('git', args, { cwd: root });
@@ -258,6 +298,15 @@ async function getDiff(root, staged = true) {
   } catch (error) {
     return '';
   }
+
+  async function getStagedFileSize(root, file) {
+    try {
+      const { stdout } = await execa('git', ['cat-file', '-s', `:${file}`], { cwd: root });
+      return Number(stdout.trim());
+    } catch (error) {
+      return null;
+    }
+  }
 }
 
 /**
@@ -361,6 +410,8 @@ module.exports = {
   getPorcelainStatus,
   addAll,
   addAllExcept,
+  addPaths,
+  unstagePaths,
   hasStagedChanges,
   commit,
   fetch,
@@ -368,6 +419,7 @@ module.exports = {
   isRemoteAhead,
   push,
   getDiff,
+  getStagedFileSize,
   revert,
   resetSoft,
   commitExists,
