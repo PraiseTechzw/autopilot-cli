@@ -8,8 +8,6 @@
 
 **Latest release:** v4.0.2 keeps the 4.x line aligned with the real brand assets, safer staging, and cleaner public docs.
 
-![Autopilot banner](autopilot-docs/public/info-banner.png)
-
 
 [![npm version](https://img.shields.io/npm/v/@traisetech/autopilot?style=flat-square&color=success)](https://www.npmjs.com/package/@traisetech/autopilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
@@ -74,6 +72,8 @@ Autopilot is a local CLI tool that runs in the background of your terminal. It w
 5. **Push** — pushes to your remote repository (optional, enabled by default).
 
 You can stop, pause, or undo Autopilot at any time.
+
+Commit subjects follow the Conventional Commits format, for example `fix(core): handle invalid input without throwing`. Autopilot avoids adding a product prefix to the subject and includes an explanatory body only when it can support the details from the diff.
 
 ---
 
@@ -234,12 +234,12 @@ Prefer a GUI? Use the official **Autopilot VS Code Extension**:
 | `autopilot doctor` | Diagnose configuration and environment issues. |
 | `autopilot guide` | Interactive, beginner-friendly walkthrough. |
 
-Full flag-by-flag reference: [CLI Reference](docs/commands.md)
+Full flag-by-flag reference: [CLI Reference](docs/EXTENSION_CONTRACT.md) and [Configuration](docs/CONFIGURATION.md).
 
 <details>
 <summary><strong>Platform integration notes (click to expand)</strong></summary>
 
-Many commands (`status`, `doctor`, `start`, `config`) support a `--json` flag to return structured output suitable for reading programmatically (e.g. by the VS Code extension).
+`status`, `doctor`, `start`, `config`, and `version` support `--json` output for scripts and integrations. `config list` already prints JSON without the flag.
 
 **Exit codes:**
 

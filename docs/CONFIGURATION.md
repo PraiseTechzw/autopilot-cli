@@ -68,8 +68,8 @@ This document reflects the current `.autopilotrc.json` options.
 - **Type:** `"smart" | "simple" | "ai"`
 - **Default:** `"smart"`
 - **Description:** 
-  - smart: file/diff-based conventional messages
-  - simple: `chore: update changes`
+  - smart: file/diff-based Conventional Commit messages
+  - simple: concise local Conventional Commit messages without AI
   - ai: uses the configured AI provider when enabled
 
 ### `teamMode`

@@ -82,7 +82,7 @@ test('Integration: Watcher detects changes and commits', { timeout: 30000 }, asy
     console.log('Git Log:', log);
 
     // Assertions
-    assert.ok(log.includes('chore: auto-commit changes'), 'Should have auto-commit message');
+    assert.match(log, /(?:feat|fix|docs|style|refactor|chore)(?:\([a-z0-9._/-]+\))?: [^\n]+/, 'Should have a Conventional Commit message');
     const commitCount = log.trim().split('\n').length;
     assert.ok(commitCount >= 2, 'Should have at least 2 commits (initial + auto)');
     

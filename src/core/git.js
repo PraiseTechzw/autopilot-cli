@@ -112,35 +112,29 @@ async function addAllExcept(root, excludePaths = []) {
       args.push(`:!${normalized}/**`);
     }
 
-    async function addPaths(root, paths) {
-      if (!Array.isArray(paths) || paths.length === 0) {
-        return { ok: true, stdout: '', stderr: '' };
-      }
-
-      try {
-        const literalPaths = paths.map(file => `:(literal)${file}`);
-        const { stdout, stderr } = await execa('git', ['add', '-A', '--', ...literalPaths], { cwd: root });
-        return { ok: true, stdout, stderr };
-      } catch (error) {
-        return { ok: false, stdout: '', stderr: error.message };
-      }
-    }
-
-    async function unstagePaths(root, paths) {
-      if (!Array.isArray(paths) || paths.length === 0) {
-        return { ok: true, stdout: '', stderr: '' };
-      }
-
-      try {
-        const literalPaths = paths.map(file => `:(literal)${file}`);
-        const { stdout, stderr } = await execa('git', ['restore', '--staged', '--', ...literalPaths], { cwd: root });
-        return { ok: true, stdout, stderr };
-      } catch (error) {
-        return { ok: false, stdout: '', stderr: error.message };
-      }
-    }
-
     const { stdout, stderr } = await execa('git', args, { cwd: root });
+    return { ok: true, stdout, stderr };
+  } catch (error) {
+    return { ok: false, stdout: '', stderr: error.message };
+  }
+}
+
+async function addPaths(root, paths) {
+  if (!Array.isArray(paths) || paths.length === 0) return { ok: true, stdout: '', stderr: '' };
+  try {
+    const literalPaths = paths.map(file => `:(literal)${file}`);
+    const { stdout, stderr } = await execa('git', ['add', '-A', '--', ...literalPaths], { cwd: root });
+    return { ok: true, stdout, stderr };
+  } catch (error) {
+    return { ok: false, stdout: '', stderr: error.message };
+  }
+}
+
+async function unstagePaths(root, paths) {
+  if (!Array.isArray(paths) || paths.length === 0) return { ok: true, stdout: '', stderr: '' };
+  try {
+    const literalPaths = paths.map(file => `:(literal)${file}`);
+    const { stdout, stderr } = await execa('git', ['restore', '--staged', '--', ...literalPaths], { cwd: root });
     return { ok: true, stdout, stderr };
   } catch (error) {
     return { ok: false, stdout: '', stderr: error.message };
@@ -299,13 +293,24 @@ async function getDiff(root, staged = true) {
     return '';
   }
 
-  async function getStagedFileSize(root, file) {
-    try {
-      const { stdout } = await execa('git', ['cat-file', '-s', `:${file}`], { cwd: root });
-      return Number(stdout.trim());
-    } catch (error) {
-      return null;
-    }
+}
+
+async function getStagedFileSize(root, file) {
+  try {
+    const { stdout } = await execa('git', ['cat-file', '-s', `:${file}`], { cwd: root });
+    return Number(stdout.trim());
+  } catch (error) {
+    return null;
+  }
+
+}
+
+async function getStagedDiff(root, file) {
+  try {
+    const { stdout } = await execa('git', ['diff', '--cached', '--no-ext-diff', '--', `:(literal)${file}`], { cwd: root });
+    return stdout || '';
+  } catch (error) {
+    return '';
   }
 }
 
@@ -420,6 +425,7 @@ module.exports = {
   push,
   getDiff,
   getStagedFileSize,
+  getStagedDiff,
   revert,
   resetSoft,
   commitExists,

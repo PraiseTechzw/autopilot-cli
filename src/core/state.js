@@ -14,7 +14,7 @@ class StateManager {
 
   init() {
     if (!fs.existsSync(this.stateFile)) {
-      this.reset();
+      this.setState({ status: 'stopped', running: false, paused: false });
     }
   }
 

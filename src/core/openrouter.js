@@ -109,11 +109,11 @@ async function generateCommitMessage(diff, apiKey, model = DEFAULT_MODELS[0]) {
           messages: [
             {
               role: 'system',
-              content: 'You are an expert commit message generator. Return only one concise conventional commit message, no explanation.'
+              content: 'Write a specific Conventional Commit from the diff. Use an allowed type, an optional lowercase scope, and an imperative lowercase subject of at most 72 characters. Do not invent details or use vague summaries. Add a body only when the diff supports useful detail. Return only the message, without markdown or an Autopilot prefix.'
             },
             {
               role: 'user',
-              content: `Generate a concise conventional commit message for this diff. Prefer a short summary with a conventional prefix.\n\n${diff}`
+              content: `Write the Conventional Commit header and optional useful body for this diff. Describe the actual change, use imperative mood, and avoid generic subjects such as "update files".\n\n${diff}`
             }
           ]
         })

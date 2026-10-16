@@ -329,6 +329,11 @@ class Watcher {
   }
 
   async askApproval(message) {
+      if (!process.stdin.isTTY) {
+          logger.warn('AI review is enabled but this process has no interactive terminal; no commit was created.');
+          return { approved: false };
+      }
+
       const rl = readline.createInterface({
           input: process.stdin,
           output: process.stdout
@@ -345,7 +350,10 @@ class Watcher {
                    const rlEdit = readline.createInterface({ input: process.stdin, output: process.stdout });
                    rlEdit.question('Enter new message: ', (newMessage) => {
                        rlEdit.close();
-                       resolve({ approved: true, message: newMessage });
+                       const editedMessage = newMessage.trim();
+                       resolve(editedMessage
+                         ? { approved: true, message: editedMessage }
+                         : { approved: false });
                    });
               } else {
                   resolve({ approved: false });
@@ -400,6 +408,26 @@ class Watcher {
         return;
       }
 
+      if (!statusObj.ok) {
+        logger.error(`Could not inspect repository changes: ${statusObj.raw}`);
+        return;
+      }
+
+      if (statusObj.files.some(file => file.indexStatus !== ' ' && file.indexStatus !== '?')) {
+        logger.warn('Skip commit: the Git index already contains staged changes. Commit or unstage them before Autopilot continues.');
+        return;
+      }
+
+      const filesToStage = statusObj.files.filter(file => {
+        const absolutePath = path.join(this.repoPath, file.file);
+        return !this.ignoredFilter || !this.ignoredFilter(absolutePath);
+      });
+
+      if (filesToStage.length === 0) {
+        logger.debug('No changed files remain after applying Autopilot ignore rules.');
+        return;
+      }
+
       // Update state: processing
       await this.updateStatusFile({ status: 'committing' });
 
@@ -423,15 +451,6 @@ class Watcher {
         return;
       }
 
-      // 5. Safety: Pre-commit checks (Validation)
-      logger.debug('Running pre-commit validation...');
-      const validation = await validateBeforeCommit(this.repoPath, this.config);
-      if (!validation.ok) {
-        logger.warn('Skip commit: Pre-commit validation failed:');
-        validation.errors.forEach(e => logger.error(`- ${e}`));
-        return;
-      }
-
       // 6. Safety: Custom checks (Legacy)
       if (this.config?.requireChecks) {
         const checksPassed = await this.runChecks();
@@ -441,24 +460,9 @@ class Watcher {
         }
       }
 
-      // 7. Commit
-      const nestedRepoExclusions = [];
-      const entries = await fs.readdir(this.repoPath, { withFileTypes: true });
-      for (const entry of entries) {
-        if (!entry.isDirectory()) {
-          continue;
-        }
-
-        const nestedGitPath = path.join(this.repoPath, entry.name, '.git');
-        if (await fs.pathExists(nestedGitPath)) {
-          nestedRepoExclusions.push(entry.name);
-          logger.warn(`Skipping nested Git repository: ${entry.name}`);
-        }
-      }
-
-      const addResult = nestedRepoExclusions.length > 0
-        ? await git.addAllExcept(this.repoPath, nestedRepoExclusions)
-        : await git.addAll(this.repoPath);
+      // Stage only changed paths that passed Autopilot's ignore filter.
+      const stagedPaths = filesToStage.map(file => file.file);
+      const addResult = await git.addPaths(this.repoPath, stagedPaths);
       if (!addResult.ok) {
         logger.error(`Failed to stage changes: ${addResult.stderr}`);
         return;
@@ -466,19 +470,45 @@ class Watcher {
 
       const hasStagedChanges = await git.hasStagedChanges(this.repoPath);
       if (!hasStagedChanges) {
-        logger.info('No staged changes after git add -A. Skipping commit.');
+        logger.info('No staged changes after applying Autopilot ignore rules. Skipping commit.');
         await this.updateStatusFile({ status: 'watching' });
+        return;
+      }
+
+      // Run checks against the index that will actually be committed.
+      logger.debug('Running pre-commit validation...');
+      const validation = await validateBeforeCommit(this.repoPath, this.config);
+      if (!validation.ok) {
+        logger.warn('Skip commit: pre-commit validation failed:');
+        validation.errors.forEach(error => logger.error(`- ${error}`));
+        const unstageResult = await git.unstagePaths(this.repoPath, stagedPaths);
+        if (!unstageResult.ok) {
+          logger.error(`Could not unstage Autopilot changes: ${unstageResult.stderr}`);
+        }
         return;
       }
 
       logger.info('Committing changes...');
       
-      const changedFiles = statusObj.files;
-      let message = 'update: auto-commit changes';
+      const changedFiles = filesToStage;
+      let message = 'chore: update project files';
 
       // Always use AI if enabled, otherwise fallback to rule-based (handled in generateCommitMessage)
       const diff = await git.getDiff(this.repoPath, true); // Staged diff
       message = await generateCommitMessage(changedFiles, diff, this.config);
+
+      if (this.config?.ai?.enabled && this.config?.ai?.interactive) {
+        const approval = await this.askApproval(message);
+        if (!approval.approved) {
+          const unstageResult = await git.unstagePaths(this.repoPath, stagedPaths);
+          if (!unstageResult.ok) {
+            logger.error(`Could not unstage unapproved changes: ${unstageResult.stderr}`);
+          }
+          logger.info('Commit cancelled; your working-tree changes were left untouched.');
+          return;
+        }
+        message = approval.message;
+      }
 
       // Add Trust/Attribution Trailers
       message = await addTrailers(message);
@@ -519,6 +549,10 @@ class Watcher {
         }
       } else {
         logger.error(`Commit failed: ${commitResult.stderr}`);
+        const unstageResult = await git.unstagePaths(this.repoPath, stagedPaths);
+        if (!unstageResult.ok) {
+          logger.error(`Could not unstage changes after commit failure: ${unstageResult.stderr}`);
+        }
         return;
       }
 

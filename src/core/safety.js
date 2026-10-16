@@ -1,5 +1,3 @@
-const fs = require('fs-extra');
-const path = require('path');
 const execa = require('execa');
 const logger = require('../utils/logger');
 const git = require('./git');
@@ -89,25 +87,24 @@ const validateBeforeCommit = async (repoPath, config) => {
   }
 
   try {
-    // Get staged files
+    // Check staged Git objects, not the possibly newer working-tree contents.
     const statusObj = await git.getPorcelainStatus(repoPath);
-    // Filter only modified/added files (ignore deleted)
-    const stagedFiles = statusObj.files.filter(f => f.status !== 'D' && f.status !== ' D');
+    if (!statusObj.ok) {
+      return { ok: false, errors: [`Could not inspect staged files: ${statusObj.raw}`] };
+    }
+    const stagedFiles = statusObj.files
+      .filter(file => file.indexStatus !== ' ' && file.indexStatus !== '?' && file.indexStatus !== 'D')
+      .map(file => file.file);
     
     // 1. File Size Check
     if (config.preCommitChecks.fileSize) {
       for (const file of stagedFiles) {
-        try {
-          const filePath = path.join(repoPath, file.file);
-          if (fs.existsSync(filePath)) {
-            const stats = await fs.stat(filePath);
-            const sizeMb = stats.size / (1024 * 1024);
-            if (sizeMb > MAX_FILE_SIZE_MB) {
-              errors.push(`File ${file.file} is too large (${sizeMb.toFixed(2)}MB > ${MAX_FILE_SIZE_MB}MB)`);
-            }
+        const size = await git.getStagedFileSize(repoPath, file);
+        if (size !== null) {
+          const sizeMb = size / (1024 * 1024);
+          if (sizeMb > MAX_FILE_SIZE_MB) {
+            errors.push(`File ${file} is too large (${sizeMb.toFixed(2)}MB > ${MAX_FILE_SIZE_MB}MB)`);
           }
-        } catch (err) {
-          // Ignore missing files
         }
       }
     }
@@ -115,23 +112,9 @@ const validateBeforeCommit = async (repoPath, config) => {
     // 2. Secret Detection
     if (config.preCommitChecks.secrets) {
       for (const file of stagedFiles) {
-        try {
-          const filePath = path.join(repoPath, file.file);
-          const stats = await fs.stat(filePath);
-          if (stats.isFile()) {
-            const buffer = Buffer.alloc(1024 * 1024);
-            const fd = await fs.open(filePath, 'r');
-            const { bytesRead } = await fs.read(fd, buffer, 0, buffer.length, 0);
-            await fs.close(fd);
-            
-            const content = buffer.toString('utf8', 0, bytesRead);
-            
-            for (const finding of findSecretFindings(content)) {
-              errors.push(`Possible ${finding} detected in ${file.file}`);
-            }
-          }
-        } catch (err) {
-           logger.debug(`Could not read ${file.file} for secret scan: ${err.message}`);
+        const stagedDiff = await git.getStagedDiff(repoPath, file);
+        for (const finding of findSecretFindings(stagedDiff)) {
+          errors.push(`Possible ${finding} detected in ${file}`);
         }
       }
     }

@@ -17,7 +17,7 @@ const DEFAULT_MODEL = 'gemini-2.5-flash';
  */
 async function generateAICommitMessage(diff, apiKey, model = DEFAULT_MODEL) {
   if (!diff || !diff.trim()) {
-    return 'chore: update changes';
+    return 'chore: update project files';
   }
 
   // Truncate diff if it's too large (Gemini has token limits, though high)
@@ -29,12 +29,13 @@ You are an expert software engineer.
 Generate a concise, standardized commit message following the Conventional Commits specification based on the provided git diff.
 
 Rules:
-1. Format: <type>(<scope>): <subject>
-2. Keep the subject line under 72 characters.
-3. If there are multiple changes, use a bulleted body.
-4. Detect breaking changes and add "BREAKING CHANGE:" footer if necessary.
-5. Use types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert.
-6. Return ONLY the commit message, no explanations or markdown code blocks.
+1. Format: <type>[optional-scope][!]: <subject>
+2. Use an imperative, lowercase subject line no longer than 72 characters.
+3. Describe only changes supported by the diff; avoid vague subjects and invented claims.
+4. Add a body only when it conveys useful details supported by the diff.
+5. Detect breaking changes and add a "BREAKING CHANGE:" footer only when the diff proves one.
+6. Use types: feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert.
+7. Return ONLY the message, no explanations, markdown, or Autopilot prefix.
 
 Diff:
 ${truncatedDiff}

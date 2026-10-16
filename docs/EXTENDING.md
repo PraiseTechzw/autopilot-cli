@@ -24,7 +24,7 @@ If any command fails, the commit and push are skipped.
 ## 2. Commit Message Modes
 
 - `smart` uses file-based conventional commit messages
-- `simple` uses `chore: update changes`
+- `simple` uses local diff analysis to produce a concise Conventional Commit message
 
 ```json
 {

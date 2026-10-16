@@ -116,6 +116,7 @@ async function status(options = {}) {
   } catch (err) {
     if (isJson) {
       console.log(JSON.stringify({ running: false, error: err.message }, null, 2));
+      process.exitCode = EXIT_CODES.GENERAL_ERROR;
     } else {
       console.log(`  Error:          Could not read state: ${err.message}`);
     }

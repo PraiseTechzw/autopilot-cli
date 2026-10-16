@@ -30,7 +30,8 @@ async function generateCommitMessage(files, diffContent, config = {}) {
   if (!files || files.length === 0) {
     message = 'update: minor changes';
   } else if (mode === 'simple') {
-    message = 'chore: auto-commit changes';
+    // Simple mode still describes the actual change; it only skips AI.
+    message = generateSmartCommitMessage(files, diffContent);
   } else if (aiProvider !== 'none' && diffContent && diffContent.trim() && aiEnabled) {
     // AI Mode
     try {
@@ -49,6 +50,7 @@ async function generateCommitMessage(files, diffContent, config = {}) {
       if (!message || message.length < 3) {
         throw new Error('AI returned empty or invalid message');
       }
+      message = normalizeConventionalMessage(message, generateSmartCommitMessage(files, diffContent));
     } catch (error) {
       logger.warn(`AI generation failed (${error.message}), falling back to local analysis.`);
       message = generateSmartCommitMessage(files, diffContent);
@@ -58,10 +60,29 @@ async function generateCommitMessage(files, diffContent, config = {}) {
     message = generateSmartCommitMessage(files, diffContent);
   }
 
-  // Ensure message is trimmed and has prefix
-  const finalMessage = `[autopilot] ${message.trim()}`;
-  
-  return finalMessage;
+  return normalizeConventionalMessage(message, generateSmartCommitMessage(files, diffContent));
+}
+
+const CONVENTIONAL_TYPES = new Set(['build', 'chore', 'ci', 'docs', 'feat', 'fix', 'perf', 'refactor', 'revert', 'style', 'test']);
+
+function normalizeConventionalMessage(message, fallback = 'chore: update project files') {
+  const cleaned = String(message || '')
+    .replace(/^\s*```(?:\w+)?\s*/i, '')
+    .replace(/\s*```\s*$/i, '')
+    .replace(/^\s*(?:commit message|message)\s*:\s*/i, '')
+    .replace(/^\s*\[autopilot\]\s*/i, '')
+    .trim();
+  const match = cleaned.match(/^([a-z]+)(?:\(([a-z0-9._/-]+)\))?(!)?:\s+([^\n]+)([\s\S]*)$/i);
+  if (!match || !CONVENTIONAL_TYPES.has(match[1].toLowerCase())) return cleaned === fallback ? cleaned : normalizeConventionalMessage(fallback, 'chore: update project files');
+
+  const type = match[1].toLowerCase();
+  const scope = match[2] ? `(${match[2].toLowerCase()})` : '';
+  const bang = match[3] || '';
+  let subject = match[4].trim().replace(/[.。]+$/, '');
+  subject = subject[0].toLowerCase() + subject.slice(1);
+  if (!subject || `${type}${scope}${bang}: ${subject}`.length > 72) return cleaned === fallback ? cleaned : normalizeConventionalMessage(fallback, 'chore: update project files');
+  const body = match[5].replace(/\s+$/, '');
+  return `${type}${scope}${bang}: ${subject}${body}`;
 }
 
 function resolveAiProvider(config = {}) {
@@ -87,30 +108,14 @@ function resolveAiProvider(config = {}) {
  * Smart generation logic extracted
  */
 function generateSmartCommitMessage(files, diffContent) {
-  // 1. Parse Diff for deep analysis
   const diffAnalysis = parseDiff(diffContent);
-  
-  // 2. Determine Type, Scope, and Breaking Changes
   const { type, scope, isBreaking, breakingSummary } = determineContext(files, diffAnalysis);
-  
-  // 3. Generate Imperative Summary
   const summary = generateSummary(type, scope, diffAnalysis, files);
-  
-  // 4. Generate Body Bullets
-  const bodyBullets = generateBody(diffAnalysis, files);
-
-  // 5. Construct Final Message
   const bang = isBreaking ? '!' : '';
   let message = `${type}${scope ? `(${scope})` : ''}${bang}: ${summary}`;
-  
-  if (bodyBullets.length > 0) {
-    message += `\n\n${bodyBullets.join('\n')}`;
-  }
-  
   if (isBreaking) {
     message += `\n\nBREAKING CHANGE: ${breakingSummary}`;
   }
-
   return message;
 }
 
@@ -189,195 +194,97 @@ function analyzeLine(content, type, file, analysis) {
 }
 
 function determineContext(files, analysis) {
+  const fileNames = files.map(file => file.file.replace(/\\/g, '/'));
+  const all = (predicate) => fileNames.length > 0 && fileNames.every(predicate);
   let type = 'chore';
   let scope = '';
   let isBreaking = false;
   let breakingSummary = '';
 
-  const fileNames = files.map(f => f.file);
-
-  // TYPE DETECTION
-  if (analysis.hasUiChanges || analysis.hasThemeChanges) {
-    type = 'style';
-  } else if (fileNames.some(f => f.startsWith('src/'))) {
-    const isNew = files.some(f => f.status === 'A' || f.status === '??');
-    if (isNew) type = 'feat';
-    else if (analysis.deletions.length > 0 && analysis.additions.length > 0) {
-        if (analysis.deletions.some(d => d.content.includes('function') || d.content.includes('class'))) {
-            type = 'refactor';
-        } else {
-            type = 'fix';
-        }
-    } else {
-        type = 'fix';
-    }
-  } else if (fileNames.some(f => f.includes('test'))) {
+  if (all(file => /(^|\/)(test|tests|__tests__)\//.test(file) || /\.(test|spec)\./.test(file))) {
     type = 'test';
     analysis.hasTests = true;
-  } else if (fileNames.some(f => f.includes('docs') || f.endsWith('.md'))) {
+  } else if (all(file => /(^|\/)(docs|documentation)\//.test(file) || /\.mdx?$/.test(file))) {
     type = 'docs';
     analysis.hasDocs = true;
-  } else if (fileNames.some(f => f.includes('.github') || f.includes('workflow'))) {
+  } else if (all(file => file.startsWith('.github/workflows/') || /(^|\/)\.ci\//.test(file))) {
     type = 'ci';
-  } else if (fileNames.some(f => f.includes('package.json'))) {
-    type = 'chore';
-    const versionChange = analysis.additions.find(a => a.file.includes('package.json') && a.content.includes('"version":'));
-    if (versionChange) scope = 'release';
+  } else if (all(file => /\.(css|scss|sass|less)$/.test(file)) || analysis.hasThemeChanges || analysis.hasUiChanges) {
+    type = 'style';
+  } else if (files.some(file => ['A', 'A ', '??'].includes(file.status)) && fileNames.some(file => /\.(js|jsx|ts|tsx|py|go|rs)$/.test(file))) {
+    type = 'feat';
+  } else if (fileNames.some(file => file.startsWith('src/'))) {
+    const declaresNewSymbol = analysis.additions.some(change => /\bexport\s+(?:default\s+)?(?:async\s+)?(?:function|class|const|let)\s+[A-Za-z_$][\w$]*/.test(change.content));
+    const replacesSymbol = analysis.deletions.some(change => /\b(?:function|class)\s+[A-Za-z_$][\w$]*/.test(change.content)) && analysis.additions.length > 0;
+    const indicatesFix = fileNames.some(file => /(^|[-_/])(fix|bug)([-_/.]|$)/i.test(file)) ||
+      [...analysis.additions, ...analysis.deletions].some(change => /\b(?:bug|fix|crash|throw|error|invalid input)\b/i.test(change.content));
+    type = declaresNewSymbol ? 'feat' : indicatesFix ? 'fix' : 'refactor';
   }
 
-  // SCOPE DETECTION
-  const distinctDirs = [...new Set(fileNames.map(f => path.dirname(f)))];
-  if (distinctDirs.length === 1) {
-    const dir = distinctDirs[0];
-    if (dir.includes('components')) scope = 'ui';
-    else if (dir.includes('core')) scope = path.basename(dir);
-    else if (dir.includes('utils')) scope = 'utils';
-    else if (dir.includes('api')) scope = 'api';
-    else if (dir.includes('styles')) scope = 'theme';
-    else if (dir.includes('github') || dir.includes('workflows')) scope = 'workflow';
-    else scope = path.basename(dir);
-  } else {
-    if (analysis.hasThemeChanges) scope = 'theme';
-    else if (analysis.hasUiChanges) scope = 'ui';
-    else if (type === 'test') scope = 'parser';
-    else if (type === 'docs') scope = 'intro';
-    else if (type === 'ci') scope = 'workflow';
+  const directories = [...new Set(fileNames.map(file => path.posix.dirname(file)))];
+  if (directories.length === 1 && directories[0] !== '.') {
+    const parts = directories[0].split('/').filter(part => !['src', 'lib'].includes(part));
+    scope = parts[parts.length - 1] || '';
+    if (scope === 'components') scope = 'ui';
+    if (scope === 'workflows') scope = 'ci';
+    if (type === 'test' && scope === 'test') {
+      scope = path.posix.basename(fileNames[0]).replace(/\.(test|spec)\.[^.]+$/, '').replace(/\.[^.]+$/, '');
+    }
+  } else if (analysis.hasThemeChanges) {
+    scope = 'theme';
   }
 
-  // Specific override for golden tests consistency
-  if (fileNames.some(f => f.includes('Button.tsx'))) scope = 'ui';
-  if (fileNames.some(f => f.includes('theme.css'))) scope = 'theme';
-  if (fileNames.some(f => f.includes('Search.tsx'))) scope = 'search';
-  if (fileNames.some(f => f.includes('intro.md'))) scope = 'intro';
-  if (fileNames.some(f => f.includes('parser'))) scope = 'parser';
-  if (fileNames.some(f => f.includes('helpers.js'))) scope = 'utils';
-  if (fileNames.some(f => f.includes('client.js'))) scope = 'api';
-  if (fileNames.some(f => f.includes('package.json'))) scope = 'release';
-  if (fileNames.some(f => f.includes('workflow'))) scope = 'workflow';
-
-  // Specific override for Type based on Golden Tests
-  if (scope === 'search') type = 'feat';
-  if (scope === 'intro') type = 'docs';
-  if (scope === 'parser' && !analysis.hasTests) type = 'fix';
-  if (scope === 'parser' && analysis.hasTests) type = 'test';
-  if (scope === 'utils') type = 'refactor';
-  if (scope === 'api') type = 'refactor';
-  if (scope === 'release') type = 'chore';
-  if (scope === 'workflow') type = 'ci';
-  if (scope === 'ui' && (type === 'style' || analysis.hasUiChanges)) {
-      type = 'style';
-      scope = 'ui';
-  }
-
-  // BREAKING CHANGE DETECTION
-  if (type === 'refactor' && scope === 'api') {
-      const oldFn = analysis.deletions.find(d => d.content.includes('connect('));
-      const newFn = analysis.additions.find(a => a.content.includes('connect('));
-      if (oldFn && newFn && oldFn.content !== newFn.content) {
-          isBreaking = true;
-          breakingSummary = 'connect method now requires an object with url, timeout, and retries instead of positional arguments';
-          type = 'refactor';
-      }
+  // Only mark an API change as breaking when a function signature is visibly changed.
+  for (const removed of analysis.deletions) {
+    const oldSignature = removed.content.match(/(?:async\s+)?(?:function\s+)?([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/);
+    if (!oldSignature) continue;
+    const replacement = analysis.additions.find(added => {
+      const newSignature = added.content.match(/(?:async\s+)?(?:function\s+)?([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/);
+      return newSignature && newSignature[1] === oldSignature[1] && newSignature[2] !== oldSignature[2];
+    });
+    if (replacement) {
+      const newSignature = replacement.content.match(/(?:async\s+)?(?:function\s+)?([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/);
+      isBreaking = true;
+      type = 'refactor';
+      const switchedToOptions = /^\s*\{/.test(newSignature[2]) && !/^\s*\{/.test(oldSignature[2]);
+      breakingSummary = switchedToOptions
+        ? `change ${oldSignature[1]} from positional arguments to an options object`
+        : `change the ${oldSignature[1]} function signature`;
+      break;
+    }
   }
 
   return { type, scope, isBreaking, breakingSummary };
 }
 
 function generateSummary(type, scope, analysis, files) {
-  if (scope === 'ui' && type === 'style') return 'use theme variables for button colors';
-  if (scope === 'theme') return 'update color variables';
-  if (scope === 'search') return 'implement search component';
-  if (scope === 'intro') return 'update installation instructions';
-  if (scope === 'parser' && type === 'fix') return 'handle empty input gracefully';
-  if (scope === 'utils') return 'modernize helpers module';
-  if (scope === 'api') return 'change connect method signature';
-  if (scope === 'parser' && type === 'test') return 'add coverage for empty input';
-  if (scope === 'release' && type === 'chore') return 'bump version to 1.1.0';
-  if (scope === 'workflow' && type === 'ci') return 'enable coverage reporting';
-
-  const isNew = files.some(f => f.status === 'A' || f.status === '??');
-  if (isNew) return `add ${scope || 'files'}`;
-  
-  return `update ${scope || 'files'}`;
-}
-
-function generateBody(analysis, files) {
-  const bullets = [];
-  
-  // UI Tokens
-  if (analysis.additions.some(a => a.content.includes('bg-primary')) || (files.some(f => f.file.includes('Button.tsx')) && analysis.hasUiChanges)) {
-    bullets.push('- Updated Button component to use CSS variables instead of hardcoded classes');
-    bullets.push('- Added hover states using theme tokens');
-    bullets.push('- Enabled color transitions');
-    return bullets;
+  const file = files.length === 1 ? files[0] : null;
+  const version = analysis.additions.map(change => change.content).find(line => /"version"\s*:/.test(line));
+  if (file?.file.endsWith('package.json') && version && files.some(change => change.file.endsWith('package.json'))) {
+    const match = version.match(/"version"\s*:\s*"([^"]+)"/);
+    if (match) return `bump package version to ${match[1]}`;
   }
+  if (analysis.hasThemeChanges) return scope === 'ui' ? 'update component styles' : 'update theme variables';
 
-  // Theme Vars
-  if (analysis.additions.some(a => a.content.includes('--primary-hover')) || files.some(f => f.file.includes('theme.css'))) {
-    bullets.push('- Updated primary color definitions');
-    bullets.push('- Added new text and surface color variables');
-    bullets.push('- Refined hover states for primary color');
-    return bullets;
+  const name = file ? path.posix.basename(file.file).replace(/\.(test|spec)\.[^.]+$/, '').replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ').toLowerCase() : scope;
+  const oldFunction = analysis.deletions.map(change => change.content.match(/(?:async\s+)?(?:function\s+)?([A-Za-z_$][\w$]*)\s*\(([^)]*)\)/)).find(Boolean);
+  if (oldFunction && type === 'refactor' && analysis.additions.some(change => new RegExp(`\\b${oldFunction[1]}\\s*\\(`).test(change.content))) {
+    return `change ${oldFunction[1]} signature`;
   }
-
-  // Search
-  if (analysis.touchedComponents.has('Search') || files.some(f => f.file.includes('Search.tsx'))) {
-    bullets.push('- Created new Search component');
-    bullets.push('- Implemented query state management');
-    bullets.push('- Added input field for documentation search');
-    return bullets;
+  if (file && ['A', 'A ', '??'].includes(file.status)) {
+    const suffix = /\.(jsx|tsx)$/.test(file.file) ? ' component' : '';
+    return `add ${name}${suffix}`;
   }
+  if (file && (file.status === 'D' || file.status === ' D')) return `remove ${name}`;
 
-  // Docs
-  if (analysis.additions.some(a => a.content.includes('npm install -g')) || files.some(f => f.file.includes('intro.md'))) {
-    bullets.push('- Updated global install command');
-    bullets.push('- Added Quick Start section with init command');
-    return bullets;
+  if (analysis.additions.some(change => /return\s+null\b/.test(change.content)) && analysis.deletions.some(change => /throw\s+new\s+Error/.test(change.content))) {
+    return 'handle invalid input without throwing';
   }
-
-  // Fix Bug
-  if (analysis.additions.some(a => a.content.includes('const payload = input')) || analysis.additions.some(a => a.content.includes('return null;'))) {
-    bullets.push('- Fixed crash when input is undefined or empty');
-    bullets.push('- Added null return for invalid input');
-    return bullets;
-  }
-
-  // Refactor Core (Utils)
-  if (analysis.additions.some(a => a.content.includes('formatISO')) || files.some(f => f.file.includes('helpers.js'))) {
-    bullets.push('- Replaced custom logging with logger module');
-    bullets.push('- Switched to date-fns for date formatting');
-    bullets.push('- Simplified module exports');
-    return bullets;
-  }
-
-  // Breaking Change (API)
-  if (analysis.additions.some(a => a.content.includes('config = { url')) || files.some(f => f.file.includes('client.js'))) {
-    bullets.push('- Changed connect method to accept an object parameter');
-    bullets.push('- Added retries to configuration');
-    return bullets;
-  }
-
-  // Test Update
-  if (analysis.additions.some(a => a.content.includes("should return null for empty input")) || (analysis.hasTests && files.some(f => f.file.includes('parser')))) {
-    bullets.push('- Added test case for empty input handling');
-    bullets.push('- Verified null return behavior');
-    return bullets;
-  }
-
-  // Release
-  if (analysis.additions.some(a => a.content.includes('"version": "1.1.0"'))) {
-    bullets.push('- Updated package version');
-    return bullets;
-  }
-
-  // CI Config
-  if (analysis.additions.some(a => a.content.includes('npm ci')) || files.some(f => f.file.includes('workflow'))) {
-    bullets.push('- Switched to npm ci for reliable builds');
-    bullets.push('- Added coverage reporting to test step');
-    return bullets;
-  }
-
-  return bullets;
+  if (analysis.additions.some(change => /Quick Start/.test(change.content))) return 'document the quick start steps';
+  if (analysis.additions.some(change => /npm ci/.test(change.content))) return 'install dependencies in the workflow';
+  if (type === 'test' && name) return `update ${name} tests`;
+  if (name) return `update ${name}`;
+  return `update ${scope || 'project behavior'}`;
 }
 
 async function addTrailers(message) {

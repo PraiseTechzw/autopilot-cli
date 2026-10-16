@@ -13,13 +13,13 @@ describe('Commit Message Generator', () => {
       { status: 'A', file: 'src/commands/start.js' }
     ];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^\[autopilot\] feat(\(.*\))?: /);
+    assert.match(msg, /^feat(\(.*\))?: /);
   });
 
   it('should generate a fix: message for bug fixes', async () => {
     const files = [{ status: 'M', file: 'src/fix-bug.js' }];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^\[autopilot\] fix(\(.*\))?: /);
+    assert.match(msg, /^fix(\(.*\))?: /);
   });
 
   it('should generate a docs: message for documentation changes', async () => {
@@ -28,7 +28,7 @@ describe('Commit Message Generator', () => {
       { status: 'A', file: 'docs/api.md' }
     ];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^\[autopilot\] docs(\(.*\))?: /);
+    assert.match(msg, /^docs(\(.*\))?: /);
   });
 
   it('should generate a chore: message for config files', async () => {
@@ -37,7 +37,7 @@ describe('Commit Message Generator', () => {
       { status: 'M', file: '.gitignore' }
     ];
     const msg = await generateCommitMessage(files);
-    assert.match(msg, /^\[autopilot\] chore(\(.*\))?: /);
+    assert.match(msg, /^chore(\(.*\))?: /);
   });
 
   it('should handle mixed file types with priority', async () => {
@@ -47,7 +47,7 @@ describe('Commit Message Generator', () => {
     ];
     const msg = await generateCommitMessage(files);
     // Source code usually takes precedence
-    assert.match(msg, /^\[autopilot\] (feat|fix|refactor|update)(\(.*\))?: /);
+    assert.match(msg, /^(feat|fix|refactor|chore)(\(.*\))?: /);
   });
 
   it('should use OpenRouter when configured for AI commit generation', async () => {
@@ -62,7 +62,7 @@ describe('Commit Message Generator', () => {
       }
     });
 
-    assert.strictEqual(msg, '[autopilot] feat: add openrouter support');
+    assert.strictEqual(msg, 'feat: add openrouter support');
   });
 
   it('should use OpenRouter by default when AI is enabled and a key is available', async () => {
@@ -92,7 +92,7 @@ describe('Commit Message Generator', () => {
         }
       });
 
-      assert.strictEqual(msg, '[autopilot] feat: use openrouter by default');
+      assert.strictEqual(msg, 'feat: use openrouter by default');
       assert.strictEqual(fetchCalled, true);
     } finally {
       global.fetch = originalFetch;

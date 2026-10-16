@@ -78,11 +78,15 @@ async function doctor(options = {}) {
   }
 
   // 5. AI API key present
-  const openrouterKey = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || (config && config.ai && config.ai.apiKey);
-  const aiProvider = (config && config.ai && config.ai.provider) || 'openrouter';
-  const aiEnabled = (config && config.ai && config.ai.enabled) !== false;
-
-  const hasKey = aiProvider === 'openrouter' ? !!openrouterKey : !aiEnabled;
+  const aiProvider = (config && (config.ai?.provider || config.aiProvider)) || 'openrouter';
+  const aiEnabled = config ? (config.ai?.enabled ?? config.commitMessageMode !== 'template') : false;
+  const providerKey = {
+    openrouter: process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY || config?.ai?.apiKey || config?.aiApiKey,
+    grok: process.env.GROK_API_KEY || config?.ai?.grokApiKey,
+    gemini: process.env.GEMINI_API_KEY || config?.ai?.geminiApiKey,
+    none: true
+  }[aiProvider];
+  const hasKey = !!providerKey;
 
   if (config) {
     if (!aiEnabled) {
@@ -90,7 +94,7 @@ async function doctor(options = {}) {
     } else if (!hasKey) {
       addDiag('AI Configuration', false, `API key missing for provider: ${aiProvider}`);
     } else {
-      addDiag('AI Configuration', true, `API key present for provider: ${aiProvider}`);
+      addDiag('AI Configuration', true, aiProvider === 'none' ? 'AI disabled' : `API key present for provider: ${aiProvider}`);
     }
   }
 
@@ -141,7 +145,10 @@ async function doctor(options = {}) {
            alive = true;
          } catch(e) {}
        }
-       addDiag('Watcher consistency', true, alive ? 'Running' : 'Stopped');
+       const statePid = state.watcherPid || state.pid;
+       const activeByState = state.status === 'running' || state.status === 'watching' || state.status === 'committing' || state.status === 'pushing';
+       const inconsistent = activeByState && !alive && !!statePid;
+       addDiag('Watcher consistency', !inconsistent, inconsistent ? 'State says running but watcher PID is not alive' : (alive ? 'Running' : 'Stopped'));
     } catch (err) {
       addDiag('Watcher consistency', false, 'State file corrupted');
     }
@@ -151,7 +158,7 @@ async function doctor(options = {}) {
     console.log(JSON.stringify({ 
       health: issues === 0 ? 'good' : 'poor', 
       issuesCount: issues, 
-      diagnostics 
+      diagnostics
     }, null, 2));
     // Exit non-zero only for JSON consumers who need machine-readable failure
     if (issues > 0) process.exit(EXIT_CODES.GENERAL_ERROR);

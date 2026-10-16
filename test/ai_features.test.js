@@ -107,7 +107,7 @@ describe('AI Features Integration', () => {
       mock.method(grok, 'generateGrokCommitMessage', async () => 'feat: grok message');
 
       const msg = await commit.generateCommitMessage([{ status: 'M', file: 'test.js' }], 'diff', config);
-      assert.strictEqual(msg, '[autopilot] feat: gemini message');
+      assert.strictEqual(msg, 'feat: gemini message');
     });
 
     it('should use Grok when provider is grok', async () => {
@@ -126,7 +126,7 @@ describe('AI Features Integration', () => {
       mock.method(grok, 'generateGrokCommitMessage', async () => 'feat: grok message');
 
       const msg = await commit.generateCommitMessage([{ status: 'M', file: 'test.js' }], 'diff', config);
-      assert.strictEqual(msg, '[autopilot] feat: grok message');
+      assert.strictEqual(msg, 'feat: grok message');
     });
 
     it('should default to OpenRouter if provider is missing', async () => {
@@ -141,7 +141,7 @@ describe('AI Features Integration', () => {
       mock.method(openrouter, 'generateCommitMessage', async () => 'feat: default openrouter');
 
       const msg = await commit.generateCommitMessage([{ status: 'M', file: 'test.js' }], 'diff', config);
-      assert.strictEqual(msg, '[autopilot] feat: default openrouter');
+      assert.strictEqual(msg, 'feat: default openrouter');
     });
 
 
@@ -166,10 +166,10 @@ describe('AI Features Integration', () => {
       // Let's verify it returns a message that DOES NOT start with 'feat: gemini' but follows smart logic.
       
       const msg = await commit.generateCommitMessage([{ status: 'M', file: 'test.js' }], 'diff', config);
-      // Smart commit message logic: "chore: update changes" or analyzed one.
+      // Smart fallback should still produce a Conventional Commit header.
       // With 'diff' string as just 'diff', parseDiff might fail or return empty.
       // Let's provide a valid diff to ensure smart logic works or just check it's not empty.
-      assert.ok(msg.startsWith('[autopilot]'));
+      assert.match(msg, /^(?:build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?:\([a-z0-9._/-]+\))?!?: /);
       assert.doesNotMatch(msg, /gemini message/);
     });
   });
