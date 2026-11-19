@@ -1,0 +1,38 @@
+{
+  "name": "@traisetech/autopilot-v5",
+  "version": "5.0.0-alpha.0",
+  "private": true,
+  "description": "Autopilot 5.0 rebuild: safe, local-first Git automation.",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "bin": {
+    "autopilot-v5": "./dist/src/cli.js"
+  },
+  "main": "./dist/src/index.js",
+  "exports": {
+    ".": "./dist/src/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "clean": "node scripts/clean.mjs",
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run clean && npm run build && node --test \"dist/test/*.test.js\"",
+    "dev": "npm run build && node dist/src/cli.js"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "typescript": "^5.9.3"
+  }
+}
